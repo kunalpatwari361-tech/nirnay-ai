@@ -37,6 +37,7 @@ class AppState extends ChangeNotifier {
   Uint8List? selfie;
   SelfieResult? selfieResult;
   final documents = <DocSlot, DocResult>{};
+  DigiLockerShare? digiLocker; // PAN and e-Aadhaar shared from the documents step
   Decision? inPrinciple;
   Decision? finalDecision;
   PropertyInput? property;
@@ -115,6 +116,7 @@ class AppState extends ChangeNotifier {
     selfie = null;
     selfieResult = null;
     documents.clear();
+    digiLocker = null;
     inPrinciple = null;
     finalDecision = null;
     property = null;
@@ -175,7 +177,7 @@ class AppState extends ChangeNotifier {
   LoanRequest get request => LoanRequest(product: product, amount: loanAmount, years: years, propertyValue: propertyValue);
 
   /// Income documents asked for, by type of work. Bank statements come through the Account Aggregator.
-  List<DocSlot> get requiredDocs => profile?.requiredDocuments ?? (profile?.employment == Employment.selfEmployed
+  List<DocSlot> get requiredDocs => digiLocker?.requiredDocuments ?? profile?.requiredDocuments ?? (profile?.employment == Employment.selfEmployed
       ? [DocSlot.pan, DocSlot.aadhaar, DocSlot.itr, DocSlot.gst]
       : [DocSlot.pan, DocSlot.aadhaar, DocSlot.salarySlip, DocSlot.form16]);
 
@@ -220,6 +222,7 @@ class AppState extends ChangeNotifier {
     selfie = null;
     selfieResult = null;
     documents.clear();
+    digiLocker = null;
     inPrinciple = null;
     finalDecision = null;
     property = null;

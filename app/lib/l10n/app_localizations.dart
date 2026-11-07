@@ -1706,12 +1706,6 @@ abstract class AppLocalizations {
   /// **'Business'**
   String get fieldBusiness;
 
-  /// No description provided for @fieldGstin.
-  ///
-  /// In en, this message translates to:
-  /// **'GSTIN'**
-  String get fieldGstin;
-
   /// No description provided for @consentSectionRequired.
   ///
   /// In en, this message translates to:
@@ -2239,6 +2233,264 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Too many codes asked for. Please wait 15 minutes and try again.'**
   String get otpTooManySends;
+
+  /// No description provided for @dlTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get your details from DigiLocker'**
+  String get dlTitle;
+
+  /// No description provided for @dlBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name, date of birth, PAN and Aadhaar come straight from DigiLocker, so you don\'t type them or upload the cards.'**
+  String get dlBody;
+
+  /// No description provided for @dlOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open DigiLocker'**
+  String get dlOpen;
+
+  /// No description provided for @dlWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish in DigiLocker, then come back here.'**
+  String get dlWaiting;
+
+  /// No description provided for @dlCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get dlCheck;
+
+  /// No description provided for @dlDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Received from DigiLocker'**
+  String get dlDone;
+
+  /// No description provided for @dlDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing was shared from DigiLocker. Try again, or type your details below.'**
+  String get dlDenied;
+
+  /// No description provided for @dlFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t get your details from DigiLocker. Try again in a minute, or type them below.'**
+  String get dlFailed;
+
+  /// No description provided for @bureauAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t need to enter a credit score. We get your credit report from the credit bureau using your PAN.'**
+  String get bureauAuto;
+
+  /// No description provided for @bureauFetched.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit report fetched from the credit bureau'**
+  String get bureauFetched;
+
+  /// No description provided for @bureauLater.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll get your credit report from the credit bureau before the decision.'**
+  String get bureauLater;
+
+  /// No description provided for @fillWorkDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill in your work, employer and income.'**
+  String get fillWorkDetails;
+
+  /// No description provided for @liveSelfieStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start live selfie'**
+  String get liveSelfieStart;
+
+  /// No description provided for @liveSelfieBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a live check, not a photo. Keep your face inside the oval and follow the prompts. It takes about 8 seconds.'**
+  String get liveSelfieBody;
+
+  /// No description provided for @liveLookStraight.
+  ///
+  /// In en, this message translates to:
+  /// **'Look straight at the camera'**
+  String get liveLookStraight;
+
+  /// No description provided for @liveTurnLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Slowly turn your head to your left'**
+  String get liveTurnLeft;
+
+  /// No description provided for @liveTurnRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Slowly turn your head to your right'**
+  String get liveTurnRight;
+
+  /// No description provided for @liveChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking it\'s really you…'**
+  String get liveChecking;
+
+  /// No description provided for @checkHeadTurn.
+  ///
+  /// In en, this message translates to:
+  /// **'Head turn followed'**
+  String get checkHeadTurn;
+
+  /// No description provided for @cameraUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t open the front camera. Allow camera access for Nirnay in your phone\'s settings, then try again.'**
+  String get cameraUnavailable;
+
+  /// No description provided for @docsDlTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get your PAN and e-Aadhaar from DigiLocker'**
+  String get docsDlTitle;
+
+  /// No description provided for @docsDlBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No photos of the cards: sign in to DigiLocker and allow sharing. Your PAN and e-Aadhaar come straight from the government\'s records.'**
+  String get docsDlBody;
+
+  /// No description provided for @docsDlDone.
+  ///
+  /// In en, this message translates to:
+  /// **'PAN and e-Aadhaar received from DigiLocker'**
+  String get docsDlDone;
+
+  /// No description provided for @docsDlRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing came from DigiLocker. Try again, or photograph the cards below.'**
+  String get docsDlRetry;
+
+  /// No description provided for @dlPanMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The PAN in your DigiLocker isn\'t the one you entered, so it wasn\'t used. Photograph your PAN card below.'**
+  String get dlPanMismatch;
+
+  /// No description provided for @docVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified: {type}'**
+  String docVerified(String type);
+
+  /// No description provided for @docFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'This document didn\'t pass verification'**
+  String get docFailed;
+
+  /// No description provided for @docFailedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'An application with a document that fails verification is rejected. You can ask a person to review the decision.'**
+  String get docFailedBody;
+
+  /// No description provided for @verifyScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Score {score}/100'**
+  String verifyScore(String score);
+
+  /// No description provided for @checkName.
+  ///
+  /// In en, this message translates to:
+  /// **'The name matches your details'**
+  String get checkName;
+
+  /// No description provided for @checkPan.
+  ///
+  /// In en, this message translates to:
+  /// **'The PAN matches the one you entered'**
+  String get checkPan;
+
+  /// No description provided for @seeDecision.
+  ///
+  /// In en, this message translates to:
+  /// **'See the decision'**
+  String get seeDecision;
+
+  /// No description provided for @yourScores.
+  ///
+  /// In en, this message translates to:
+  /// **'Your scores'**
+  String get yourScores;
+
+  /// No description provided for @creditNotPulled.
+  ///
+  /// In en, this message translates to:
+  /// **'Not pulled yet: an officer pulls your credit report'**
+  String get creditNotPulled;
+
+  /// No description provided for @creditNoHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'The bureau has no credit history for you'**
+  String get creditNoHistory;
+
+  /// No description provided for @verificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification score'**
+  String get verificationTitle;
+
+  /// No description provided for @verificationFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Your lowest document score, out of 100'**
+  String get verificationFrom;
+
+  /// No description provided for @reasonDoc05.
+  ///
+  /// In en, this message translates to:
+  /// **'One of your documents didn\'t pass our verification checks.'**
+  String get reasonDoc05;
+
+  /// No description provided for @cardAsked.
+  ///
+  /// In en, this message translates to:
+  /// **'You asked for'**
+  String get cardAsked;
+
+  /// No description provided for @cardSanctionedAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sanctioned amount'**
+  String get cardSanctionedAmount;
+
+  /// No description provided for @cardSanctionLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Your sanctioned amount, rate and EMI show here once your loan is approved.'**
+  String get cardSanctionLater;
+
+  /// No description provided for @cardNotStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Start an application and your details show here.'**
+  String get cardNotStarted;
+
+  /// No description provided for @statusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get statusInProgress;
 }
 
 class _AppLocalizationsDelegate

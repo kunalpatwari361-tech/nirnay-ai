@@ -67,12 +67,17 @@ def fetch_profile(app: Application, pan: str, declared: dict | None = None) -> d
     pan = pan.strip().upper()
     if not fields.PAN.fullmatch(pan):
         raise IntakeError("bad_pan")
+    dl = digilocker_identity(app)
+    if dl and dl.get("pan") and dl["pan"] != pan:
+        raise IntakeError("pan_mismatch")                 # the PAN must be the one DigiLocker shared
     if app.mode == "real":
         return _declared_profile(app, pan, declared)
     p = app.persona
     app.pan = pan
     aadhaar_last4 = str(int(app.id.split("-")[-1]) % 10000).zfill(4)
     ekyc = sandbox.ekyc(p, aadhaar_last4)
+    if dl and dl.get("aadhaar_masked"):
+        ekyc["aadhaar_masked"], ekyc["source"] = dl["aadhaar_masked"], dl["source"]
     pan_check = sandbox.pan_verify(p, pan)
     bureau = sandbox.bureau(p)
     aa = sandbox.aa_statement(p, app.consents["aa"]["months"], app.consents["aa"]["accounts"])
@@ -90,7 +95,7 @@ def fetch_profile(app: Application, pan: str, declared: dict | None = None) -> d
         income = round(itr["total_income"] / 12, 2) if itr else 0.0
     existing_emi = max(bureau["existing_emi"], s["avg_monthly_emi"])
     app.sources = {"ekyc": ekyc, "pan": pan_check, "bureau": bureau, "itr": itr,
-                   "aa": {k: v for k, v in aa.items() if k != "transactions"}}
+                   "aa": {k: v for k, v in aa.items() if k != "transactions"}, **({"digilocker": dl} if dl else {})}
     app.profile = {"name": ekyc["name"], "dob": ekyc["dob"], "gender": ekyc["gender"], "address": ekyc["address"],
                    "pincode": ekyc["pincode"], "address_months": ekyc["address_months"], "email": p.email,
                    "employment": p.employment, "employer": p.employer, "monthly_income": income,
@@ -104,33 +109,138 @@ SELF_DECLARED = ("name", "dob", "email", "address", "employment", "employer", "m
 
 
 def _declared_profile(app: Application, pan: str, d: dict | None) -> dict:
-    """Real mode: no bureau, eKYC or Account Aggregator connection, so the applicant types the
-    facts in. Every one is marked self-declared; the documents then have to prove them."""
+    """Real mode. Identity comes from DigiLocker when the applicant shared it there, and the credit
+    report from the bureau when one is connected; whatever is left the applicant types in, marked
+    self-declared, and the documents then have to prove it."""
+    from . import bureau as bureau_mod
     if not d:
         raise IntakeError("details_required")
+    dl = digilocker_identity(app) or {}
+    name = dl.get("name") or (d.get("name") or "").strip()
+    if len(name) < 2:
+        raise IntakeError("details_required")
     try:
-        dob = date.fromisoformat(d["dob"])
-    except (KeyError, ValueError) as e:
+        dob = date.fromisoformat(dl.get("dob") or d["dob"])
+    except (KeyError, TypeError, ValueError) as e:
         raise IntakeError("bad_dob") from e
     age = (date.today() - dob).days / 365.25
     if not 18 <= age <= 80:
         raise IntakeError("bad_dob")
     app.pan = pan
     app.declared = {k: d.get(k) for k in SELF_DECLARED}
-    score = d.get("credit_score")
-    bureau = {"source": "self-declared", "score": int(score) if score else None,
-              "status": "self_declared" if score else "no_history", "history_years": None, "total_accounts": 0,
-              "active_accounts": 0, "overdue_accounts": 0, "recent_delinquencies": 0, "enquiries_6m": 0,
-              "new_accounts_6m": 0, "outstanding": 0, "sanctioned_total": 0, "disbursed_total": 0,
-              "avg_account_age_years": None, "has_credit_card": None, "existing_emi": float(d["existing_emi"])}
-    app.sources = {"declared": app.declared}
-    app.profile = {"name": d["name"].strip(), "dob": dob.isoformat(), "gender": None, "address": d.get("address") or "",
-                   "pincode": None, "address_months": None, "email": (d.get("email") or "").strip().lower() or None,
+    address = dl.get("address") or d.get("address") or ""
+    source = bureau_mod.provider(settings.sandbox)
+    if source is not None:
+        who = {"application_id": app.id, "name": name, "dob": dob.isoformat(), "mobile": app.phone, "pan": pan,
+               "address": address, "pincode": dl.get("pincode"), "persona": app.persona.key if app.persona else None}
+        try:
+            bureau = source.pull(who, today())
+        except bureau_mod.BureauError as e:        # the decision waits for an officer instead of failing
+            bureau = bureau_mod.empty(source.source, "unavailable", error=e.code)
+        bureau["pulled_at"] = now().isoformat()
+    else:
+        # No bureau connected. The app no longer asks for a credit score (older versions did), so the
+        # report is "not pulled" and an officer pulls it before deciding (R-BUR-06).
+        score = d.get("credit_score")
+        bureau = (bureau_mod.empty("self-declared", "self_declared", score=int(score)) if score
+                  else bureau_mod.empty("not-connected", "not_pulled"))
+    existing_emi = max(float(d["existing_emi"]), float(bureau.get("existing_emi") or 0))
+    bureau["existing_emi"] = existing_emi
+    from_digilocker = [k for k in ("name", "dob", "address") if dl.get(k)]
+    declared = [k for k in SELF_DECLARED if k not in from_digilocker
+                and not (k == "credit_score" and (source is not None or not d.get("credit_score")))]
+    app.sources = {"declared": app.declared, **({"digilocker": dl} if dl else {}),
+                   **({"bureau": {k: bureau.get(k) for k in ("source", "reference", "pulled_at", "status")}} if source else {})}
+    app.profile = {"name": name, "dob": dob.isoformat(), "gender": dl.get("gender"), "address": address,
+                   "pincode": dl.get("pincode"), "address_months": None,
+                   "email": (d.get("email") or "").strip().lower() or None,
                    "employment": d["employment"], "employer": d["employer"].strip(),
                    "monthly_income": float(d["monthly_income"]), "income_source": "self-declared, to be proven by documents",
-                   "existing_emi": float(d["existing_emi"]), "bureau": bureau, "pan_masked": f"{pan[:2]}XXX{pan[5:9]}X",
-                   "pan_name": None, "aadhaar_masked": None, "self_declared": list(SELF_DECLARED)}
+                   "existing_emi": existing_emi, "bureau": bureau, "pan_masked": f"{pan[:2]}XXX{pan[5:9]}X",
+                   "pan_name": dl.get("pan_name"), "aadhaar_masked": dl.get("aadhaar_masked"), "self_declared": declared,
+                   "identity_source": dl.get("source")}
     return app.profile
+
+
+# --------------------------------------------------------------------------- DigiLocker (backend/digilocker.py)
+
+def digilocker_identity(app: Application) -> dict | None:
+    return app.sources.get("digilocker") if (app.digilocker or {}).get("status") == "done" else None
+
+
+def apply_digilocker(app: Application, got: dict, source: str) -> dict:
+    """Keep what DigiLocker shared (never the Aadhaar number, the files or the photo). The
+    e-Aadhaar photo goes straight into the face match with the selfie, in memory only.
+
+    Before the details are saved, DigiLocker fills them in. After (from the documents step), it
+    stands in for photos of the PAN and Aadhaar cards: the PAN must be the one entered, and the
+    verified name, date of birth and address replace what was typed."""
+    a, p = got.get("aadhaar") or {}, got.get("pan") or {}
+    if app.profile is not None and p.get("pan") and app.pan and p["pan"] != app.pan:
+        raise IntakeError("pan_mismatch", 409)
+    photo = a.get("photo")
+    ident = {"source": source, "at": now().isoformat(), "name": a.get("name") or p.get("name"),
+             "dob": a.get("dob") or p.get("dob"), "gender": a.get("gender") or p.get("gender"),
+             "address": a.get("address") or None, "pincode": a.get("pincode"), "aadhaar_masked": a.get("aadhaar_masked"),
+             "pan": p.get("pan"), "pan_name": p.get("name"), "has_aadhaar": bool(a), "has_pan": bool(p),
+             "aadhaar_photo": photo is not None,
+             # Is DigiLocker's mobile number the one the applicant signed in with? (The number isn't kept.)
+             "mobile_matches": got["mobile"] == app.phone if got.get("mobile") else None}
+    if p.get("pan"):
+        app.pan = p["pan"]
+    if a and p.get("name"):
+        ident["pan_name_score"] = round(fields.name_score(p["name"], a["name"]), 1)
+    if app.profile is not None:
+        _verified_profile(app, ident)
+    app.sources["digilocker"] = ident
+    app.digilocker = {"status": "done", "at": ident["at"]}
+    if photo:
+        _id_photo_bytes(app, "digilocker", photo)
+    return ident
+
+
+def _verified_profile(app: Application, ident: dict) -> None:
+    """DigiLocker came after the details were saved. Its verified facts replace the typed ones; how
+    far the typed name and date of birth were from them stays on record for the identity gate."""
+    prof = app.profile
+    ident["typed_vs_digilocker"] = {
+        "name_score": round(fields.name_score(ident["name"], prof["name"]), 1) if ident.get("name") else None,
+        "dob_matches": ident["dob"] == prof["dob"] if ident.get("dob") else None,
+    }
+    for k in ("name", "dob", "gender", "address", "pincode"):
+        if ident.get(k):
+            prof[k] = ident[k]
+    if ident.get("pan_name"):
+        prof["pan_name"] = ident["pan_name"]
+    if ident.get("aadhaar_masked"):
+        prof["aadhaar_masked"] = ident["aadhaar_masked"]
+    prof["identity_source"] = ident["source"]
+    verified = {k for k in ("name", "dob", "address") if ident.get(k)}
+    prof["self_declared"] = [k for k in prof.get("self_declared") or [] if k not in verified]
+    for d in app.documents.values():                 # papers already read: check them against the verified name
+        found = (d.get("fields") or {}).get("name")
+        if found and d.get("name_score") is not None:
+            d["name_score"] = round(fields.name_score(found, prof["name"]), 1)
+
+
+def _id_photo_bytes(app: Application, slot: str, photo: bytes) -> None:
+    """The e-Aadhaar photo is a small JPEG 2000 (or JPEG): convert it, find the face, match."""
+    import io
+    from PIL import Image, ImageOps
+    from models.face_match import face
+    try:
+        img = ImageOps.exif_transpose(Image.open(io.BytesIO(photo))).convert("RGB")
+        if min(img.size) < 160:                       # e-Aadhaar photos are tiny; give the detector room
+            k = 160 / min(img.size)
+            img = img.resize((round(img.width * k), round(img.height * k)))
+        buf = io.BytesIO()
+        img.save(buf, "JPEG", quality=95)
+        d = face.model().describe(buf.getvalue())
+    except Exception:                                 # an unreadable photo just means no face match from it
+        return
+    if d["fingerprint"] is not None:
+        app.id_fingerprint, app.id_photo_slot = d["fingerprint"], slot
+        _match_faces(app)
 
 
 def _bank_from_statement(app: Application, text: str, found: dict) -> dict | None:
@@ -156,6 +266,13 @@ def required_documents(app: Application) -> list[str]:
     from .policy import POLICY
     emp = (app.profile or {}).get("employment", "salaried")
     docs = list(POLICY["required_documents"][emp])
+    dl = digilocker_identity(app) or {}
+    # DigiLocker shared the PAN record: no photo of the card needed. Real mode never skips the face
+    # match, so the PAN card is still asked for when the e-Aadhaar photo gave no face to match with.
+    if dl.get("has_pan") and (app.mode != "real" or app.id_photo_slot == "digilocker"):
+        docs.remove("pan")
+    if dl.get("has_aadhaar"):
+        docs.remove("aadhaar")              # the same for the e-Aadhaar
     if app.mode == "real":
         docs.append("bankStatement")        # no Account Aggregator, so the statement is uploaded
     return docs
@@ -176,6 +293,23 @@ def check_selfie(app: Application, data: bytes) -> dict:
         live = liveness.model().check(d["image"], d["face_box"])
         result.update(live=live["live"], liveness=live)
         app.selfie_fingerprint = d["fingerprint"]
+    app.selfie = result
+    _match_faces(app)
+    return result
+
+
+def check_live_selfie(app: Application, challenge_id: str, frames: list[bytes]) -> dict:
+    """The in-app live selfie: one frame per step of the head-turn challenge (backend/live_selfie.py)."""
+    from . import live_selfie
+    try:
+        steps = live_selfie.take(challenge_id, app.id)
+        result = live_selfie.check(frames, steps)
+    except live_selfie.LiveSelfieError as e:
+        raise IntakeError(e.code, 415 if e.code == "not_an_image" else 409 if e.code.startswith("challenge") else 400) from e
+    fingerprint = result.pop("fingerprint")
+    result["at"] = now().isoformat()
+    if fingerprint is not None:
+        app.selfie_fingerprint = fingerprint
     app.selfie = result
     _match_faces(app)
     return result
@@ -228,7 +362,8 @@ def upload_document(store: Store, app: Application, slot: str, data: bytes, file
     # The same file on another applicant's application. Documents are compared byte for byte:
     # every PAN card shares one template, so "looks alike" would match different people.
     digest = hashlib.sha256(data).hexdigest()
-    rec["reuse"] = links.duplicate_check(app.id, digest, store.file_digests())
+    mine = {a for a, i in store.identities().items() if app.pan and i.get("pan") == app.pan}
+    rec["reuse"] = links.duplicate_check(app.id, digest, store.file_digests(), same_person=mine)
     app.file_digests.add(digest)
     if app.profile and found.get("name") and slot in NAMED_SLOTS:
         rec["name_score"] = round(fields.name_score(found["name"], app.profile["name"]), 1)
@@ -245,6 +380,14 @@ def upload_document(store: Store, app: Application, slot: str, data: bytes, file
         app.profile["pan_name"] = found["name"]                      # no NSDL check in real mode: the card's name
     if slot == "bankStatement" and rec["accepted"] and app.mode == "real":
         rec["statement"] = _bank_from_statement(app, text, found)
+    # A failed document can't be cleared by uploading another one: the failure stays on the file.
+    prev = app.documents.get(slot) or {}
+    earlier = list(prev.get("failed_before") or [])
+    if (prev.get("verification") or {}).get("verdict") == "failed":
+        earlier.append({"uploaded_at": prev["uploaded_at"], "problems": prev["verification"]["problems"]})
+    if earlier:
+        rec["failed_before"] = earlier
+    rec["verification"] = verify(rec)
     app.documents[slot] = rec
     # Keep the file for officers, except Aadhaar: UIDAI rules forbid storing Aadhaar copies,
     # so only the masked number and the checks are kept.
@@ -262,13 +405,75 @@ def _id_photo(app: Application, slot: str, data: bytes, rec: dict) -> None:
         _match_faces(app)
 
 
+# --------------------------------------------------------------------------- document verification
+
+NAME_MISMATCH_BELOW = 50    # a name this far from the applicant's is another person's, not an OCR misread
+DOUBTFUL_CAP = 60           # a later edit date or an appended revision: an officer looks, the score shows the doubt
+FAILED_CAP = 10
+
+
+def verify(rec: dict) -> dict:
+    """The verdict on one uploaded document, and its 0-100 verification score. No one confirms
+    what was read: the checks decide.
+
+    retake:   the classifier couldn't confirm it's the document asked for, or OCR couldn't read it,
+              so nothing could be checked. The applicant uploads it again.
+    failed:   it is the document asked for, and it names an editing tool, or is the same file as on
+              another applicant's application, or its PAN isn't the one entered, or its name is
+              another person's, or an earlier upload in this slot failed. The application is
+              rejected (R-DOC-05).
+    verified: every check passed.
+    The score is the weakest check: the classifier's confidence, the name match, and a cap for a
+    doubtful or failed check. Rules decide the rejection, not a model on its own (CMP-07).
+    """
+    signals = rec["tamper"]["signals"]
+    edited = tamper.edited(signals)
+    reused = bool((rec.get("reuse") or {}).get("reused_from"))
+    name, pan, earlier = rec.get("name_score"), rec.get("pan_matches"), rec.get("failed_before") or []
+    checks = {"type": rec["accepted"], "readable": rec["reason_code"] != "R-DOC-02", "untouched": not edited, "unique": not reused}
+    if name is not None:
+        checks["name"] = name >= NAME_MISMATCH_BELOW
+    if pan is not None:
+        checks["pan"] = pan
+    if not rec["accepted"]:
+        return {"verdict": "retake", "score": None, "checks": checks, "problems": []}
+    problems = []
+    if edited:
+        problems.append("the file names an editing tool")
+    if reused:
+        problems.append("the same file is on another applicant's application")
+    if pan is False:
+        problems.append("the PAN on the card isn't the one entered")
+    if name is not None and name < NAME_MISMATCH_BELOW:
+        problems.append(f"the name is another person's (name score {name})")
+    if earlier:
+        problems.append("an earlier upload of this document failed verification")
+    score = rec["classifier"]["confidence"] * 100
+    if name is not None:
+        score = min(score, name)
+    if signals and not edited:
+        score = min(score, DOUBTFUL_CAP)
+    if problems:
+        score = min(score, FAILED_CAP)
+    return {"verdict": "failed" if problems else "verified", "score": int(round(score)), "checks": checks, "problems": problems}
+
+
+def verification(rec: dict) -> dict:
+    """A document's verification, worked out again for files uploaded before verdicts existed."""
+    return rec.get("verification") or verify(rec)
+
+
 def doc_result(rec: dict) -> dict:
-    """The app's DocResult."""
+    """The app's DocResult. The fraud checks (editing tools, reused files) are left out of what the
+    applicant sees, so the checks aren't taught; a failure shows only as the verdict."""
     detected = TYPE_SLOTS.get(rec["classifier"]["document_type"], rec["classifier"]["document_type"])
     shown = {k: v for k, v in rec["fields"].items() if k in ("name", "pan", "aadhaar", "employer", "netPay", "period", "year",
-                                                              "income", "business", "gstin")}
+                                                              "income", "business")}
+    v = verification(rec)
     return {"slot": rec["slot"], "detectedType": detected, "confidence": rec["classifier"]["confidence"],
-            "accepted": rec["accepted"], "reasonCode": rec["reason_code"], "fields": shown}
+            "accepted": rec["accepted"], "reasonCode": rec["reason_code"], "fields": shown,
+            "verification": {"verdict": v["verdict"], "score": v["score"],
+                             "checks": {k: ok for k, ok in v["checks"].items() if k in ("type", "readable", "name", "pan")}}}
 
 
 def today() -> date:

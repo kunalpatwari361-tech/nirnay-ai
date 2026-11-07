@@ -896,9 +896,6 @@ class AppLocalizationsSa extends AppLocalizations {
   String get fieldBusiness => 'व्यवसायः';
 
   @override
-  String get fieldGstin => 'GSTIN';
-
-  @override
   String get consentSectionRequired => 'भवतः ऋणाय आवश्यकम्';
 
   @override
@@ -1206,4 +1203,151 @@ class AppLocalizationsSa extends AppLocalizations {
   @override
   String get otpTooManySends =>
       'अतीव बहवः कोडाः याचिताः। 15 निमेषान् प्रतीक्ष्य पुनः प्रयतताम्।';
+
+  @override
+  String get dlTitle => 'डिजिलॉकरतः भवतः विवरणानि प्राप्नोतु';
+
+  @override
+  String get dlBody =>
+      'भवतः नाम, जन्मतिथिः, PAN, आधारः च साक्षात् डिजिलॉकरतः आगच्छन्ति, अतः तानि टङ्कयितुं पत्राणि उपारोपयितुं वा आवश्यकता नास्ति।';
+
+  @override
+  String get dlOpen => 'डिजिलॉकरम् उद्घाटयतु';
+
+  @override
+  String get dlWaiting => 'डिजिलॉकरे समापयतु, ततः अत्र प्रत्यागच्छतु।';
+
+  @override
+  String get dlCheck => 'पुनः पश्यतु';
+
+  @override
+  String get dlDone => 'डिजिलॉकरतः प्राप्तम्';
+
+  @override
+  String get dlDenied =>
+      'डिजिलॉकरतः किमपि न विभक्तम्। पुनः प्रयततां, अथवा अधः भवतः विवरणानि लिखतु।';
+
+  @override
+  String get dlFailed =>
+      'डिजिलॉकरतः भवतः विवरणानि प्राप्तुं न अशक्नुम। एकनिमेषानन्तरं पुनः प्रयततां, अथवा अधः लिखतु।';
+
+  @override
+  String get bureauAuto =>
+      'भवता क्रेडिट-स्कोर न लेखनीयः। वयं भवतः PAN द्वारा ऋणसूचनासंस्थायाः भवतः ऋणप्रतिवेदनं प्राप्नुमः।';
+
+  @override
+  String get bureauFetched => 'ऋणसूचनासंस्थायाः ऋणप्रतिवेदनं प्राप्तम्';
+
+  @override
+  String get bureauLater =>
+      'निर्णयात् पूर्वं वयं ऋणसूचनासंस्थायाः भवतः ऋणप्रतिवेदनं प्राप्स्यामः।';
+
+  @override
+  String get fillWorkDetails => 'कृपया भवतः कार्यं, नियोक्तारम्, आयं च पूरयतु।';
+
+  @override
+  String get liveSelfieStart => 'सजीवं स्वचित्रम् आरभताम्';
+
+  @override
+  String get liveSelfieBody =>
+      'एषा सजीवा परीक्षा, न तु चित्रम्। मुखं अण्डाकारस्य अन्तः स्थापयतु, निर्देशान् अनुसरतु च। प्रायः 8 क्षणाः लगन्ति।';
+
+  @override
+  String get liveLookStraight => 'साक्षात् कैमरां पश्यतु';
+
+  @override
+  String get liveTurnLeft => 'शनैः शिरः वामतः परिवर्तयतु';
+
+  @override
+  String get liveTurnRight => 'शनैः शिरः दक्षिणतः परिवर्तयतु';
+
+  @override
+  String get liveChecking => 'भवान् एव वस्तुतः इति परीक्ष्यते…';
+
+  @override
+  String get checkHeadTurn => 'शिरःपरिवर्तनस्य निर्देशः पालितः';
+
+  @override
+  String get cameraUnavailable =>
+      'अग्रकैमरा उद्घाटयितुं न अशक्नुम। दूरभाषस्य व्यवस्थासु Nirnay कृते कैमरानुमतिं ददातु, ततः पुनः प्रयतताम्।';
+
+  @override
+  String get docsDlTitle => 'स्वस्य PAN ई-आधारं च DigiLocker तः गृह्णातु';
+
+  @override
+  String get docsDlBody =>
+      'पत्राणां चित्राणि न आवश्यकानि: DigiLocker मध्ये प्रविश्य साझाकरणम् अनुमन्यताम्। भवतः PAN ई-आधारं च साक्षात् शासकीयाभिलेखेभ्यः आगच्छतः।';
+
+  @override
+  String get docsDlDone => 'PAN ई-आधारं च DigiLocker तः प्राप्ते';
+
+  @override
+  String get docsDlRetry =>
+      'DigiLocker तः किमपि न आगतम्। पुनः प्रयततां, अथवा अधः पत्राणां चित्राणि गृह्णातु।';
+
+  @override
+  String get dlPanMismatch =>
+      'भवतः DigiLocker स्थं PAN भवता प्रविष्टं न, अतः तत् न उपयुक्तम्। अधः स्वस्य PAN पत्रस्य चित्रं गृह्णातु।';
+
+  @override
+  String docVerified(String type) {
+    return 'सत्यापितम्: $type';
+  }
+
+  @override
+  String get docFailed => 'अयं प्रलेखः सत्यापने न उत्तीर्णः';
+
+  @override
+  String get docFailedBody =>
+      'यस्य आवेदनस्य कश्चित् प्रलेखः सत्यापने विफलः भवति, तत् आवेदनम् अस्वीक्रियते। भवान् कञ्चित् जनम् अस्य निर्णयस्य पुनरवलोकनाय वक्तुं शक्नोति।';
+
+  @override
+  String verifyScore(String score) {
+    return 'अङ्कः $score/100';
+  }
+
+  @override
+  String get checkName => 'नाम भवतः विवरणेन सह मेलति';
+
+  @override
+  String get checkPan => 'PAN भवता प्रविष्टम् एव';
+
+  @override
+  String get seeDecision => 'निर्णयं पश्यतु';
+
+  @override
+  String get yourScores => 'भवतः अङ्काः';
+
+  @override
+  String get creditNotPulled =>
+      'अद्यापि न आनीतम्: एकः अधिकारी भवतः क्रेडिट-प्रतिवेदनम् आनेष्यति';
+
+  @override
+  String get creditNoHistory => 'ब्यूरो-समीपे भवतः ऋण-इतिहासः नास्ति';
+
+  @override
+  String get verificationTitle => 'सत्यापन-अङ्कः';
+
+  @override
+  String get verificationFrom => 'भवतः प्रलेखेषु न्यूनतमः अङ्कः, 100 मध्ये';
+
+  @override
+  String get reasonDoc05 =>
+      'भवतः एकः प्रलेखः अस्माकं सत्यापन-परीक्षायां न उत्तीर्णः।';
+
+  @override
+  String get cardAsked => 'भवता याचिता राशिः';
+
+  @override
+  String get cardSanctionedAmount => 'स्वीकृता राशिः';
+
+  @override
+  String get cardSanctionLater =>
+      'ऋणे स्वीकृते सति भवतः स्वीकृता राशिः, व्याज-दरः EMI च अत्र दृश्यन्ते।';
+
+  @override
+  String get cardNotStarted => 'आवेदनम् आरभताम्, भवतः विवरणम् अत्र दृश्यते।';
+
+  @override
+  String get statusInProgress => 'प्रचलति';
 }

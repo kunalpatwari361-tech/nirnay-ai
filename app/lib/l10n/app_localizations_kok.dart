@@ -893,9 +893,6 @@ class AppLocalizationsKok extends AppLocalizations {
   String get fieldBusiness => 'वेवसाय';
 
   @override
-  String get fieldGstin => 'GSTIN';
-
-  @override
   String get consentSectionRequired => 'तुमच्या कर्जाखातीर गरजेचें';
 
   @override
@@ -1199,4 +1196,152 @@ class AppLocalizationsKok extends AppLocalizations {
 
   @override
   String get otpTooManySends => 'चड कोड मागले. 15 मिनटां राकून परत यत्न करात.';
+
+  @override
+  String get dlTitle => 'डिजीलॉकरांतल्यान तुमची माहिती घेयात';
+
+  @override
+  String get dlBody =>
+      'तुमचें नांव, जल्मतारीख, PAN आनी आधार थेट डिजीलॉकरांतल्यान येता, देखून तें टायप करपाची वा कार्डां अपलोड करपाची गरज ना.';
+
+  @override
+  String get dlOpen => 'डिजीलॉकर उगडात';
+
+  @override
+  String get dlWaiting => 'डिजीलॉकरांत पुराय करात, मागीर हांगा परत येयात.';
+
+  @override
+  String get dlCheck => 'परत पळयात';
+
+  @override
+  String get dlDone => 'डिजीलॉकरांतल्यान मेळ्ळें';
+
+  @override
+  String get dlDenied =>
+      'डिजीलॉकरांतल्यान कांयच वांटून घेतलें ना. परत यत्न करात, वा सकयल तुमची माहिती बरयात.';
+
+  @override
+  String get dlFailed =>
+      'आमकां डिजीलॉकरांतल्यान तुमची माहिती मेळूंक ना. एका मिनटान परत यत्न करात, वा सकयल बरयात.';
+
+  @override
+  String get bureauAuto =>
+      'तुमकां क्रेडिट स्कोअर भरपाची गरज ना. आमी तुमच्या PAN वयल्यान क्रेडिट ब्युरोकडल्यान तुमचो क्रेडिट रिपोर्ट घेतात.';
+
+  @override
+  String get bureauFetched => 'क्रेडिट ब्युरोकडल्यान क्रेडिट रिपोर्ट घेतलो';
+
+  @override
+  String get bureauLater =>
+      'निर्णया आदीं आमी क्रेडिट ब्युरोकडल्यान तुमचो क्रेडिट रिपोर्ट घेतले.';
+
+  @override
+  String get fillWorkDetails =>
+      'उपकार करून तुमचें काम, नोकरी दिवपी आनी उत्पन्न भरात.';
+
+  @override
+  String get liveSelfieStart => 'लायव्ह सेल्फी सुरू करात';
+
+  @override
+  String get liveSelfieBody =>
+      'ही लायव्ह तपासणी, फोटो न्हय. तुमचें तोंड अंडाकाराभितर दवरात आनी सुचोवण्यो पाळात. हाका सुमार 8 सेकंद लागतात.';
+
+  @override
+  String get liveLookStraight => 'सरळ कॅमेऱ्याकडेन पळयात';
+
+  @override
+  String get liveTurnLeft => 'हळूहळू तुमची तकली दाव्या वटेन वळयात';
+
+  @override
+  String get liveTurnRight => 'हळूहळू तुमची तकली उजव्या वटेन वळयात';
+
+  @override
+  String get liveChecking => 'हे खरेंच तुमीच म्हूण तपासतात…';
+
+  @override
+  String get checkHeadTurn => 'तकली वळोवपाची सुचोवणी पाळ्ळी';
+
+  @override
+  String get cameraUnavailable =>
+      'आमकां मुखावयलो कॅमेरा उगडूंक जालो ना. फोनाच्या सेटिंगांनी Nirnay क कॅमेऱ्याची परवानगी दियात, मागीर परत यत्न करात.';
+
+  @override
+  String get docsDlTitle => 'तुमचो PAN आनी ई-आधार DigiLocker सावन घेयात';
+
+  @override
+  String get docsDlBody =>
+      'कार्डांचे फोटो नाकात: DigiLocker चेर साइन इन करात आनी शेअर करपाक परवानगी दियात. तुमचो PAN आनी ई-आधार थेट सरकारी नोंदींतल्यान येतात.';
+
+  @override
+  String get docsDlDone => 'PAN आनी ई-आधार DigiLocker सावन मेळ्ळे';
+
+  @override
+  String get docsDlRetry =>
+      'DigiLocker सावन कांयच आयलें ना. परत यत्न करात, वा सकयल कार्डांचे फोटो काडात.';
+
+  @override
+  String get dlPanMismatch =>
+      'तुमच्या DigiLocker चो PAN तुमी दिल्लो न्हय, देखून तो वापरूंक ना. सकयल तुमच्या PAN कार्डाचो फोटो काडात.';
+
+  @override
+  String docVerified(String type) {
+    return 'पडताळलें: $type';
+  }
+
+  @override
+  String get docFailed => 'हें कागदपत्र पडताळणेंत पास जालें ना';
+
+  @override
+  String get docFailedBody =>
+      'जाच्या अर्जाचें खंयचेंय कागदपत्र पडताळणेंत अपेशी जाता, तो अर्ज नाकारतात. तुमी एका मनशाक ह्या निर्णयाची परतून तपासणी करपाक सांगूंक शकतात.';
+
+  @override
+  String verifyScore(String score) {
+    return 'स्कोअर $score/100';
+  }
+
+  @override
+  String get checkName => 'नांव तुमच्या तपशिलां कडेन जुळटा';
+
+  @override
+  String get checkPan => 'PAN तुमी घाल्लोलोच';
+
+  @override
+  String get seeDecision => 'निर्णय पळयात';
+
+  @override
+  String get yourScores => 'तुमचे स्कोअर';
+
+  @override
+  String get creditNotPulled =>
+      'अजून काडूंक ना: एक अधिकारी तुमचो क्रेडिट रिपोर्ट काडटलो';
+
+  @override
+  String get creditNoHistory => 'ब्युरो कडेन तुमचो खंयचोच क्रेडिट इतिहास ना';
+
+  @override
+  String get verificationTitle => 'पडताळणी स्कोअर';
+
+  @override
+  String get verificationFrom =>
+      'तुमच्या कागदपत्रां मदलो सगळ्यांत उणो स्कोअर, 100 पयकीं';
+
+  @override
+  String get reasonDoc05 => 'तुमचें एक कागदपत्र आमच्या पडताळणेंत पास जालें ना.';
+
+  @override
+  String get cardAsked => 'तुमी मागिल्ली रक्कम';
+
+  @override
+  String get cardSanctionedAmount => 'मंजूर रक्कम';
+
+  @override
+  String get cardSanctionLater =>
+      'कर्ज मंजूर जाले उपरांत तुमची मंजूर रक्कम, व्याज दर आनी EMI हांगा दिसतलें।';
+
+  @override
+  String get cardNotStarted => 'अर्ज सुरू करात, तुमचो तपशील हांगा दिसतलो।';
+
+  @override
+  String get statusInProgress => 'चालू आसा';
 }

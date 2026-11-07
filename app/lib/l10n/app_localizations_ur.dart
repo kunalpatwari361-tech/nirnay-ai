@@ -892,9 +892,6 @@ class AppLocalizationsUr extends AppLocalizations {
   String get fieldBusiness => 'کاروبار';
 
   @override
-  String get fieldGstin => 'GSTIN';
-
-  @override
   String get consentSectionRequired => 'آپ کے لون کے لیے ضروری';
 
   @override
@@ -1200,4 +1197,153 @@ class AppLocalizationsUr extends AppLocalizations {
   @override
   String get otpTooManySends =>
       'بہت زیادہ کوڈ مانگے گئے۔ 15 منٹ رک کر دوبارہ کوشش کریں۔';
+
+  @override
+  String get dlTitle => 'ڈیجی لاکر سے اپنی تفصیلات لیں';
+
+  @override
+  String get dlBody =>
+      'آپ کا نام، تاریخ پیدائش، PAN اور آدھار سیدھے ڈیجی لاکر سے آتے ہیں، اس لیے آپ کو انہیں ٹائپ کرنے یا کارڈ اپ لوڈ کرنے کی ضرورت نہیں۔';
+
+  @override
+  String get dlOpen => 'ڈیجی لاکر کھولیں';
+
+  @override
+  String get dlWaiting => 'ڈیجی لاکر میں مکمل کریں، پھر یہاں واپس آئیں۔';
+
+  @override
+  String get dlCheck => 'دوبارہ دیکھیں';
+
+  @override
+  String get dlDone => 'ڈیجی لاکر سے ملا';
+
+  @override
+  String get dlDenied =>
+      'ڈیجی لاکر سے کچھ شیئر نہیں ہوا۔ دوبارہ کوشش کریں، یا نیچے اپنی تفصیلات لکھیں۔';
+
+  @override
+  String get dlFailed =>
+      'ہم ڈیجی لاکر سے آپ کی تفصیلات حاصل نہیں کر سکے۔ ایک منٹ بعد دوبارہ کوشش کریں، یا نیچے لکھیں۔';
+
+  @override
+  String get bureauAuto =>
+      'آپ کو کریڈٹ اسکور درج کرنے کی ضرورت نہیں۔ ہم آپ کے PAN سے کریڈٹ بیورو سے آپ کی کریڈٹ رپورٹ لیتے ہیں۔';
+
+  @override
+  String get bureauFetched => 'کریڈٹ بیورو سے کریڈٹ رپورٹ لی گئی';
+
+  @override
+  String get bureauLater =>
+      'فیصلے سے پہلے ہم کریڈٹ بیورو سے آپ کی کریڈٹ رپورٹ لیں گے۔';
+
+  @override
+  String get fillWorkDetails => 'براہ کرم اپنا کام، آجر اور آمدنی بھریں۔';
+
+  @override
+  String get liveSelfieStart => 'لائیو سیلفی شروع کریں';
+
+  @override
+  String get liveSelfieBody =>
+      'یہ لائیو جانچ ہے، تصویر نہیں۔ اپنا چہرہ بیضوی دائرے کے اندر رکھیں اور ہدایات پر عمل کریں۔ اس میں تقریباً 8 سیکنڈ لگتے ہیں۔';
+
+  @override
+  String get liveLookStraight => 'سیدھا کیمرے کی طرف دیکھیں';
+
+  @override
+  String get liveTurnLeft => 'آہستہ سے اپنا سر بائیں طرف گھمائیں';
+
+  @override
+  String get liveTurnRight => 'آہستہ سے اپنا سر دائیں طرف گھمائیں';
+
+  @override
+  String get liveChecking => 'جانچ رہے ہیں کہ یہ واقعی آپ ہیں…';
+
+  @override
+  String get checkHeadTurn => 'سر گھمانے کی ہدایت پوری ہوئی';
+
+  @override
+  String get cameraUnavailable =>
+      'ہم سامنے کا کیمرہ نہیں کھول سکے۔ فون کی سیٹنگز میں Nirnay کو کیمرے کی اجازت دیں، پھر دوبارہ کوشش کریں۔';
+
+  @override
+  String get docsDlTitle => 'اپنا PAN اور ای-آدھار DigiLocker سے لیں';
+
+  @override
+  String get docsDlBody =>
+      'کارڈوں کی تصویریں نہیں: DigiLocker میں سائن اِن کریں اور شیئر کرنے کی اجازت دیں۔ آپ کا PAN اور ای-آدھار سیدھے سرکاری ریکارڈ سے آتے ہیں۔';
+
+  @override
+  String get docsDlDone => 'PAN اور ای-آدھار DigiLocker سے مل گئے';
+
+  @override
+  String get docsDlRetry =>
+      'DigiLocker سے کچھ نہیں آیا۔ دوبارہ کوشش کریں، یا نیچے کارڈوں کی تصویر لیں۔';
+
+  @override
+  String get dlPanMismatch =>
+      'آپ کے DigiLocker کا PAN وہ نہیں جو آپ نے درج کیا تھا، اس لیے استعمال نہیں ہوا۔ نیچے اپنے PAN کارڈ کی تصویر لیں۔';
+
+  @override
+  String docVerified(String type) {
+    return 'تصدیق شدہ: $type';
+  }
+
+  @override
+  String get docFailed => 'یہ دستاویز تصدیق میں پاس نہیں ہوا';
+
+  @override
+  String get docFailedBody =>
+      'جس درخواست کا کوئی دستاویز تصدیق میں ناکام ہو، وہ درخواست مسترد کر دی جاتی ہے۔ آپ کسی شخص سے اس فیصلے پر نظرثانی کے لیے کہہ سکتے ہیں۔';
+
+  @override
+  String verifyScore(String score) {
+    return 'اسکور $score/100';
+  }
+
+  @override
+  String get checkName => 'نام آپ کی تفصیلات سے ملتا ہے';
+
+  @override
+  String get checkPan => 'PAN وہی ہے جو آپ نے درج کیا تھا';
+
+  @override
+  String get seeDecision => 'فیصلہ دیکھیں';
+
+  @override
+  String get yourScores => 'آپ کے اسکور';
+
+  @override
+  String get creditNotPulled =>
+      'ابھی نہیں نکالی گئی: ایک افسر آپ کی کریڈٹ رپورٹ نکالے گا';
+
+  @override
+  String get creditNoHistory => 'بیورو کے پاس آپ کی کوئی کریڈٹ تاریخ نہیں ہے';
+
+  @override
+  String get verificationTitle => 'تصدیقی اسکور';
+
+  @override
+  String get verificationFrom =>
+      'آپ کے دستاویزات میں سب سے کم اسکور، 100 میں سے';
+
+  @override
+  String get reasonDoc05 =>
+      'آپ کا ایک دستاویز ہماری تصدیقی جانچ میں پاس نہیں ہوا۔';
+
+  @override
+  String get cardAsked => 'آپ کی مانگی ہوئی رقم';
+
+  @override
+  String get cardSanctionedAmount => 'منظور شدہ رقم';
+
+  @override
+  String get cardSanctionLater =>
+      'لون منظور ہونے کے بعد آپ کی منظور شدہ رقم، شرح سود اور EMI یہاں نظر آئیں گے۔';
+
+  @override
+  String get cardNotStarted =>
+      'درخواست شروع کریں، آپ کی تفصیلات یہاں نظر آئیں گی۔';
+
+  @override
+  String get statusInProgress => 'جاری ہے';
 }

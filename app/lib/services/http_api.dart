@@ -81,6 +81,41 @@ class HttpNirnayApi implements NirnayApi {
   }
 
   @override
+  Future<Connections> connections() async {
+    final j = await _send(_http.get(_u('v1/health')));
+    return Connections(digilocker: j['digilocker'] as String?, bureau: j['bureau'] as String?);
+  }
+
+  @override
+  Future<String?> startDigiLocker(Session session, {bool returnToApp = true}) async {
+    final j = await _send(_http.post(_u(_app(session, '/digilocker')),
+        headers: _auth(session), body: jsonEncode({'returnTo': returnToApp ? 'app' : 'page'})));
+    return j['url'] as String;
+  }
+
+  @override
+  Future<DigiLockerShare> digiLockerStatus(Session session) async {
+    final j = await _send(_http.get(_u(_app(session, '/digilocker')), headers: _auth(session, json: false)));
+    final dob = j['dateOfBirth'] as String?;
+    return DigiLockerShare(
+      status: j['status'] as String? ?? 'none',
+      error: j['error'] as String?,
+      name: j['name'] as String?,
+      dateOfBirth: dob == null ? null : DateTime.parse(dob),
+      address: j['address'] as String?,
+      pan: j['pan'] as String?,
+      panMasked: j['panMasked'] as String?,
+      aadhaarMasked: j['aadhaarMasked'] as String?,
+      hasPan: j['hasPan'] as bool? ?? false,
+      hasAadhaar: j['hasAadhaar'] as bool? ?? false,
+      requiredDocuments: _slots(j['requiredDocuments']),
+    );
+  }
+
+  static List<DocSlot>? _slots(dynamic l) =>
+      (l as List?)?.map((s) => DocSlot.values.where((d) => d.name == s).firstOrNull).whereType<DocSlot>().toList();
+
+  @override
   Future<Profile> fetchProfile(Session session, String pan, {Declaration? declared}) async {
     final body = {'pan': pan, if (declared != null) 'declared': declared.toJson()};
     final j = await _send(_http.post(_u(_app(session, '/profile')), headers: _auth(session), body: jsonEncode(body)));
@@ -100,6 +135,9 @@ class HttpNirnayApi implements NirnayApi {
           .whereType<DocSlot>()
           .toList(),
       selfDeclared: j['selfDeclared'] as bool? ?? false,
+      identitySource: j['identitySource'] as String?,
+      bureauStatus: j['bureauStatus'] as String?,
+      bureauSource: j['bureauSource'] as String?,
     );
   }
 
@@ -108,15 +146,39 @@ class HttpNirnayApi implements NirnayApi {
     final req = http.MultipartRequest('POST', _u(_app(session, '/selfie')))
       ..headers.addAll(_auth(session, json: false))
       ..files.add(http.MultipartFile.fromBytes('file', jpeg, filename: 'selfie.jpg'));
-    final j = await _multipart(req);
-    return SelfieResult(
-      faceFound: j['faceFound'] as bool,
-      live: j['live'] as bool,
-      livenessScore: (j['livenessScore'] as num).toDouble(),
-      faceMatch: j['faceMatch'] as bool,
-      matchScore: (j['matchScore'] as num).toDouble(),
-      matchPending: j['matchPending'] as bool? ?? false,
+    return _selfie(await _multipart(req));
+  }
+
+  SelfieResult _selfie(dynamic j) => SelfieResult(
+        faceFound: j['faceFound'] as bool,
+        live: j['live'] as bool,
+        livenessScore: (j['livenessScore'] as num).toDouble(),
+        faceMatch: j['faceMatch'] as bool,
+        matchScore: (j['matchScore'] as num).toDouble(),
+        matchPending: j['matchPending'] as bool? ?? false,
+        liveSelfie: j['liveSelfie'] as bool? ?? false,
+        headTurn: j['headTurn'] as bool?,
+      );
+
+  @override
+  Future<SelfieChallenge> selfieChallenge(Session session) async {
+    final j = await _send(_http.post(_u(_app(session, '/selfie/challenge')), headers: _auth(session)));
+    return SelfieChallenge(
+      id: j['challengeId'] as String,
+      steps: (j['steps'] as List).cast<String>(),
+      expiresIn: (j['expiresIn'] as num?)?.toInt() ?? 120,
     );
+  }
+
+  @override
+  Future<SelfieResult> checkLiveSelfie(Session session, String challengeId, List<Uint8List> frames) async {
+    final req = http.MultipartRequest('POST', _u(_app(session, '/selfie/live')))
+      ..headers.addAll(_auth(session, json: false))
+      ..fields['challengeId'] = challengeId;
+    for (var i = 0; i < frames.length; i++) {
+      req.files.add(http.MultipartFile.fromBytes('frames', frames[i], filename: 'frame$i.jpg'));
+    }
+    return _selfie(await _multipart(req));
   }
 
   @override
@@ -133,8 +195,17 @@ class HttpNirnayApi implements NirnayApi {
       accepted: j['accepted'] as bool,
       reasonCode: j['reasonCode'] as String?,
       fields: (j['fields'] as Map).map((k, v) => MapEntry(k as String, '$v')),
+      verification: _verification(j['verification'] as Map<String, dynamic>?),
     );
   }
+
+  static DocVerification? _verification(Map<String, dynamic>? v) => v == null
+      ? null
+      : DocVerification(
+          verdict: v['verdict'] as String,
+          score: (v['score'] as num?)?.toInt(),
+          checks: (v['checks'] as Map? ?? {}).map((k, ok) => MapEntry(k as String, ok as bool)),
+        );
 
   @override
   Future<DecisionLetter> decisionLetter(Session session, String lang) async {
@@ -235,8 +306,23 @@ Decision decisionFromJson(Map<String, dynamic> j) {
     keyFacts: _keyFacts(j['kfs'] as Map<String, dynamic>?),
     score: _score(j['score'] as Map<String, dynamic>?),
     reference: _reference(j['record'] as Map<String, dynamic>?),
+    credit: _credit(j['credit'] as Map<String, dynamic>?),
+    verification: _verified(j['verification'] as Map<String, dynamic>?),
   );
 }
+
+CreditScore? _credit(Map<String, dynamic>? c) =>
+    c == null ? null : CreditScore(score: (c['score'] as num?)?.toInt(), status: c['status'] as String?);
+
+VerificationScore? _verified(Map<String, dynamic>? v) => v == null
+    ? null
+    : VerificationScore(
+        score: (v['score'] as num?)?.toInt(),
+        documents: {
+          for (final e in (v['documents'] as Map? ?? {}).entries)
+            ?DocSlot.values.where((s) => s.name == e.key).firstOrNull: (e.value as num).toInt(),
+        },
+      );
 
 double _d(Object? x) => (x as num? ?? 0).toDouble();
 

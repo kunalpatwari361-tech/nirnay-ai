@@ -102,6 +102,19 @@ def test_edited_pdf_refers(ev):
     assert "R-DOC-03" in run(ev)[1]
 
 
+def test_a_document_that_failed_verification_rejects(ev):
+    ev["documents"]["salarySlip"].update(verdict="failed", problems=["the file names an editing tool"])
+    d, internal, shown = run(ev)
+    assert d["outcome"] == "reject" and "R-DOC-05" in internal and shown == ["R-DOC-05"]
+
+
+def test_records_from_before_verdicts_decide_as_they_did(ev):
+    for d in ev["documents"].values():
+        for k in ("verdict", "verification_score", "problems", "failed_before"):
+            d.pop(k, None)
+    assert pipeline.decide(ev)["outcome"] == "approve"
+
+
 def test_withdrawn_consent_holds_the_decision(ev):
     ev["consents"]["given"]["bureau"] = False
     d, internal, shown = run(ev)

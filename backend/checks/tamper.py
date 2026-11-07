@@ -61,3 +61,10 @@ def check_image(data: bytes) -> dict:
 
 def check(data: bytes) -> dict:
     return check_pdf(data) if data[:5] == b"%PDF-" else check_image(data)
+
+
+def edited(signals: list[str]) -> bool:
+    """The strong signal: the file names an editing tool. A later modification date or an appended
+    revision is weaker, because digitally signed PDFs (bank e-statements, DigiLocker files) append
+    revisions when they're signed, so those only send the file to an officer."""
+    return any(s.startswith(("made with an editing tool", "edited with")) for s in signals)

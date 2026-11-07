@@ -56,9 +56,11 @@ Future<void> applyAs(WidgetTester tester, String phone) async {
   final slots = phone == '9876500002' ? ['pan', 'aadhaar', 'itr', 'gst'] : ['pan', 'aadhaar', 'salarySlip', 'form16'];
   for (final s in slots) {
     await tapAndWait(tester, 'sample-$s');
-    expect(find.textContaining('Recognised'), findsWidgets); // the document AI view
+    expect(find.textContaining('Verified'), findsWidgets); // the document AI's verdict, with no one asked to confirm it
+    expect(find.textContaining('/100'), findsWidgets); // its verification score
+    expect(find.byKey(const Key('looks-right')), findsNothing);
     expect(find.text('What we read'), findsOneWidget);
-    await tapKey(tester, 'looks-right');
+    await tapKey(tester, 'continue');
   }
   await tapAndWait(tester, 'primary'); // get the in-principle offer
 }
@@ -78,6 +80,8 @@ void main() {
     expect(find.text('Track your application'), findsOneWidget);
     expect(find.text("Add your property's details and photos"), findsOneWidget);
     expect(find.byKey(const Key('score-panel')), findsOneWidget);
+    expect(find.descendant(of: find.byKey(const Key('credit-score')), matching: find.text('765')), findsOneWidget);
+    expect(find.byKey(const Key('verification-score')), findsOneWidget);
     expect(find.text('How we scored you'), findsOneWidget);
     expect(find.textContaining('Decision record #SBX-'), findsOneWidget);
     await tapKey(tester, 'kfs');
@@ -102,6 +106,66 @@ void main() {
     await settle(tester);
     expect(find.text('Loan sanctioned'), findsOneWidget);
     expect(find.text('Property title and papers checked'), findsOneWidget);
+  });
+
+  testWidgets('the Home card shows what was asked, the sanctioned amount only once approved, and tracking', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    addTearDown(tester.view.reset);
+    Finder onCard(String text) => find.descendant(of: find.byKey(const Key('loan-card')), matching: find.text(text));
+    String? amount() => tester.widget<Text>(find.byKey(const Key('card-sanctioned'))).data;
+    Future<void> home() async {
+      tester.state<NavigatorState>(find.byType(Navigator).first).popUntil((r) => r.isFirst);
+      await tester.pumpAndSettle();
+    }
+
+    await tester.pumpWidget(NirnayApp(api: MockNirnayApi(delay: Duration.zero)));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('card-asked')), findsOneWidget);
+    expect(find.byKey(const Key('card-sanctioned')), findsNothing);
+    expect(find.byKey(const Key('track')), findsNothing);
+    expect(find.byKey(const Key('lang-hi')), findsNothing); // no language grid under Start application
+    expect(find.byKey(const Key('language')), findsOneWidget); // the language is picked from the header
+
+    await applyAs(tester, '9876500001');
+    await home();
+    expect(onCard('Ravi Kumar'), findsOneWidget);
+    expect(onCard('Nimbus Software Pvt Ltd'), findsOneWidget);
+    expect(onCard('Approved'), findsOneWidget);
+    expect(onCard('Approved in principle'), findsOneWidget);
+    expect(amount(), '₹45,00,000');
+    expect(onCard('₹39,767'), findsOneWidget); // the EMI, shown only once approved
+    expect(onCard('Sanctioned amount'), findsNothing);
+    await tapKey(tester, 'track');
+    expect(find.byKey(const Key('track-timeline')), findsOneWidget);
+    expect(find.text("Add your property's details and photos"), findsOneWidget); // where it is now
+    await tapKey(tester, 'track-open');
+    expect(find.byKey(const Key('decision-approve')), findsOneWidget);
+    await tapKey(tester, 'primary'); // add property details
+    await tapKey(tester, 'primary'); // final sanction
+    await settle(tester);
+    expect(find.text('Loan sanctioned'), findsOneWidget);
+
+    await home();
+    expect(onCard('Sanctioned'), findsOneWidget);
+    expect(onCard('Sanctioned amount'), findsOneWidget);
+    expect(amount(), '₹45,00,000');
+    await tapKey(tester, 'track');
+    expect(find.text('Sign your sanction letter online'), findsOneWidget);
+  });
+
+  testWidgets('a declined application shows no amount on the Home card', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    addTearDown(tester.view.reset);
+    await applyAs(tester, '9876500003');
+    expect(find.byKey(const Key('decision-reject')), findsOneWidget);
+    tester.state<NavigatorState>(find.byType(Navigator).first).popUntil((r) => r.isFirst);
+    await tester.pumpAndSettle();
+    final card = find.byKey(const Key('loan-card'));
+    expect(find.descendant(of: card, matching: find.text('Declined')), findsOneWidget);
+    expect(find.descendant(of: card, matching: find.text('Arjun Mehta')), findsOneWidget);
+    expect(find.byKey(const Key('card-sanctioned')), findsNothing);
+    expect(find.byKey(const Key('card-asked')), findsOneWidget);
+    expect(find.descendant(of: card, matching: find.text('Your sanctioned amount, rate and EMI show here once your loan is approved.')), findsOneWidget);
   });
 
   testWidgets('Meena is approved in principle, then referred for the title', (tester) async {
@@ -169,18 +233,21 @@ void main() {
     expect(find.textContaining('₹39,767'), findsNothing); // the EMI follows the smaller loan
   });
 
-  testWidgets('every language can be picked from the welcome screen', (tester) async {
+  testWidgets('every language can be picked from the header on the welcome screen', (tester) async {
     tester.view.physicalSize = const Size(1080, 2400);
     addTearDown(tester.view.reset);
     await tester.pumpWidget(NirnayApp(api: MockNirnayApi(delay: Duration.zero)));
     await tester.pumpAndSettle();
     for (final code in ['en', 'hi', 'bn', 'mr', 'te', 'ta', 'gu', 'ur', 'kn', 'or', 'ml', 'pa', 'as', 'mai', 'sat', 'ks', 'ne', 'kok', 'sd', 'doi', 'mni', 'brx', 'sa']) {
+      await tapKey(tester, 'language'); // the picker opens from the header
       await tapKey(tester, 'lang-$code');
       expect(tester.takeException(), isNull, reason: code);
       expect(find.byKey(const Key('start')), findsOneWidget, reason: code);
     }
+    await tapKey(tester, 'language');
     await tapKey(tester, 'lang-ur');
     expect(Directionality.of(tester.element(find.byKey(const Key('start')))), TextDirection.rtl);
+    await tapKey(tester, 'language');
     await tapKey(tester, 'lang-ks');
     expect(Directionality.of(tester.element(find.byKey(const Key('start')))), TextDirection.rtl);
   });
@@ -251,6 +318,7 @@ void main() {
     await tester.pumpWidget(NirnayApp(api: MockNirnayApi(delay: Duration.zero)));
     await tester.pumpAndSettle();
     expect(find.text('Your home loan decision in minutes'), findsOneWidget);
+    await tapKey(tester, 'language');
     await tapKey(tester, 'lang-hi');
     expect(find.text('होम लोन पर फ़ैसला, कुछ ही मिनटों में'), findsOneWidget);
     expect(find.text('आवेदन शुरू करें'), findsOneWidget);

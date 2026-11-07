@@ -26,6 +26,9 @@ class Profile {
     required this.bureauScore,
     this.requiredDocuments,
     this.selfDeclared = false,
+    this.identitySource,
+    this.bureauStatus,
+    this.bureauSource,
   });
   final String name, panMasked, aadhaarMasked, address, employer;
   final DateTime dateOfBirth;
@@ -34,6 +37,11 @@ class Profile {
   final int? bureauScore; // null: no credit history
   final List<DocSlot>? requiredDocuments; // the engine's list; null: the app's own
   final bool selfDeclared; // real mode: the customer typed these in, and documents will prove them
+  final String? identitySource; // "digilocker": name, date of birth, PAN and Aadhaar came from DigiLocker
+  // How the credit report was got: "scored" / "no_history" from the bureau, "not_pulled" (no bureau
+  // connected: an officer pulls it), "unavailable" (the bureau failed), "self_declared" (older apps).
+  final String? bureauStatus, bureauSource;
+  bool get bureauPulled => bureauStatus == 'scored' || bureauStatus == 'no_history';
 
   int ageOn(DateTime day) {
     var age = day.year - dateOfBirth.year;
@@ -43,11 +51,12 @@ class Profile {
 }
 
 /// Real mode: what the customer tells us about themselves. The engine marks every fact
-/// self-declared and checks it against the documents.
+/// self-declared and checks it against the documents. Name and date of birth are left out when
+/// DigiLocker shared them. The credit score is never asked: the engine pulls the credit report.
 class Declaration {
   Declaration({
-    required this.name,
-    required this.dateOfBirth,
+    this.name,
+    this.dateOfBirth,
     required this.employment,
     required this.employer,
     required this.monthlyIncome,
@@ -56,18 +65,17 @@ class Declaration {
     this.address,
     this.creditScore,
   });
-  final String name, employer;
-  final DateTime dateOfBirth;
+  final String? name;
+  final String employer;
+  final DateTime? dateOfBirth;
   final Employment employment;
   final double monthlyIncome, existingEmi;
   final String? email, address;
   final int? creditScore;
 
   Map<String, Object?> toJson() => {
-    'name': name,
-    'dob':
-        '${dateOfBirth.year.toString().padLeft(4, '0')}-${dateOfBirth.month.toString().padLeft(2, '0')}-'
-        '${dateOfBirth.day.toString().padLeft(2, '0')}',
+    if (name != null) 'name': name,
+    if (dateOfBirth != null) 'dob': isoDay(dateOfBirth!),
     'employment': employment == Employment.selfEmployed ? 'selfEmployed' : 'salaried',
     'employer': employer,
     'monthly_income': monthlyIncome,
@@ -78,6 +86,49 @@ class Declaration {
   };
 }
 
+String isoDay(DateTime d) =>
+    '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+/// What the engine can do for the customer. Null means it can't.
+class Connections {
+  const Connections({this.digilocker, this.bureau});
+  final String? digilocker; // "digilocker" (the real one) or "sandbox" (a test stand-in)
+  final String? bureau; // where the credit report comes from, e.g. "decentro-live-eq"
+}
+
+/// What DigiLocker shared: Aadhaar (name, date of birth, address, last 4 digits) and the PAN record.
+class DigiLockerShare {
+  DigiLockerShare({
+    required this.status,
+    this.error,
+    this.name,
+    this.dateOfBirth,
+    this.address,
+    this.pan,
+    this.panMasked,
+    this.aadhaarMasked,
+    this.hasPan = false,
+    this.hasAadhaar = false,
+    this.requiredDocuments,
+  });
+  final String status; // none, pending, done, denied, failed
+  final String? error, name, address, pan, panMasked, aadhaarMasked;
+  final DateTime? dateOfBirth;
+  final bool hasPan, hasAadhaar;
+
+  /// Shared from the documents step (details already saved): the documents still to upload.
+  final List<DocSlot>? requiredDocuments;
+  bool get done => status == 'done';
+}
+
+/// The live selfie's steps, in the order the engine picked: "center", then "left" and "right".
+class SelfieChallenge {
+  SelfieChallenge({required this.id, required this.steps, this.expiresIn = 120});
+  final String id;
+  final List<String> steps;
+  final int expiresIn; // seconds the engine waits for the frames
+}
+
 class SelfieResult {
   SelfieResult({
     required this.faceFound,
@@ -86,11 +137,15 @@ class SelfieResult {
     required this.faceMatch,
     required this.matchScore,
     this.matchPending = false,
+    this.liveSelfie = false,
+    this.headTurn,
   });
   final bool faceFound, live, faceMatch;
   final double livenessScore, matchScore;
   // No ID photo to compare with yet: the engine matches the selfie when the Aadhaar or PAN card arrives.
   final bool matchPending;
+  final bool liveSelfie; // taken live in the app with the head-turn check (not a single photo)
+  final bool? headTurn; // the head turned as asked (live selfie only)
   bool get passed => faceFound && live && faceMatch;
 }
 
@@ -107,13 +162,37 @@ class ConsentRecord {
 enum DocSlot { pan, aadhaar, salarySlip, form16, itr, gst, bankStatement, saleDeed, allotmentLetter, encumbrance, propertyTax }
 
 class DocResult {
-  DocResult({required this.slot, required this.detectedType, required this.confidence, required this.accepted, this.reasonCode, this.fields = const {}});
+  DocResult({
+    required this.slot,
+    required this.detectedType,
+    required this.confidence,
+    required this.accepted,
+    this.reasonCode,
+    this.fields = const {},
+    this.verification,
+  });
   final DocSlot slot;
   final String detectedType; // what model 6 says it is
   final double confidence;
   final bool accepted;
   final String? reasonCode; // R-DOC-01 wrong document, R-DOC-02 unreadable
-  final Map<String, String> fields; // what OCR read: name, pan, employer, netPay, period, year, income, business, gstin
+  final Map<String, String> fields; // what OCR read: name, pan, employer, netPay, period, year, income, business
+  final DocVerification? verification; // null from an engine older than verdicts
+
+  bool get failed => verification?.verdict == 'failed';
+  bool get verified => accepted && !failed;
+  /// 0-100. Older engines sent only the classifier's confidence.
+  int? get score => verification != null ? verification!.score : (accepted ? (confidence * 100).round() : null);
+}
+
+/// The engine's verdict on one document. No one confirms what was read: the checks decide.
+/// verified: every check passed. retake: it couldn't be checked (not the document asked for, or
+/// unreadable). failed: it's the right document but didn't pass verification, which rejects the application.
+class DocVerification {
+  DocVerification({required this.verdict, this.score, this.checks = const {}});
+  final String verdict;
+  final int? score; // the weakest check, 0-100; null for a retake
+  final Map<String, bool> checks; // type, readable, name, pan (the fraud checks are never sent)
 }
 
 class PropertyInput {
@@ -166,6 +245,8 @@ class Decision {
     this.keyFacts,
     this.score,
     this.reference,
+    this.credit,
+    this.verification,
   });
   final String stage; // "in_principle" or "final"
   final Outcome outcome;
@@ -176,6 +257,23 @@ class Decision {
   final KeyFacts? keyFacts; // the engine's Key Facts Statement for this offer
   final ScoreBreakdown? score; // how the credit scorecard (model 1) reached its score
   final String? reference; // the decision record's number and the start of its hash, for audits and complaints
+  final CreditScore? credit; // the credit bureau's score
+  final VerificationScore? verification; // the document checks' score
+}
+
+/// The credit bureau's score. status: scored, no_history, not_pulled (no bureau connected: an
+/// officer pulls the report), unavailable (the bureau failed), self_declared (older applications).
+class CreditScore {
+  CreditScore({this.score, this.status});
+  final int? score;
+  final String? status;
+}
+
+/// The score after verification: the weakest uploaded document's, since one bad document decides.
+class VerificationScore {
+  VerificationScore({this.score, this.documents = const {}});
+  final int? score;
+  final Map<DocSlot, int> documents;
 }
 
 /// Key Facts Statement numbers: processing fee 0.5% plus 18% GST (illustrative), and the APR,

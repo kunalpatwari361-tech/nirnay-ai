@@ -43,6 +43,8 @@ String reasonText(AppLocalizations t, Reason r, String lang) {
       return t.reasonAff01;
     case 'R-AUT-01':
       return t.reasonAut01;
+    case 'R-DOC-05':
+      return t.reasonDoc05;
     case 'R-RSK-01':
       return t.reasonRsk01;
     case 'R-RSK-02':

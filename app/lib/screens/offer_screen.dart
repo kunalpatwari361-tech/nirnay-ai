@@ -189,7 +189,7 @@ class _OfferScreenState extends State<OfferScreen> {
                 height: 6,
                 width: w * used.clamp(0.0, 1.0),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: ok ? [C.good, const Color(0xFF4ADE80)] : [C.action, C.badInk]),
+                  color: ok ? C.good : C.badInk,
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),

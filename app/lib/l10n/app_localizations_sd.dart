@@ -891,9 +891,6 @@ class AppLocalizationsSd extends AppLocalizations {
   String get fieldBusiness => 'ڪاروبار';
 
   @override
-  String get fieldGstin => 'GSTIN';
-
-  @override
   String get consentSectionRequired => 'توهان جي لون لاءِ ضروري';
 
   @override
@@ -1199,4 +1196,154 @@ class AppLocalizationsSd extends AppLocalizations {
   @override
   String get otpTooManySends =>
       'تمام گهڻا ڪوڊ گهريا ويا. 15 منٽ ترسي ٻيهر ڪوشش ڪريو.';
+
+  @override
+  String get dlTitle => 'ڊجي لاڪر مان پنهنجي تفصيل وٺو';
+
+  @override
+  String get dlBody =>
+      'توهان جو نالو، ڄمڻ جي تاريخ، PAN ۽ آڌار سڌو ڊجي لاڪر مان اچن ٿا، تنهن ڪري توهان کي اهي ٽائيپ ڪرڻ يا ڪارڊ اپلوڊ ڪرڻ جي ضرورت ناهي.';
+
+  @override
+  String get dlOpen => 'ڊجي لاڪر کوليو';
+
+  @override
+  String get dlWaiting => 'ڊجي لاڪر ۾ پورو ڪريو، پوءِ هتي واپس اچو.';
+
+  @override
+  String get dlCheck => 'ٻيهر ڏسو';
+
+  @override
+  String get dlDone => 'ڊجي لاڪر مان مليو';
+
+  @override
+  String get dlDenied =>
+      'ڊجي لاڪر مان ڪجهه به شيئر نه ٿيو. ٻيهر ڪوشش ڪريو، يا هيٺ پنهنجي تفصيل لکو.';
+
+  @override
+  String get dlFailed =>
+      'اسان ڊجي لاڪر مان توهان جي تفصيل حاصل نه ڪري سگهياسين. هڪ منٽ کانپوءِ ٻيهر ڪوشش ڪريو، يا هيٺ لکو.';
+
+  @override
+  String get bureauAuto =>
+      'توهان کي ڪريڊٽ اسڪور ڀرڻ جي ضرورت ناهي. اسان توهان جي PAN سان ڪريڊٽ بيورو مان توهان جي ڪريڊٽ رپورٽ وٺون ٿا.';
+
+  @override
+  String get bureauFetched => 'ڪريڊٽ بيورو مان ڪريڊٽ رپورٽ ورتي وئي';
+
+  @override
+  String get bureauLater =>
+      'فيصلي کان اڳ اسان ڪريڊٽ بيورو مان توهان جي ڪريڊٽ رپورٽ وٺنداسين.';
+
+  @override
+  String get fillWorkDetails =>
+      'مهرباني ڪري پنهنجو ڪم، ملازمت ڏيندڙ ۽ آمدني ڀريو.';
+
+  @override
+  String get liveSelfieStart => 'لائيو سيلفي شروع ڪريو';
+
+  @override
+  String get liveSelfieBody =>
+      'هي لائيو جانچ آهي، تصوير نه. پنهنجو چهرو بيضوي دائري اندر رکو ۽ هدايتن تي عمل ڪريو. ان ۾ لڳ ڀڳ 8 سيڪنڊ لڳن ٿا.';
+
+  @override
+  String get liveLookStraight => 'سڌو ڪئميرا ڏانهن ڏسو';
+
+  @override
+  String get liveTurnLeft => 'آهستي آهستي پنهنجو مٿو کاٻي پاسي ڦيرايو';
+
+  @override
+  String get liveTurnRight => 'آهستي آهستي پنهنجو مٿو ساڄي پاسي ڦيرايو';
+
+  @override
+  String get liveChecking => 'جانچي رهيا آهيون ته اهو واقعي توهان آهيو…';
+
+  @override
+  String get checkHeadTurn => 'مٿو ڦيرائڻ جي هدايت پوري ٿي';
+
+  @override
+  String get cameraUnavailable =>
+      'اسان سامهون وارو ڪئميرا کولي نه سگهياسين. فون جي سيٽنگن ۾ Nirnay کي ڪئميرا جي اجازت ڏيو، پوءِ ٻيهر ڪوشش ڪريو.';
+
+  @override
+  String get docsDlTitle => 'پنهنجو PAN ۽ اي-آڌار DigiLocker مان وٺو';
+
+  @override
+  String get docsDlBody =>
+      'ڪارڊن جون تصويرون نه: DigiLocker ۾ سائن ان ڪريو ۽ شيئر ڪرڻ جي اجازت ڏيو. توهان جو PAN ۽ اي-آڌار سڌو سرڪاري رڪارڊ مان اچن ٿا.';
+
+  @override
+  String get docsDlDone => 'PAN ۽ اي-آڌار DigiLocker مان ملي ويا';
+
+  @override
+  String get docsDlRetry =>
+      'DigiLocker مان ڪجهه نه آيو. ٻيهر ڪوشش ڪريو، يا هيٺ ڪارڊن جي تصوير وٺو.';
+
+  @override
+  String get dlPanMismatch =>
+      'توهان جي DigiLocker ۾ PAN اهو ناهي جيڪو توهان داخل ڪيو، تنهنڪري استعمال نه ٿيو. هيٺ پنهنجي PAN ڪارڊ جي تصوير وٺو.';
+
+  @override
+  String docVerified(String type) {
+    return 'تصديق ٿيل: $type';
+  }
+
+  @override
+  String get docFailed => 'هي دستاويز تصديق ۾ پاس نه ٿيو';
+
+  @override
+  String get docFailedBody =>
+      'جنهن درخواست جو ڪو دستاويز تصديق ۾ ناڪام ٿئي ٿو، اها درخواست رد ڪئي وڃي ٿي. توهان ڪنهن ماڻهو کي هن فيصلي تي نظرثاني لاءِ چئي سگهو ٿا.';
+
+  @override
+  String verifyScore(String score) {
+    return 'اسڪور $score/100';
+  }
+
+  @override
+  String get checkName => 'نالو توهان جي تفصيل سان ملي ٿو';
+
+  @override
+  String get checkPan => 'PAN اهو ئي آهي جيڪو توهان داخل ڪيو';
+
+  @override
+  String get seeDecision => 'فيصلو ڏسو';
+
+  @override
+  String get yourScores => 'توهان جا اسڪور';
+
+  @override
+  String get creditNotPulled =>
+      'اڃا نه ڪڍي وئي: هڪ آفيسر توهان جي ڪريڊٽ رپورٽ ڪڍندو';
+
+  @override
+  String get creditNoHistory => 'بيورو وٽ توهان جي ڪا ڪريڊٽ تاريخ ناهي';
+
+  @override
+  String get verificationTitle => 'تصديق اسڪور';
+
+  @override
+  String get verificationFrom =>
+      'توهان جي دستاويزن مان سڀ کان گهٽ اسڪور، 100 مان';
+
+  @override
+  String get reasonDoc05 =>
+      'توهان جو هڪ دستاويز اسان جي تصديق جاچ ۾ پاس نه ٿيو.';
+
+  @override
+  String get cardAsked => 'توهان جي گهريل رقم';
+
+  @override
+  String get cardSanctionedAmount => 'منظور ٿيل رقم';
+
+  @override
+  String get cardSanctionLater =>
+      'لون منظور ٿيڻ کان پوءِ توهان جي منظور ٿيل رقم، وياج جي شرح ۽ EMI هتي ڏيکاري ويندي.';
+
+  @override
+  String get cardNotStarted =>
+      'درخواست شروع ڪريو، توهان جو تفصيل هتي ڏيکاريو ويندو.';
+
+  @override
+  String get statusInProgress => 'جاري آهي';
 }

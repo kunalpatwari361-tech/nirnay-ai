@@ -36,6 +36,32 @@ Set `NIRNAY_SMS_PROVIDER=twilio`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` and 
 
 **Limits:** the engine allows 3 codes per number every 15 minutes and 5 tries per code. Codes are checked by the provider, so the engine never sees them.
 
+## Optional: the credit report and DigiLocker
+
+The app never asks applicants for their credit score. Without a bureau the report isn't pulled, and every decision waits for an officer to pull one (R-BUR-06).
+
+**Credit report: Decentro** ([docs](https://docs.decentro.tech/docs/credit-bureau-credit-report)):
+1. Create a Decentro account and get the staging `client_id` and `client_secret`.
+2. Set `NIRNAY_BUREAU=decentro`, `DECENTRO_CLIENT_ID` and `DECENTRO_CLIENT_SECRET`.
+3. Staging reports are test data, so the engine refers every case that uses one. For live reports, set `DECENTRO_BASE_URL=https://in.decentro.tech` once Decentro moves your account to production.
+
+**DigiLocker** (Requester – Meri Pehchaan API Specification v2.4, NeGD, Sep 2026): the government's own route. Applicants share their name, date of birth, PAN and e-Aadhaar from DigiLocker instead of typing them and photographing the cards, with no partner in between.
+1. Register the lender as a DigiLocker requester on DigiLocker's partner portal (it needs an organisation, which NeGD approves). Ask for the e-Aadhaar and the PAN Verification Record (doctype `PANCR`).
+2. Register the redirect URI `https://<your server>/v1/digilocker/callback`; it must match exactly.
+3. Set `DIGILOCKER_CLIENT_ID`, `DIGILOCKER_CLIENT_SECRET` and `DIGILOCKER_REDIRECT_URI`. Optionally set `DIGILOCKER_SERVICE_NAME` and `DIGILOCKER_PURPOSE`, which DigiLocker shows on its consent screen (letters, digits, spaces and underscores).
+4. The app shows **Get my details from DigiLocker** (and the DigiLocker card on the documents step) once `/v1/health` reports `"digilocker": "digilocker"`.
+5. Run one real sign-in yourself before inviting applicants: the calls are written from the specification and tested against a stand-in.
+
+**DigiLocker through Cashfree** ([docs](https://www.cashfree.com/docs/api-reference/vrs/v2/digilocker/digilocker-integration)): no requester registration of your own, because Cashfree is the DigiLocker partner. Its sandbox signs in to the real DigiLocker, so testers share their own PAN and e-Aadhaar.
+1. Create a Cashfree merchant account, open Secure ID, and generate sandbox API keys (Developers > API Keys). If DigiLocker isn't switched on for the test environment, ask Cashfree support to enable it.
+2. Cashfree needs 2FA even in the sandbox: under Developers > Two-Factor Authentication, whitelist the server's IP, or generate a public key and download the `.pem` file (only once). A home connection's IP changes, so use the public key there.
+3. Set `CASHFREE_CLIENT_ID`, `CASHFREE_CLIENT_SECRET` and `CASHFREE_PUBLIC_KEY_FILE` (the `.pem` path). The app offers DigiLocker on the details and documents screens once `/v1/health` reports `"digilocker": "cashfree"`.
+4. Live: set `CASHFREE_VERIFICATION_URL=https://api.cashfree.com/verification` with production keys and key, once Cashfree approves the account.
+
+For a laptop test, `backend\run-local-real.ps1 -Bureau -DigiLocker` (or `-Cashfree`) asks for these keys and doesn't save the secrets.
+
+With `-Twilio`, the Twilio Auth Token is the exception: once Twilio accepts it, the script remembers it, encrypted with Windows DPAPI so only your Windows account on that PC can read it (`backend\var\real\twilio-token.dpapi`, git-ignored). If Twilio later refuses it, the script forgets it and asks again; `-ForgetTwilioToken` deletes it. `-Port 8002` runs the server on another port when 8000 is busy; the phone still calls 8000, which `adb reverse` forwards.
+
 ## 3. The server: Render
 
 The engine needs about **1 GB of memory**, so use the **Standard** plan (2 GB). The free and Starter plans have 512 MB, which is too small.

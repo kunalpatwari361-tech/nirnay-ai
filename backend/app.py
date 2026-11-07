@@ -16,18 +16,21 @@ database (backend/db.py; Supabase when DATABASE_URL is set).
 from __future__ import annotations
 
 import hmac
+import html
 import json
 import logging
 from typing import Annotated, Literal
+from urllib.parse import urlencode
 
 from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
-from . import intake, letters, otp, pipeline, registry, sandbox
+from . import bureau, digilocker, live_selfie, intake, letters, otp, pipeline, registry, sandbox
 from .config import settings
 from .db import Database
+from .digilocker import DigiLockerError
 from .intake import IntakeError
 from .ledger import DbLedger
 from .otp import OtpError
@@ -104,8 +107,11 @@ def health():
         sms = otp.provider(settings.sandbox).name
     except OtpError:
         sms = None
+    credit = bureau.provider(settings.sandbox)
     return {"ok": True, "engine": pipeline.ENGINE_VERSION, "sandbox": settings.sandbox,
-            "mode": "sandbox" if settings.sandbox else "real", "database": db.describe()["backend"], "sms": sms}
+            "mode": "sandbox" if settings.sandbox else "real", "database": db.describe()["backend"], "sms": sms,
+            # What the app can offer: DigiLocker sign-in, and a credit report pulled from PAN.
+            "digilocker": digilocker.available(settings.sandbox), "bureau": credit.source if credit else None}
 
 
 @app.get("/v1/models")
@@ -184,9 +190,10 @@ def put_consents(body: Consents, a: Customer):
 
 
 class Declared(BaseModel):
-    """What a real applicant types in (real mode). Each fact is marked self-declared."""
-    name: str = Field(min_length=2, max_length=80, pattern=r"^[A-Za-z][A-Za-z .'-]*$")
-    dob: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}$")
+    """What a real applicant types in (real mode). Each fact is marked self-declared. Name and date
+    of birth may be left out when DigiLocker shared them."""
+    name: str | None = Field(default=None, min_length=2, max_length=80, pattern=r"^[A-Za-z][A-Za-z .'-]*$")
+    dob: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
     email: str | None = Field(default=None, max_length=120, pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
     address: str | None = Field(default=None, max_length=200)
     employment: Literal["salaried", "selfEmployed"]
@@ -208,19 +215,225 @@ def profile(body: ProfileRequest, a: Customer):
     return {"name": p["name"], "dateOfBirth": p["dob"], "panMasked": p["pan_masked"], "aadhaarMasked": p["aadhaar_masked"] or "",
             "address": p["address"], "employment": p["employment"], "employer": p["employer"],
             "monthlyIncome": p["monthly_income"], "existingEmi": p["existing_emi"], "bureauScore": p["bureau"].get("score"),
-            "requiredDocuments": intake.required_documents(a), "selfDeclared": bool(p.get("self_declared"))}
+            "requiredDocuments": intake.required_documents(a), "selfDeclared": bool(p.get("self_declared")),
+            "identitySource": "digilocker" if intake.digilocker_identity(a) else None,
+            "bureauStatus": p["bureau"].get("status"), "bureauSource": p["bureau"].get("source")}
+
+
+# --------------------------------------------------------------------------- DigiLocker (backend/digilocker.py)
+
+def _digilocker_view(a: Application) -> dict:
+    st = (a.digilocker or {}).get("status", "none")
+    out = {"status": st, "error": (a.digilocker or {}).get("error")}
+    d = intake.digilocker_identity(a)
+    if d:
+        pan = d.get("pan")
+        out.update(name=d["name"], dateOfBirth=d["dob"], gender=d.get("gender"), address=d.get("address") or "",
+                   pan=pan, panMasked=f"{pan[:2]}XXX{pan[5:9]}X" if pan else "", aadhaarMasked=d.get("aadhaar_masked") or "",
+                   hasPan=d["has_pan"], hasAadhaar=d["has_aadhaar"])
+    if a.profile is not None:                        # shared from the documents step: fewer cards to photograph
+        out["requiredDocuments"] = intake.required_documents(a)
+    return out
+
+
+class DigiLockerStart(BaseModel):
+    returnTo: Literal["app", "page"] = "page"     # "app": the phone app waits for nirnay://digilocker
+
+
+@app.post("/v1/applications/{application_id}/digilocker")
+def digilocker_start(request: Request, a: Customer, body: DigiLockerStart | None = None):
+    """The link to DigiLocker's sign-in and consent page. The app opens it in the browser;
+    DigiLocker sends the applicant back to /v1/digilocker/callback (or, through Cashfree, the engine
+    asks Cashfree when the app checks). Works before the details are saved and after (documents)."""
+    if not intake.consents_ok(a):
+        raise IntakeError("consent_required", 409)
+    c = digilocker.client(settings.sandbox, str(request.base_url))
+    if c is None:
+        raise IntakeError("digilocker_not_connected", 501)
+    if isinstance(c, digilocker.CashfreeDigiLocker):
+        base = str(request.base_url).rstrip("/")
+        try:
+            url, vid = c.begin(a.id, a.phone, f"{base}/v1/digilocker/return")
+        except DigiLockerError as e:
+            raise IntakeError(e.code, 502) from e
+        a.digilocker = {"status": "pending", "provider": "cashfree", "verification_id": vid, "at": now().isoformat()}
+        store.save(a)
+        return {"url": url}
+    url = digilocker.start(c, a.id, "app" if body and body.returnTo == "app" else None, a.phone)
+    a.digilocker = {"status": "pending", "at": now().isoformat()}
+    store.save(a)
+    return {"url": url}
+
+
+@app.get("/v1/applications/{application_id}/digilocker")
+def digilocker_status(request: Request, a: Customer):
+    f = a.digilocker or {}
+    if f.get("status") == "pending" and f.get("provider") == "cashfree":
+        _collect_cashfree(a, request)
+    return _digilocker_view(a)
+
+
+def _collect_cashfree(a: Application, request: Request) -> None:
+    """Cashfree doesn't call back: ask it whether the applicant has finished in DigiLocker."""
+    c = digilocker.client(settings.sandbox, str(request.base_url))
+    if not isinstance(c, digilocker.CashfreeDigiLocker):
+        return
+    try:
+        got = c.collect(a.digilocker["verification_id"])
+        if got is None:                              # still signing in or choosing what to share
+            return
+        intake.apply_digilocker(a, got, c.name)
+    except DigiLockerError as e:
+        if e.code == "digilocker_unreachable":       # try again on the next check
+            return
+        a.digilocker = {"status": "denied" if e.code == "digilocker_access_denied" else "failed", "error": e.code,
+                        "at": now().isoformat()}
+    except IntakeError as e:
+        a.digilocker = {"status": "failed", "error": e.code, "at": now().isoformat()}
+    except Exception as e:                           # an answer we didn't expect: failed, not a crash
+        log.error("Cashfree DigiLocker check failed: %s", type(e).__name__)
+        a.digilocker = {"status": "failed", "error": "digilocker_unexpected", "at": now().isoformat()}
+    store.save(a)
+
+
+_PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>{title}</title>
+<style>body{{font-family:system-ui,sans-serif;margin:0;padding:28px 20px;background:#f4f6fb;color:#14213d}}
+.card{{max-width:440px;margin:0 auto;background:#fff;border-radius:18px;padding:24px;box-shadow:0 6px 24px #0a255014}}
+h1{{font-size:21px;margin:0 0 10px}}p{{line-height:1.5;color:#3d4a66}}.tag{{display:inline-block;font-size:12px;
+font-weight:700;color:#8a5a00;background:#fff3d6;border-radius:99px;padding:3px 10px;margin-bottom:12px}}
+a.btn{{display:block;text-align:center;text-decoration:none;font-weight:700;padding:14px;border-radius:12px;
+margin-top:12px;background:#0a2550;color:#fff}}a.alt{{background:#eef1f7;color:#0a2550}}
+dl{{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px}}dt{{color:#6b7690}}dd{{margin:0;font-weight:600}}</style>
+</head><body><div class="card">{body}</div>{script}</body></html>"""
+
+_BACK = "nirnay://digilocker"
+
+
+def _page(title: str, body: str, status: int = 200, back: bool = False) -> HTMLResponse:
+    script = f"<script>setTimeout(function(){{location.href='{_BACK}'}},400)</script>" if back else ""
+    return HTMLResponse(_PAGE.format(title=html.escape(title), body=body, script=script), status_code=status)
+
+
+@app.get("/v1/digilocker/return")
+def digilocker_return():
+    """Where Cashfree sends the browser after DigiLocker (an https engine only): back to the app,
+    which then asks the engine what was shared."""
+    return _page("Back to Nirnay", "<h1>Done in DigiLocker</h1><p>Go back to the Nirnay app to carry on. "
+                 "You can close this page.</p>" + f'<a class="btn" href="{_BACK}">Back to the Nirnay app</a>', back=True)
+
+
+@app.get("/v1/digilocker/callback")
+def digilocker_callback(request: Request, state: str = "", code: str = "", error: str = ""):
+    """Where DigiLocker sends the applicant's browser after they allow (or refuse) sharing."""
+    f = digilocker.take(state)
+    a = store.apps.get(f["application_id"]) if f else None
+    back = f'<a class="btn" href="{_BACK}">Back to the Nirnay app</a>'
+    if a is None:
+        return _page("Link expired", "<h1>This DigiLocker link has expired</h1><p>Go back to the Nirnay app and "
+                     "tap <b>Get my details from DigiLocker</b> again.</p>" + back, 400)
+    if error or not code:
+        a.digilocker = {"status": "denied" if error in ("", "access_denied") else "failed", "error": error or "no_code",
+                        "at": now().isoformat()}
+    else:
+        c = digilocker.client(settings.sandbox, str(request.base_url))
+        try:
+            if c is None:
+                raise DigiLockerError("digilocker_not_connected")
+            intake.apply_digilocker(a, c.finish(code, f["verifier"], f["redirect_uri"]), c.name)
+        except (DigiLockerError, IntakeError) as e:
+            a.digilocker = {"status": "failed", "error": e.code, "at": now().isoformat()}
+        except Exception as e:                       # an answer we didn't expect: a page, not a crash
+            log.error("DigiLocker callback failed: %s", type(e).__name__)
+            a.digilocker = {"status": "failed", "error": "digilocker_unexpected", "at": now().isoformat()}
+    store.save(a)
+    if f.get("return_to") == "app":                  # the phone app's sign-in tab closes on this redirect
+        return RedirectResponse(f"{_BACK}?{urlencode({'status': a.digilocker['status']})}", 302)
+    if a.digilocker["status"] == "done":
+        return _page("Details received", "<h1>Done: your details came from DigiLocker</h1><p>Go back to the Nirnay "
+                     "app to carry on. You can close this page.</p>" + back, back=True)
+    if a.digilocker["status"] == "denied":
+        return _page("Not shared", "<h1>Nothing was shared</h1><p>You didn't allow DigiLocker to share your details. "
+                     "You can go back and type them in instead.</p>" + back, back=True)
+    return _page("Something went wrong", "<h1>We couldn't get your details from DigiLocker</h1><p>Go back to the "
+                 "Nirnay app and try again in a minute, or type your details in.</p>" + back, back=True)
+
+
+@app.get("/v1/sandbox/digilocker/oauth2/1/authorize")
+def sandbox_digilocker_page(state: str = "", client_id: str = "", redirect_uri: str = "", code_challenge: str = "",
+                            code_challenge_method: str = "", purpose: str = "", service_name: str = ""):
+    """Sandbox only: a stand-in for DigiLocker's sign-in and consent page, for the fictional demo people.
+    Like the real one (spec v2.4), it refuses a link without a purpose and a service name."""
+    f = digilocker.flow(state)
+    a = store.apps.get(f["application_id"]) if f else None
+    if (not settings.sandbox or a is None or a.persona is None or client_id != digilocker.TestDigiLocker.CLIENT_ID
+            or redirect_uri != f["redirect_uri"] or code_challenge != f["challenge"] or code_challenge_method != "S256"
+            or not purpose or digilocker.consent_text(purpose, "") != purpose
+            or not service_name or digilocker.consent_text(service_name, "") != service_name):
+        raise HTTPException(404, "not_found")
+    p = a.persona
+    pan = digilocker.SANDBOX_PANS.get(p.key, "DNRPN7731F")
+    q = html.escape(state, quote=True)
+    body = (f'<span class="tag">TEST DIGILOCKER: SANDBOX, FICTIONAL PERSON</span><h1>Share your documents with Nirnay?</h1>'
+            f'<p><b>{html.escape(service_name)}</b> asks for these from your DigiLocker. Purpose: '
+            f'{html.escape(purpose.replace("_", " "))}.</p>'
+            f'<dl><dt>Aadhaar</dt><dd>{html.escape(p.name)}, born {p.dob:%d %b %Y}</dd>'
+            f'<dt>PAN</dt><dd>{pan[:2]}XXX{pan[5:9]}X</dd></dl>'
+            f'<a class="btn" href="/v1/sandbox/digilocker/consent?state={q}&amp;allow=1">Allow</a>'
+            f'<a class="btn alt" href="/v1/sandbox/digilocker/consent?state={q}&amp;allow=0">Deny</a>')
+    return _page("Test DigiLocker", body)
+
+
+@app.get("/v1/sandbox/digilocker/consent")
+def sandbox_digilocker_consent(state: str = "", allow: int = 0):
+    f = digilocker.flow(state)
+    a = store.apps.get(f["application_id"]) if f else None
+    if not settings.sandbox or a is None or a.persona is None:
+        raise HTTPException(404, "not_found")
+    if not allow:
+        return RedirectResponse(f"{f['redirect_uri']}?{urlencode({'error': 'access_denied', 'state': state})}", 302)
+    code = digilocker.test_digilocker().issue_code(a.persona.key, f["challenge"], f["redirect_uri"])
+    return RedirectResponse(f"{f['redirect_uri']}?{urlencode({'code': code, 'state': state})}", 302)
+
+
+def _selfie_view(a: Application, r: dict) -> dict:
+    fm = a.face_match
+    out = {"faceFound": r["face_found"], "live": r["live"], "livenessScore": (r["liveness"] or {}).get("score", 0.0),
+           "faceMatch": fm["match"] if fm else r["face_found"], "matchScore": (fm or {}).get("similarity") or 0.0,
+           "matchPending": fm is None}
+    if r.get("method") == "live":
+        out.update(liveSelfie=True, headTurn=r["head_turn"]["passed"], problems=r["problems"])
+    return out
 
 
 @app.post("/v1/applications/{application_id}/selfie")
 def selfie(a: Customer, file: UploadFile = File(...)):
+    """One photo (older apps and the demo's sample selfie). Real mode refers it: use the live selfie."""
     if a.profile is None:
         raise IntakeError("profile_required", 409)
     r = intake.check_selfie(a, _read(file))
     store.save(a)
-    fm = a.face_match
-    return {"faceFound": r["face_found"], "live": r["live"], "livenessScore": (r["liveness"] or {}).get("score", 0.0),
-            "faceMatch": fm["match"] if fm else r["face_found"], "matchScore": (fm or {}).get("similarity") or 0.0,
-            "matchPending": fm is None}
+    return _selfie_view(a, r)
+
+
+@app.post("/v1/applications/{application_id}/selfie/challenge")
+def selfie_challenge(a: Customer):
+    """The live selfie's steps, in an order the engine picks: look straight, then turn left and right."""
+    if a.profile is None:
+        raise IntakeError("profile_required", 409)
+    return live_selfie.new_challenge(a.id)
+
+
+@app.post("/v1/applications/{application_id}/selfie/live")
+def selfie_live(a: Customer, challengeId: Annotated[str, Form()], frames: list[UploadFile] = File(...)):
+    """One frame from the app's camera per challenge step, in order (backend/live_selfie.py)."""
+    if a.profile is None:
+        raise IntakeError("profile_required", 409)
+    if len(frames) > 5:
+        raise IntakeError("bad_frames")
+    r = intake.check_live_selfie(a, challengeId, [_read(f) for f in frames])
+    store.save(a)
+    return _selfie_view(a, r)
 
 
 @app.post("/v1/applications/{application_id}/documents")

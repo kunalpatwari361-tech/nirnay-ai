@@ -9,9 +9,13 @@ import '../services/models.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 
-/// What the engine read from a document photo: a scan passes over the photo, then the document
-/// type with how sure the classifier is (model 6), the checks, and the fields it read.
-/// Pops true when the customer wants to retake the photo.
+/// What the customer does next, once the engine has checked a document.
+enum DocReadNext { keep, retake, decide }
+
+/// The engine's check of a document photo: a scan passes over the photo, then the verdict with
+/// its verification score, the checks, and the fields it read. No one confirms what was read:
+/// a verified document is kept, one that couldn't be checked is retaken, and one that failed
+/// verification goes to the decision, which rejects the application. Pops a [DocReadNext].
 class DocReadScreen extends StatefulWidget {
   const DocReadScreen({super.key, required this.slot, required this.bytes, required this.result});
   final DocSlot slot;
@@ -38,10 +42,22 @@ class _DocReadScreenState extends State<DocReadScreen> with SingleTickerProvider
     final asked = docName(t, widget.slot);
     final seen = DocSlot.values.where((s) => s.name == r.detectedType).firstOrNull;
     final fields = r.fields.entries.where((e) => _label(t, e.key) != null).toList();
+    final checks = r.verification?.checks ?? const <String, bool>{};
+    final score = r.score;
+    final title = r.failed
+        ? t.docFailed
+        : r.accepted
+            ? t.docVerified(seen == null ? asked : docName(t, seen))
+            : r.reasonCode == 'R-DOC-02'
+                ? t.docUnreadable
+                : t.docWrong(asked);
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context, false)),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.pop(context, r.failed ? DocReadNext.decide : DocReadNext.keep),
+        ),
         title: Text(t.readingDoc(asked), maxLines: 1, overflow: TextOverflow.ellipsis),
         shape: const Border(bottom: BorderSide(color: C.line)),
         actions: [Padding(padding: const EdgeInsets.only(right: 14), child: Center(child: Pill(t.documentAi)))],
@@ -69,18 +85,31 @@ class _DocReadScreenState extends State<DocReadScreen> with SingleTickerProvider
                           Row(children: [
                             Expanded(
                               child: Text(
-                                r.accepted ? t.docAccepted(seen == null ? asked : docName(t, seen)) : t.docWrong(asked),
-                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: r.accepted ? C.ink : C.badInk),
+                                title,
+                                key: Key('verdict-${r.failed ? 'failed' : r.accepted ? 'verified' : 'retake'}'),
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: r.verified ? C.ink : C.badInk),
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            Pill(t.sure('${(r.confidence * 100).round()}'), tone: r.accepted ? Tone.good : Tone.warn),
+                            if (score != null) ...[
+                              const SizedBox(width: 8),
+                              Pill(t.verifyScore('$score'), tone: r.failed ? Tone.bad : score >= 80 ? Tone.good : Tone.warn),
+                            ],
                           ]),
                           const SizedBox(height: 8),
-                          CheckRow(ok: r.accepted, label: t.readMatches),
-                          CheckRow(ok: true, label: t.readClear),
+                          CheckRow(ok: checks['type'] ?? r.accepted, label: t.readMatches),
+                          CheckRow(ok: checks['readable'] ?? true, label: t.readClear),
+                          if (checks['name'] != null) CheckRow(ok: checks['name']!, label: t.checkName),
+                          if (checks['pan'] != null) CheckRow(ok: checks['pan']!, label: t.checkPan),
                         ]),
                       ),
+                      if (r.failed) ...[
+                        const SizedBox(height: 12),
+                        SectionCard(
+                          tone: Tone.bad,
+                          padding: const EdgeInsets.all(14),
+                          child: Text(t.docFailedBody, style: const TextStyle(fontSize: 13.5, height: 1.4)),
+                        ),
+                      ],
                       if (r.accepted && fields.isNotEmpty) ...[
                         const SizedBox(height: 18),
                         SectionTitle(t.whatWeRead),
@@ -116,26 +145,28 @@ class _DocReadScreenState extends State<DocReadScreen> with SingleTickerProvider
               boxShadow: [BoxShadow(color: Color(0x140F1B2D), blurRadius: 16, offset: Offset(0, -4))],
             ),
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-            child: Row(children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  key: const Key('retake'),
-                  style: OutlinedButton.styleFrom(minimumSize: const Size(0, 52)),
-                  onPressed: () => Navigator.pop(context, true),
-                  icon: const Icon(Icons.refresh),
-                  label: Text(t.retake),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                flex: 2,
-                child: FilledButton(
-                  key: const Key('looks-right'),
-                  onPressed: () => Navigator.pop(context, false),
-                  child: Text(r.accepted ? t.looksRight : t.close),
-                ),
-              ),
-            ]),
+            child: SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: r.failed
+                  ? FilledButton(
+                      key: const Key('see-decision'),
+                      onPressed: () => Navigator.pop(context, DocReadNext.decide),
+                      child: Text(t.seeDecision),
+                    )
+                  : r.accepted
+                      ? FilledButton(
+                          key: const Key('continue'),
+                          onPressed: () => Navigator.pop(context, DocReadNext.keep),
+                          child: Text(t.continueLabel),
+                        )
+                      : FilledButton.icon(
+                          key: const Key('retake'),
+                          onPressed: () => Navigator.pop(context, DocReadNext.retake),
+                          icon: const Icon(Icons.refresh),
+                          label: Text(t.retake),
+                        ),
+            ),
           ),
         ]),
       ),
@@ -167,7 +198,7 @@ class _DocReadScreenState extends State<DocReadScreen> with SingleTickerProvider
                       right: 0,
                       top: 0,
                       height: y,
-                      child: Container(color: Aurora.teal.withValues(alpha: 0.10)),
+                      child: Container(color: C.brand.withValues(alpha: 0.10)),
                     ),
                     Positioned(
                       left: 0,
@@ -175,10 +206,7 @@ class _DocReadScreenState extends State<DocReadScreen> with SingleTickerProvider
                       top: y - 2,
                       height: 4,
                       child: Container(
-                        decoration: BoxDecoration(
-                          color: Aurora.teal,
-                          boxShadow: [BoxShadow(color: Aurora.teal.withValues(alpha: 0.8), blurRadius: 14, spreadRadius: 2)],
-                        ),
+                        decoration: const BoxDecoration(color: C.brand),
                       ),
                     ),
                   ] else
@@ -186,7 +214,7 @@ class _DocReadScreenState extends State<DocReadScreen> with SingleTickerProvider
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: widget.result.accepted ? Aurora.teal : C.badInk, width: 3),
+                          border: Border.all(color: widget.result.verified ? C.good : C.badInk, width: 3),
                         ),
                       ),
                     ),
@@ -207,7 +235,6 @@ class _DocReadScreenState extends State<DocReadScreen> with SingleTickerProvider
         'year' => t.fieldYear,
         'income' => t.fieldIncome,
         'business' => t.fieldBusiness,
-        'gstin' => t.fieldGstin,
         _ => null,
       };
 }

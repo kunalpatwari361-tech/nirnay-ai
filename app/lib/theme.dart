@@ -1,6 +1,6 @@
-// The look of the app, taken from the market-standard design (Figma page "G · Market standard"):
-// a white header, a light grey page, white cards with a thin border, brand blue for
-// information and orange only for the one main action on each screen.
+// The look of the app: simple, flat colours. A white header, a light grey page, white cards
+// with a thin border, and one navy blue for information and the main action on each screen.
+// Green, amber and red only say how something went. No gradients and no glow.
 import 'package:flutter/material.dart';
 
 import 'languages.dart';
@@ -12,7 +12,7 @@ class C {
   static const onBrandMuted = Color(0xFFCAD6EC);
   static const gold = Color(0xFFC9A24A);
   static const goldTint = Color(0xFFF7EFDC);
-  static const action = Color(0xFFC2410C);
+  static const action = brand; // the main button: the same navy, so the app has one accent colour
   static const page = Color(0xFFF4F5F8);
   static const card = Color(0xFFFFFFFF);
   static const line = Color(0xFFE3E7EF);
@@ -50,9 +50,6 @@ TextStyle serif(double size, {Color color = C.ink, FontWeight weight = FontWeigh
 
 /// Soft shadow under cards, so they sit a little above the page.
 const cardShadow = [BoxShadow(color: Color(0x0F0F1B2D), blurRadius: 14, offset: Offset(0, 4))];
-
-/// The navy gradient used by the offer and result cards.
-const brandGradient = LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF1A4A92), C.brandDark]);
 
 ThemeData nirnayTheme() {
   final scheme = ColorScheme.fromSeed(seedColor: C.brand).copyWith(
@@ -115,7 +112,7 @@ ThemeData nirnayTheme() {
       style: FilledButton.styleFrom(
         backgroundColor: C.action,
         foregroundColor: Colors.white,
-        disabledBackgroundColor: const Color(0xFFE5C9BC),
+        disabledBackgroundColor: const Color(0xFFB9C5DA),
         disabledForegroundColor: Colors.white,
         minimumSize: const Size.fromHeight(52),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -176,24 +173,5 @@ ThemeData nirnayTheme() {
       shape: RoundedRectangleBorder(borderRadius: radius12),
     ),
     progressIndicatorTheme: const ProgressIndicatorThemeData(color: C.brand, linearTrackColor: C.brandTint),
-  );
-}
-
-/// The dark "Aurora" look of the welcome screen: near-black with teal and violet light.
-class Aurora {
-  static const bg = Color(0xFF0A0B12);
-  static const glass = Color(0x0FFFFFFF);
-  static const glassLine = Color(0x1FFFFFFF);
-  static const text = Color(0xFFF4F6FB);
-  static const muted = Color(0xFF9AA3B8);
-  static const teal = Color(0xFF2EE6C5);
-  static const violet = Color(0xFF7C5CFF);
-  static const amber = Color(0xFFF5B649);
-  static const action = LinearGradient(colors: [teal, violet]);
-  static const card = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFF3B6CF6), Color(0xFF22C3D6), Color(0xFF7C5CFF)],
-    stops: [0, 0.55, 1],
   );
 }

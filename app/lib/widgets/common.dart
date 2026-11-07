@@ -9,20 +9,19 @@ import '../theme.dart';
 
 /// The language button in every header: shows the current language and opens the picker.
 class LanguageToggle extends StatelessWidget {
-  const LanguageToggle({super.key, this.onDark = false});
-  final bool onDark;
+  const LanguageToggle({super.key});
 
   @override
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
     final lang = languageOf(state.locale.languageCode);
-    final fg = onDark ? Colors.white : C.brand;
+    const fg = C.brand;
     return Padding(
       padding: const EdgeInsets.only(right: 12),
       child: Center(
         child: Material(
-          color: onDark ? Colors.white.withValues(alpha: 0.12) : C.page,
-          shape: StadiumBorder(side: BorderSide(color: onDark ? Colors.white.withValues(alpha: 0.24) : C.line)),
+          color: C.page,
+          shape: const StadiumBorder(side: BorderSide(color: C.line)),
           child: InkWell(
             key: const Key('language'),
             customBorder: const StadiumBorder(),
@@ -32,13 +31,13 @@ class LanguageToggle extends StatelessWidget {
               constraints: const BoxConstraints(maxWidth: 130),
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(Icons.translate, size: 16, color: fg),
+                const Icon(Icons.translate, size: 16, color: fg),
                 const SizedBox(width: 6),
                 Flexible(
                   child: Text(lang.native,
-                      maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: fg)),
+                      maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: fg)),
                 ),
-                Icon(Icons.expand_more, size: 16, color: fg),
+                const Icon(Icons.expand_more, size: 16, color: fg),
               ]),
             ),
           ),
@@ -48,10 +47,9 @@ class LanguageToggle extends StatelessWidget {
   }
 }
 
-/// A grid of all the languages, each in its own script, for the welcome screen and the picker.
+/// A grid of all the languages, each in its own script, for the language picker.
 class LanguageGrid extends StatelessWidget {
-  const LanguageGrid({super.key, this.onDark = false, this.onPicked});
-  final bool onDark;
+  const LanguageGrid({super.key, this.onPicked});
   final VoidCallback? onPicked;
 
   @override
@@ -69,7 +67,6 @@ class LanguageGrid extends StatelessWidget {
             child: _LanguageChip(
               language: l,
               selected: l.code == current,
-              onDark: onDark,
               onTap: () {
                 state.setLocale(Locale(l.code));
                 onPicked?.call();
@@ -82,15 +79,15 @@ class LanguageGrid extends StatelessWidget {
 }
 
 class _LanguageChip extends StatelessWidget {
-  const _LanguageChip({required this.language, required this.selected, required this.onDark, required this.onTap});
+  const _LanguageChip({required this.language, required this.selected, required this.onTap});
   final AppLanguage language;
-  final bool selected, onDark;
+  final bool selected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final bg = selected ? (onDark ? Colors.white.withValues(alpha: 0.16) : C.brandTint) : (onDark ? Colors.white.withValues(alpha: 0.05) : C.card);
-    final border = selected ? (onDark ? Aurora.teal : C.brand) : (onDark ? Colors.white.withValues(alpha: 0.10) : C.line);
+    final bg = selected ? C.brandTint : C.card;
+    final border = selected ? C.brand : C.line;
     return Material(
       color: bg,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: border, width: selected ? 1.6 : 1)),
@@ -104,9 +101,9 @@ class _LanguageChip extends StatelessWidget {
             Text(language.native,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: onDark ? Colors.white : (selected ? C.brand : C.ink))),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: selected ? C.brand : C.ink)),
             Text(language.english,
-                maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 10.5, color: onDark ? Aurora.muted : C.muted)),
+                maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 10.5, color: C.muted)),
           ]),
         ),
       ),
@@ -353,7 +350,7 @@ extension ToneColours on Tone {
   Color get solid => switch (this) {
     Tone.info => C.brand,
     Tone.good => C.good,
-    Tone.warn => C.action,
+    Tone.warn => C.warnInk,
     Tone.bad => C.badInk,
   };
 }

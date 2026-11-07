@@ -897,9 +897,6 @@ class AppLocalizationsSat extends AppLocalizations {
   String get fieldBusiness => 'ᱵᱮᱯᱟᱨ';
 
   @override
-  String get fieldGstin => 'GSTIN';
-
-  @override
   String get consentSectionRequired => 'ᱟᱢᱟᱜ ᱞᱚᱱ ᱞᱟᱹᱜᱤᱫ ᱞᱟᱹᱠᱛᱤ';
 
   @override
@@ -1205,4 +1202,154 @@ class AppLocalizationsSat extends AppLocalizations {
   @override
   String get otpTooManySends =>
       'ᱟᱹᱰᱤ ᱵᱟᱹᱲᱛᱤ ᱠᱳᱰ ᱠᱟᱹᱢᱤ ᱮᱱᱟ᱾ 15 ᱢᱤᱱᱤᱴ ᱛᱟᱹᱝᱜᱤ ᱠᱟᱛᱮ ᱫᱩᱦᱲᱟᱹ ᱠᱩᱨᱩᱢᱩᱴᱩᱭ ᱢᱮ᱾';
+
+  @override
+  String get dlTitle => 'ᱰᱤᱡᱤᱞᱚᱠᱟᱨ ᱠᱷᱚᱱ ᱟᱢᱟᱜ ᱵᱤᱵᱨᱚᱬ ᱦᱟᱛᱟᱣ ᱢᱮ';
+
+  @override
+  String get dlBody =>
+      'ᱟᱢᱟᱜ ᱧᱩᱛᱩᱢ, ᱡᱟᱱᱟᱢ ᱢᱟᱦᱟᱸ, PAN ᱟᱨ ᱟᱫᱷᱟᱨ ᱥᱤᱫᱷᱟ ᱰᱤᱡᱤᱞᱚᱠᱟᱨ ᱠᱷᱚᱱ ᱦᱤᱡᱩᱜᱼᱟ, ᱚᱱᱟᱛᱮ ᱱᱚᱶᱟ ᱴᱟᱭᱤᱯ ᱟᱨᱵᱟᱝ ᱠᱟᱨᱰ ᱟᱯᱞᱳᱰ ᱞᱟᱹᱠᱛᱤ ᱵᱟᱹᱱᱩᱜᱼᱟ᱾';
+
+  @override
+  String get dlOpen => 'ᱰᱤᱡᱤᱞᱚᱠᱟᱨ ᱠᱷᱩᱞᱟᱹᱭ ᱢᱮ';
+
+  @override
+  String get dlWaiting =>
+      'ᱰᱤᱡᱤᱞᱚᱠᱟᱨ ᱨᱮ ᱢᱩᱪᱟᱹᱫ ᱢᱮ, ᱛᱟᱭᱚᱢ ᱱᱚᱸᱰᱮ ᱨᱩᱣᱟᱹᱲ ᱦᱤᱡᱩᱜ ᱢᱮ᱾';
+
+  @override
+  String get dlCheck => 'ᱫᱩᱦᱲᱟᱹ ᱧᱮᱞ ᱢᱮ';
+
+  @override
+  String get dlDone => 'ᱰᱤᱡᱤᱞᱚᱠᱟᱨ ᱠᱷᱚᱱ ᱧᱟᱢ ᱮᱱᱟ';
+
+  @override
+  String get dlDenied =>
+      'ᱰᱤᱡᱤᱞᱚᱠᱟᱨ ᱠᱷᱚᱱ ᱪᱮᱫ ᱦᱚᱸ ᱵᱟᱝ ᱦᱟᱹᱴᱤᱧ ᱮᱱᱟ᱾ ᱫᱩᱦᱲᱟᱹ ᱠᱩᱨᱩᱢᱩᱴᱩᱭ ᱢᱮ, ᱟᱨᱵᱟᱝ ᱞᱟᱛᱟᱨ ᱨᱮ ᱟᱢᱟᱜ ᱵᱤᱵᱨᱚᱬ ᱚᱞ ᱢᱮ᱾';
+
+  @override
+  String get dlFailed =>
+      'ᱰᱤᱡᱤᱞᱚᱠᱟᱨ ᱠᱷᱚᱱ ᱟᱢᱟᱜ ᱵᱤᱵᱨᱚᱬ ᱵᱟᱝ ᱧᱟᱢ ᱫᱟᱲᱮᱭᱟᱫᱟᱞᱮ᱾ ᱢᱤᱫ ᱢᱤᱱᱤᱴ ᱛᱟᱭᱚᱢ ᱫᱩᱦᱲᱟᱹ ᱠᱩᱨᱩᱢᱩᱴᱩᱭ ᱢᱮ, ᱟᱨᱵᱟᱝ ᱞᱟᱛᱟᱨ ᱨᱮ ᱚᱞ ᱢᱮ᱾';
+
+  @override
+  String get bureauAuto =>
+      'ᱟᱢ ᱠᱨᱮᱰᱤᱴ ᱥᱠᱳᱨ ᱚᱞ ᱞᱟᱹᱠᱛᱤ ᱵᱟᱹᱱᱩᱜᱼᱟ᱾ ᱟᱢᱟᱜ PAN ᱛᱮ ᱠᱨᱮᱰᱤᱴ ᱵᱭᱩᱨᱳ ᱠᱷᱚᱱ ᱟᱢᱟᱜ ᱠᱨᱮᱰᱤᱴ ᱨᱤᱯᱚᱴ ᱟᱞᱮ ᱦᱟᱛᱟᱣᱟ᱾';
+
+  @override
+  String get bureauFetched => 'ᱠᱨᱮᱰᱤᱴ ᱵᱭᱩᱨᱳ ᱠᱷᱚᱱ ᱠᱨᱮᱰᱤᱴ ᱨᱤᱯᱚᱴ ᱦᱟᱛᱟᱣ ᱮᱱᱟ';
+
+  @override
+  String get bureauLater =>
+      'ᱯᱷᱟᱭᱥᱟᱞᱟ ᱞᱟᱦᱟ ᱨᱮ ᱟᱞᱮ ᱠᱨᱮᱰᱤᱴ ᱵᱭᱩᱨᱳ ᱠᱷᱚᱱ ᱟᱢᱟᱜ ᱠᱨᱮᱰᱤᱴ ᱨᱤᱯᱚᱴ ᱦᱟᱛᱟᱣᱟ᱾';
+
+  @override
+  String get fillWorkDetails =>
+      'ᱫᱟᱭᱟ ᱠᱟᱛᱮ ᱟᱢᱟᱜ ᱠᱟᱹᱢᱤ, ᱠᱟᱹᱢᱤ ᱮᱢᱚᱜᱤᱡ ᱟᱨ ᱟᱨᱡᱟᱣ ᱯᱮᱨᱮᱡ ᱢᱮ᱾';
+
+  @override
+  String get liveSelfieStart => 'ᱞᱟᱭᱤᱵᱽ ᱥᱮᱞᱯᱷᱤ ᱮᱦᱚᱵ ᱢᱮ';
+
+  @override
+  String get liveSelfieBody =>
+      'ᱱᱚᱶᱟ ᱫᱚ ᱞᱟᱭᱤᱵᱽ ᱧᱮᱞ ᱠᱟᱱᱟ, ᱪᱤᱛᱟᱹᱨ ᱵᱟᱝ᱾ ᱢᱚᱪᱟ ᱜᱚᱞ ᱵᱷᱤᱛᱨᱤ ᱨᱮ ᱫᱚᱦᱚᱭ ᱢᱮ ᱟᱨ ᱞᱟᱹᱭ ᱞᱮᱠᱟ ᱠᱟᱹᱢᱤ ᱢᱮ᱾ ᱡᱷᱚᱛᱚ 8 ᱥᱮᱠᱮᱱᱰ ᱞᱟᱹᱜᱤᱫᱼᱟ᱾';
+
+  @override
+  String get liveLookStraight => 'ᱥᱤᱫᱷᱟ ᱠᱮᱢᱮᱨᱟ ᱥᱮᱫ ᱧᱮᱞ ᱢᱮ';
+
+  @override
+  String get liveTurnLeft => 'ᱟᱥᱛᱮ ᱟᱥᱛᱮ ᱵᱚᱦᱚᱜ ᱞᱮᱸᱜᱟ ᱥᱮᱫ ᱜᱷᱩᱨᱤᱧ ᱢᱮ';
+
+  @override
+  String get liveTurnRight => 'ᱟᱥᱛᱮ ᱟᱥᱛᱮ ᱵᱚᱦᱚᱜ ᱡᱚᱡᱚᱢ ᱥᱮᱫ ᱜᱷᱩᱨᱤᱧ ᱢᱮ';
+
+  @override
+  String get liveChecking => 'ᱟᱢ ᱜᱮ ᱥᱟᱨᱤ ᱜᱮ ᱢᱮᱱᱟᱢᱟ ᱪᱮ ᱵᱟᱝ ᱧᱮᱞᱚᱜ ᱠᱟᱱᱟ…';
+
+  @override
+  String get checkHeadTurn => 'ᱵᱚᱦᱚᱜ ᱜᱷᱩᱨᱤᱧ ᱨᱮᱭᱟᱜ ᱞᱟᱹᱭ ᱢᱟᱱᱟᱣ ᱮᱱᱟ';
+
+  @override
+  String get cameraUnavailable =>
+      'ᱥᱟᱢᱟᱝ ᱠᱮᱢᱮᱨᱟ ᱵᱟᱝ ᱠᱷᱩᱞᱟᱹᱭ ᱫᱟᱲᱮᱭᱟᱫᱟᱞᱮ᱾ ᱯᱷᱚᱱ ᱥᱮᱴᱤᱝ ᱨᱮ Nirnay ᱞᱟᱹᱜᱤᱫ ᱠᱮᱢᱮᱨᱟ ᱦᱩᱠᱩᱢ ᱮᱢ ᱢᱮ, ᱛᱟᱭᱚᱢ ᱫᱩᱦᱲᱟᱹ ᱠᱩᱨᱩᱢᱩᱴᱩᱭ ᱢᱮ᱾';
+
+  @override
+  String get docsDlTitle => 'ᱟᱢᱟᱜ PAN ᱟᱨ ᱤ-ᱟᱫᱷᱟᱨ DigiLocker ᱠᱷᱚᱱ ᱦᱟᱛᱟᱣ ᱢᱮ';
+
+  @override
+  String get docsDlBody =>
+      'ᱠᱟᱨᱰ ᱨᱮᱭᱟᱜ ᱪᱤᱛᱟᱹᱨ ᱵᱟᱝ ᱞᱟᱹᱠᱛᱤᱭᱟ: DigiLocker ᱨᱮ ᱥᱟᱭᱤᱱ ᱤᱱ ᱢᱮ ᱟᱨ ᱦᱟᱹᱴᱤᱧ ᱞᱟᱹᱜᱤᱫ ᱦᱩᱠᱩᱢ ᱮᱢ ᱢᱮ᱾ ᱟᱢᱟᱜ PAN ᱟᱨ ᱤ-ᱟᱫᱷᱟᱨ ᱥᱤᱫᱷᱟ ᱥᱚᱨᱠᱟᱨᱤ ᱨᱮᱠᱚᱨᱰ ᱠᱷᱚᱱ ᱦᱤᱡᱩᱜ ᱠᱟᱱᱟ᱾';
+
+  @override
+  String get docsDlDone => 'PAN ᱟᱨ ᱤ-ᱟᱫᱷᱟᱨ DigiLocker ᱠᱷᱚᱱ ᱧᱟᱢ ᱮᱱᱟ';
+
+  @override
+  String get docsDlRetry =>
+      'DigiLocker ᱠᱷᱚᱱ ᱪᱮᱫ ᱦᱚᱸ ᱵᱟᱝ ᱦᱤᱡᱩᱜ ᱞᱮᱱᱟ᱾ ᱫᱩᱦᱲᱟᱹ ᱠᱩᱨᱩᱢᱩᱴᱩᱭ ᱢᱮ, ᱟᱨᱵᱟᱝ ᱞᱟᱛᱟᱨ ᱨᱮ ᱠᱟᱨᱰ ᱨᱮᱭᱟᱜ ᱪᱤᱛᱟᱹᱨ ᱤᱫᱤ ᱢᱮ᱾';
+
+  @override
+  String get dlPanMismatch =>
+      'ᱟᱢᱟᱜ DigiLocker ᱨᱮᱭᱟᱜ PAN ᱫᱚ ᱟᱢ ᱮᱢ ᱟᱠᱟᱫ ᱫᱚ ᱵᱟᱝ ᱠᱟᱱᱟ, ᱚᱱᱟᱛᱮ ᱵᱟᱝ ᱵᱮᱵᱷᱟᱨ ᱞᱮᱱᱟ᱾ ᱞᱟᱛᱟᱨ ᱨᱮ ᱟᱢᱟᱜ PAN ᱠᱟᱨᱰ ᱨᱮᱭᱟᱜ ᱪᱤᱛᱟᱹᱨ ᱤᱫᱤ ᱢᱮ᱾';
+
+  @override
+  String docVerified(String type) {
+    return 'ᱥᱟᱹᱨᱤ ᱧᱮᱞ ᱮᱱᱟ: $type';
+  }
+
+  @override
+  String get docFailed => 'ᱱᱚᱶᱟ ᱠᱟᱜᱚᱡ ᱥᱟᱹᱨᱤ ᱧᱮᱞ ᱨᱮ ᱵᱟᱝ ᱯᱟᱥ ᱮᱱᱟ';
+
+  @override
+  String get docFailedBody =>
+      'ᱡᱟᱦᱟᱸ ᱟᱨᱡᱤ ᱨᱮᱭᱟᱜ ᱠᱟᱜᱚᱡ ᱥᱟᱹᱨᱤ ᱧᱮᱞ ᱨᱮ ᱯᱷᱮᱞ ᱦᱩᱭᱩᱜ ᱠᱟᱱᱟ, ᱚᱱᱟ ᱟᱨᱡᱤ ᱵᱟᱹᱛᱤᱞ ᱦᱩᱭᱩᱜ ᱠᱟᱱᱟ᱾ ᱟᱢ ᱢᱤᱫ ᱦᱚᱲ ᱠᱮ ᱱᱚᱶᱟ ᱵᱤᱪᱟᱹᱨ ᱫᱚᱦᱲᱟ ᱧᱮᱞ ᱞᱟᱹᱜᱤᱫ ᱞᱟᱹᱭ ᱫᱟᱲᱮᱭᱟᱜᱼᱟᱢ᱾';
+
+  @override
+  String verifyScore(String score) {
+    return 'ᱥᱠᱚᱨ $score/100';
+  }
+
+  @override
+  String get checkName => 'ᱧᱩᱛᱩᱢ ᱟᱢᱟᱜ ᱵᱤᱵᱨᱚᱬ ᱥᱟᱶ ᱢᱤᱞᱟᱹᱣᱜ ᱠᱟᱱᱟ';
+
+  @override
+  String get checkPan => 'PAN ᱫᱚ ᱟᱢ ᱮᱢ ᱟᱠᱟᱫ ᱜᱮ ᱠᱟᱱᱟ';
+
+  @override
+  String get seeDecision => 'ᱵᱤᱪᱟᱹᱨ ᱧᱮᱞ ᱢᱮ';
+
+  @override
+  String get yourScores => 'ᱟᱢᱟᱜ ᱥᱠᱚᱨ';
+
+  @override
+  String get creditNotPulled =>
+      'ᱱᱤᱛ ᱦᱟᱹᱵᱤᱡ ᱵᱟᱝ ᱟᱹᱜᱩ ᱟᱠᱟᱱᱟ: ᱢᱤᱫ ᱚᱯᱷᱤᱥᱚᱨ ᱟᱢᱟᱜ ᱠᱨᱮᱰᱤᱴ ᱨᱤᱯᱚᱨᱴ ᱟᱹᱜᱩᱭᱟ';
+
+  @override
+  String get creditNoHistory => 'ᱵᱭᱩᱨᱚ ᱴᱷᱮᱱ ᱟᱢᱟᱜ ᱚᱠᱟ ᱠᱨᱮᱰᱤᱴ ᱤᱛᱤᱦᱟᱹᱥ ᱵᱟᱹᱱᱩᱜᱼᱟ';
+
+  @override
+  String get verificationTitle => 'ᱥᱟᱹᱨᱤ ᱧᱮᱞ ᱥᱠᱚᱨ';
+
+  @override
+  String get verificationFrom =>
+      'ᱟᱢᱟᱜ ᱠᱟᱜᱚᱡ ᱠᱚ ᱢᱩᱫᱽ ᱨᱮ ᱡᱚᱛᱚ ᱠᱷᱚᱱ ᱠᱚᱢ ᱥᱠᱚᱨ, 100 ᱨᱮ';
+
+  @override
+  String get reasonDoc05 =>
+      'ᱟᱢᱟᱜ ᱢᱤᱫᱴᱟᱹᱝ ᱠᱟᱜᱚᱡ ᱟᱵᱚᱣᱟᱜ ᱥᱟᱹᱨᱤ ᱧᱮᱞ ᱨᱮ ᱵᱟᱝ ᱯᱟᱥ ᱮᱱᱟ᱾';
+
+  @override
+  String get cardAsked => 'ᱟᱢᱟᱜ ᱠᱷᱚᱡ ᱟᱠᱟᱱ ᱛᱟᱠᱟ';
+
+  @override
+  String get cardSanctionedAmount => 'ᱢᱚᱱᱡᱩᱨ ᱛᱟᱠᱟ';
+
+  @override
+  String get cardSanctionLater =>
+      'ᱞᱚᱱ ᱢᱚᱱᱡᱩᱨ ᱦᱩᱭ ᱛᱟᱭᱚᱢ ᱟᱢᱟᱜ ᱢᱚᱱᱡᱩᱨ ᱛᱟᱠᱟ, ᱥᱩᱫᱽ ᱫᱚᱨ ᱟᱨ EMI ᱫᱚ ᱱᱚᱸᱰᱮ ᱧᱮᱞᱚᱜᱼᱟ᱾';
+
+  @override
+  String get cardNotStarted => 'ᱟᱨᱡᱤ ᱮᱛᱦᱚᱵ ᱢᱮ, ᱟᱢᱟᱜ ᱵᱤᱵᱨᱚᱬ ᱱᱚᱸᱰᱮ ᱧᱮᱞᱚᱜᱼᱟ᱾';
+
+  @override
+  String get statusInProgress => 'ᱪᱟᱞᱟᱜ ᱠᱟᱱᱟ';
 }

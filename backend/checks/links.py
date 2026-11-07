@@ -48,9 +48,10 @@ def phash(data: bytes) -> str | None:
         return None
 
 
-def duplicate_check(app_id: str, digest: str, seen: dict[str, set[str]]) -> dict:
-    """The exact same document file (SHA-256) on another application."""
-    others = [a for a, digests in seen.items() if a != app_id and digest in digests]
+def duplicate_check(app_id: str, digest: str, seen: dict[str, set[str]], same_person: set[str] = frozenset()) -> dict:
+    """The exact same document file (SHA-256) on another applicant's application. same_person:
+    the applicant's own earlier applications (same PAN), where their own files are expected."""
+    others = [a for a, digests in seen.items() if a != app_id and a not in same_person and digest in digests]
     return {"check": "duplicate_file", "reused_from": others, "flag": "refer" if others else "pass",
             "reason_code": "R-FRD-06" if others else None}
 

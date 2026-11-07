@@ -890,9 +890,6 @@ class AppLocalizationsAs extends AppLocalizations {
   String get fieldBusiness => 'ব্যৱসায়';
 
   @override
-  String get fieldGstin => 'GSTIN';
-
-  @override
   String get consentSectionRequired => 'আপোনাৰ ঋণৰ বাবে প্ৰয়োজনীয়';
 
   @override
@@ -1198,4 +1195,153 @@ class AppLocalizationsAs extends AppLocalizations {
   @override
   String get otpTooManySends =>
       'বহুত বেছি ক\'ড বিচৰা হ\'ল। 15 মিনিট অপেক্ষা কৰি পুনৰ চেষ্টা কৰক।';
+
+  @override
+  String get dlTitle => 'ডিজিলকাৰৰ পৰা আপোনাৰ তথ্য লওক';
+
+  @override
+  String get dlBody =>
+      'আপোনাৰ নাম, জন্মৰ তাৰিখ, PAN আৰু আধাৰ পোনপটীয়াকৈ ডিজিলকাৰৰ পৰা আহে, সেয়েহে সেইবোৰ টাইপ কৰিব বা কাৰ্ড আপলোড কৰিব নালাগে।';
+
+  @override
+  String get dlOpen => 'ডিজিলকাৰ খোলক';
+
+  @override
+  String get dlWaiting => 'ডিজিলকাৰত সম্পূৰ্ণ কৰক, তাৰ পিছত ইয়ালৈ উভতি আহক।';
+
+  @override
+  String get dlCheck => 'আকৌ চাওক';
+
+  @override
+  String get dlDone => 'ডিজিলকাৰৰ পৰা পোৱা গ\'ল';
+
+  @override
+  String get dlDenied =>
+      'ডিজিলকাৰৰ পৰা একো শ্বেয়াৰ কৰা নহ\'ল। আকৌ চেষ্টা কৰক, নাইবা তলত আপোনাৰ তথ্য লিখক।';
+
+  @override
+  String get dlFailed =>
+      'আমি ডিজিলকাৰৰ পৰা আপোনাৰ তথ্য পাব নোৱাৰিলোঁ। এক মিনিটৰ পিছত আকৌ চেষ্টা কৰক, নাইবা তলত লিখক।';
+
+  @override
+  String get bureauAuto =>
+      'আপুনি ক্ৰেডিট স্ক\'ৰ দিব নালাগে। আমি আপোনাৰ PAN ৰে ক্ৰেডিট ব্যুৰোৰ পৰা আপোনাৰ ক্ৰেডিট ৰিপ\'ৰ্ট লওঁ।';
+
+  @override
+  String get bureauFetched => 'ক্ৰেডিট ব্যুৰোৰ পৰা ক্ৰেডিট ৰিপ\'ৰ্ট লোৱা হ\'ল';
+
+  @override
+  String get bureauLater =>
+      'সিদ্ধান্তৰ আগতে আমি ক্ৰেডিট ব্যুৰোৰ পৰা আপোনাৰ ক্ৰেডিট ৰিপ\'ৰ্ট ল\'ম।';
+
+  @override
+  String get fillWorkDetails =>
+      'অনুগ্ৰহ কৰি আপোনাৰ কাম, নিয়োগকৰ্তা আৰু আয় লিখক।';
+
+  @override
+  String get liveSelfieStart => 'লাইভ চেলফি আৰম্ভ কৰক';
+
+  @override
+  String get liveSelfieBody =>
+      'এইটো লাইভ পৰীক্ষা, ফটো নহয়। মুখখন ডিম্বাকাৰৰ ভিতৰত ৰাখক আৰু নিৰ্দেশনা মানি চলক। ইয়াত প্ৰায় 8 ছেকেণ্ড লাগে।';
+
+  @override
+  String get liveLookStraight => 'পোনে পোনে কেমেৰালৈ চাওক';
+
+  @override
+  String get liveTurnLeft => 'লাহে লাহে মূৰটো বাওঁফালে ঘূৰাওক';
+
+  @override
+  String get liveTurnRight => 'লাহে লাহে মূৰটো সোঁফালে ঘূৰাওক';
+
+  @override
+  String get liveChecking => 'এয়া সঁচাকৈয়ে আপুনি নে পৰীক্ষা কৰি আছোঁ…';
+
+  @override
+  String get checkHeadTurn => 'মূৰ ঘূৰোৱাৰ নিৰ্দেশনা মানা হ\'ল';
+
+  @override
+  String get cameraUnavailable =>
+      'আমি সন্মুখৰ কেমেৰা খুলিব নোৱাৰিলোঁ। ফোনৰ ছেটিংছত Nirnay-ক কেমেৰাৰ অনুমতি দিয়ক, তাৰ পিছত আকৌ চেষ্টা কৰক।';
+
+  @override
+  String get docsDlTitle => 'আপোনাৰ PAN আৰু ই-আধাৰ DigiLocker ৰ পৰা লওক';
+
+  @override
+  String get docsDlBody =>
+      'কাৰ্ডৰ ফটো নালাগে: DigiLocker ত ছাইন ইন কৰি শ্বেয়াৰ কৰাৰ অনুমতি দিয়ক। আপোনাৰ PAN আৰু ই-আধাৰ পোনপটীয়াকৈ চৰকাৰী ৰেকৰ্ডৰ পৰা আহে।';
+
+  @override
+  String get docsDlDone => 'PAN আৰু ই-আধাৰ DigiLocker ৰ পৰা পোৱা গ\'ল';
+
+  @override
+  String get docsDlRetry =>
+      'DigiLocker ৰ পৰা একো নাহিল। আকৌ চেষ্টা কৰক, বা তলত কাৰ্ডৰ ফটো তোলক।';
+
+  @override
+  String get dlPanMismatch =>
+      'আপোনাৰ DigiLocker ৰ PAN আপুনি দিয়া PAN নহয়, সেয়ে ব্যৱহাৰ কৰা হোৱা নাই। তলত আপোনাৰ PAN কাৰ্ডৰ ফটো তোলক।';
+
+  @override
+  String docVerified(String type) {
+    return 'সত্যাপিত: $type';
+  }
+
+  @override
+  String get docFailed => 'এই নথিখন সত্যাপনত উত্তীৰ্ণ নহ\'ল';
+
+  @override
+  String get docFailedBody =>
+      'যি আবেদনৰ কোনো নথি সত্যাপনত উত্তীৰ্ণ নহয়, সেই আবেদন নাকচ কৰা হয়। আপুনি এজন ব্যক্তিক এই সিদ্ধান্ত পুনৰীক্ষণ কৰিবলৈ ক\'ব পাৰে।';
+
+  @override
+  String verifyScore(String score) {
+    return 'স্ক\'ৰ $score/100';
+  }
+
+  @override
+  String get checkName => 'নামটো আপোনাৰ বিৱৰণৰ সৈতে মিলে';
+
+  @override
+  String get checkPan => 'PAN আপুনি দিয়া PAN-ৰ সৈতে মিলে';
+
+  @override
+  String get seeDecision => 'সিদ্ধান্ত চাওক';
+
+  @override
+  String get yourScores => 'আপোনাৰ স্ক\'ৰ';
+
+  @override
+  String get creditNotPulled =>
+      'এতিয়াও অনা হোৱা নাই: এজন বিষয়াই আপোনাৰ ক্ৰেডিট ৰিপ\'ৰ্ট আনিব';
+
+  @override
+  String get creditNoHistory => 'ব্যুৰোৰ ওচৰত আপোনাৰ কোনো ক্ৰেডিট ইতিহাস নাই';
+
+  @override
+  String get verificationTitle => 'সত্যাপন স্ক\'ৰ';
+
+  @override
+  String get verificationFrom =>
+      'আপোনাৰ নথিসমূহৰ ভিতৰত আটাইতকৈ কম স্ক\'ৰ, 100ৰ ভিতৰত';
+
+  @override
+  String get reasonDoc05 =>
+      'আপোনাৰ এখন নথি আমাৰ সত্যাপন পৰীক্ষাত উত্তীৰ্ণ নহ\'ল।';
+
+  @override
+  String get cardAsked => 'আপুনি বিচৰা পৰিমাণ';
+
+  @override
+  String get cardSanctionedAmount => 'মঞ্জুৰ কৰা পৰিমাণ';
+
+  @override
+  String get cardSanctionLater =>
+      'ঋণ অনুমোদিত হ\'লে আপোনাৰ মঞ্জুৰ কৰা পৰিমাণ, সুদৰ হাৰ আৰু EMI ইয়াত দেখা যাব।';
+
+  @override
+  String get cardNotStarted => 'আবেদন আৰম্ভ কৰক, আপোনাৰ বিৱৰণ ইয়াত দেখা যাব।';
+
+  @override
+  String get statusInProgress => 'চলি আছে';
 }

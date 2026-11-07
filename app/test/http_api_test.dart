@@ -55,6 +55,36 @@ void main() {
     expect(jsonDecode(bodies[2])['options']['aaMonths'], 12);
   });
 
+  test('DigiLocker and the credit bureau, as the engine reports them', () async {
+    final a = api({
+      'GET /v1/health': (200, {'ok': true, 'digilocker': 'sandbox', 'bureau': 'sandbox-bureau'}),
+      'POST /v1/applications/HL-2611-12345/digilocker': (200, {'url': 'http://engine.test/v1/sandbox/digilocker/oauth2/1/authorize?state=s'}),
+      'GET /v1/applications/HL-2611-12345/digilocker': (200, {
+        'status': 'done', 'error': null, 'name': 'Priya Nair', 'dateOfBirth': '1990-05-09', 'gender': 'F',
+        'address': 'Kochi 682001', 'pan': 'DNRPN7731F', 'panMasked': 'DNXXX7731X', 'aadhaarMasked': 'XXXX XXXX 4821',
+        'hasPan': true, 'hasAadhaar': true, 'requiredDocuments': ['salarySlip', 'form16', 'bankStatement'],
+      }),
+      'POST /v1/applications/HL-2611-12345/profile': (200, {
+        'name': 'Priya Nair', 'dateOfBirth': '1990-05-09', 'panMasked': 'DNXXX7731X', 'aadhaarMasked': 'XXXX XXXX 4821',
+        'address': 'Kochi 682001', 'employment': 'salaried', 'employer': 'Orchid', 'monthlyIncome': 85000,
+        'existingEmi': 5000, 'bureauScore': null, 'requiredDocuments': ['salarySlip', 'form16'], 'selfDeclared': true,
+        'identitySource': 'digilocker', 'bureauStatus': 'not_pulled', 'bureauSource': 'not-connected',
+      }),
+    });
+    final links = await a.connections();
+    expect((links.digilocker, links.bureau), ('sandbox', 'sandbox-bureau'));
+    expect(await a.startDigiLocker(session), contains('/digilocker/oauth2/1/authorize'));
+    expect(jsonDecode(bodies.last), {'returnTo': 'app'}); // the engine sends the browser back to nirnay://
+    final share = await a.digiLockerStatus(session);
+    expect((share.done, share.name, share.dateOfBirth, share.pan, share.hasAadhaar), (true, 'Priya Nair', DateTime(1990, 5, 9), 'DNRPN7731F', true));
+    expect(share.requiredDocuments, [DocSlot.salarySlip, DocSlot.form16, DocSlot.bankStatement]); // shared from the documents step
+    final p = await a.fetchProfile(session, 'DNRPN7731F',
+        declared: Declaration(employment: Employment.salaried, employer: 'Orchid', monthlyIncome: 85000, existingEmi: 5000));
+    expect(jsonDecode(bodies.last)['declared'].keys, isNot(contains('name'))); // DigiLocker gave the name and date of birth
+    expect((p.identitySource, p.bureauStatus, p.bureauPulled), ('digilocker', 'not_pulled', false));
+    expect(p.requiredDocuments, [DocSlot.salarySlip, DocSlot.form16]);
+  });
+
   test('engine errors become ApiException codes', () async {
     final a = api({'POST /v1/otp/verify': (401, {'error': 'wrong_otp'})});
     expect(() => a.verifyOtp('9876500001', '000000', 'd'), throwsA(isA<ApiException>().having((e) => e.code, 'code', 'wrong_otp')));
@@ -70,6 +100,7 @@ void main() {
       'POST /v1/applications/HL-2611-12345/documents': (200, {
         'slot': 'salarySlip', 'detectedType': 'salarySlip', 'confidence': 0.97, 'accepted': true, 'reasonCode': null,
         'fields': {'netPay': '1,00,000.00', 'name': 'Ravi Kumar'},
+        'verification': {'verdict': 'verified', 'score': 94, 'checks': {'type': true, 'readable': true, 'name': true}},
       }),
     });
     final s = await a.checkSelfie(session, Uint8List.fromList([1, 2, 3]));
@@ -78,11 +109,30 @@ void main() {
     final d = await a.uploadDocument(session, DocSlot.salarySlip, Uint8List.fromList([4, 5]), 'slip.jpg');
     expect(d.accepted, isTrue);
     expect(d.fields['netPay'], '1,00,000.00');
+    expect((d.verified, d.failed, d.score, d.verification!.checks['name']), (true, false, 94, true));
     // MockClient hands over the encoded multipart body, so check what goes over the wire.
     expect(seen.last.headers['content-type'], startsWith('multipart/form-data'));
     expect(bodies.last, contains('name="slot"\r\n\r\nsalarySlip'));
     expect(bodies.last, contains('name="file"; filename="slip.jpg"'));
     expect(bodies[0], contains('name="file"; filename="selfie.jpg"'));
+  });
+
+  test('live selfie: the engine picks the steps, and the frames go back with its challenge id', () async {
+    final a = api({
+      'POST /v1/applications/HL-2611-12345/selfie/challenge': (200, {'challengeId': 'ch-9', 'steps': ['center', 'left', 'right'], 'expiresIn': 120}),
+      'POST /v1/applications/HL-2611-12345/selfie/live': (200, {
+        'faceFound': true, 'live': false, 'livenessScore': 0.98, 'faceMatch': false, 'matchScore': 0.0, 'matchPending': true,
+        'liveSelfie': true, 'headTurn': false, 'problems': ["the head didn't turn as asked"],
+      }),
+    });
+    final c = await a.selfieChallenge(session);
+    expect((c.id, c.expiresIn), ('ch-9', 120));
+    expect(c.steps, ['center', 'left', 'right']);
+    final r = await a.checkLiveSelfie(session, c.id, [for (var i = 0; i < 3; i++) Uint8List.fromList([i, i])]);
+    expect((r.liveSelfie, r.headTurn, r.live, r.passed), (true, false, false, false));
+    expect(seen.last.headers['X-Device-Id'], 'dev1');
+    expect(bodies.last, contains('name="challengeId"\r\n\r\nch-9'));
+    expect(RegExp('name="frames"; filename="frame[0-2].jpg"').allMatches(bodies.last), hasLength(3));
   });
 
   test('sandbox samples: bytes from the engine, or null so the app uses its own', () async {
@@ -105,6 +155,8 @@ void main() {
         {'input': 'loan_amount', 'bin': 'missing', 'points': 0},
       ]},
       'record': {'seq': 4, 'hash': 'abcdef0123456789'},
+      'credit': {'score': null, 'status': 'not_pulled'},
+      'verification': {'score': 61, 'documents': {'pan': 97, 'bankStatement': 61, 'notASlot': 50}},
     };
     final a = api({
       'POST /v1/applications/HL-2611-12345/in-principle': (200, {...decision, 'stage': 'in_principle', 'outcome': 'approve', 'valuation': null}),
@@ -122,6 +174,9 @@ void main() {
         ]));
     expect(fin.outcome, Outcome.refer);
     expect(fin.reasons.single.code, 'R-PRP-01');
+    expect((fin.credit!.score, fin.credit!.status), (null, 'not_pulled'));
+    expect(fin.verification!.score, 61);
+    expect(fin.verification!.documents, {DocSlot.pan: 97, DocSlot.bankStatement: 61}); // unknown slots are dropped
     expect(fin.valuation!.valueForLtv, 12000000);
     expect(fin.keyFacts!.loanAmount, 6000000);
     expect(fin.keyFacts!.fee + fin.keyFacts!.gst, 35400);

@@ -184,17 +184,30 @@ def test_without_a_face_on_the_id_card_the_face_match_refers(client, real):
     d = client.post(base + "/in-principle", headers=h, json=LOAN).json()
     rec, codes = internal(client, app_id, "in_principle")
     assert d["outcome"] == "refer" and "R-KYC-01" in codes             # real mode never skips the face match
+    notes = [n for g in rec["gates"] if g["gate"] == "identity" for n in g["notes"]]
+    assert any("wasn't taken live" in n for n in notes)                # and a plain photo isn't a live selfie
+
+
+def live_selfie(client, base, h, face, monkeypatch):
+    """The app's live selfie. The sample photo can't turn its head, so the turn frames are read as turns."""
+    from backend import live_selfie as ls
+    values = iter([0.0, 0.3, -0.3])
+    monkeypatch.setattr(ls, "yaw", lambda r: next(values))
+    c = client.post(base + "/selfie/challenge", headers=h).json()
+    files = [("frames", (f"f{i}.jpg", face, "image/jpeg")) for i in range(len(c["steps"]))]
+    return client.post(base + "/selfie/live", headers=h, data={"challengeId": c["challengeId"]}, files=files).json()
 
 
 @pytest.fixture
-def kavya(client, real):
+def kavya(client, real, monkeypatch):
     face = selfie_image()
     if face is None:
         pytest.skip("sample face photo not on this machine")
     app_id, h, base = sign_in(client, "9000011111", "dev-kavya")
     client.put(base + "/consents", headers=h, json=ALL_CONSENTS)
     client.post(base + "/profile", headers=h, json={"pan": realdocs.PAN, "declared": realdocs.DECLARED})
-    selfie = client.post(base + "/selfie", headers=h, files={"file": ("s.jpg", face, "image/jpeg")}).json()
+    selfie = live_selfie(client, base, h, face, monkeypatch)
+    assert selfie["live"] and selfie["headTurn"], selfie
     docs = {"pan": upload(client, base, h, "pan", realdocs.pan_with_face(face, seed=app_id))}
     for slot in ("aadhaar", "salarySlip", "form16"):
         docs[slot] = upload(client, base, h, slot, realdocs.document(slot, seed=app_id))
@@ -220,6 +233,8 @@ def test_real_applicant_is_proven_by_documents(client, kavya):
 
 def test_real_title_needs_the_sale_deed(client, kavya):
     first = final(client, kavya["base"], kavya["h"], "kavya-1")
+    rec_ip, _ = internal(client, kavya["id"], "in_principle")
+    assert first.get("stage") == "final", [(g["gate"], g["reasons"], g["notes"]) for g in rec_ip["gates"] if g["outcome"] != "pass"]
     _, codes = internal(client, kavya["id"], "final")
     assert first["outcome"] == "refer" and "R-PRP-01" in codes            # no land records, no deed: can't clear title
     deed = upload(client, kavya["base"], kavya["h"], "saleDeed", realdocs.document("saleDeed", seed=kavya["id"]))
@@ -235,7 +250,9 @@ def test_everything_is_in_the_database_and_survives_a_restart(client, kavya):
     from backend.app import db
     again = Store(db)                                                     # what a restarted engine loads
     a = again.apps[kavya["id"]]
-    assert a.mode == "real" and a.profile["name"] == "Kavya Rao" and a.in_principle["offer"]["outcome"] == "approve"
+    assert a.mode == "real" and a.profile["name"] == "Kavya Rao"
+    assert a.in_principle["offer"]["outcome"] == "approve", [(g["gate"], g["reasons"], g["notes"]) for g in a.in_principle["gates"]
+                                                            if g["outcome"] != "pass"]
     assert a.selfie_fingerprint is not None and a.face_match["match"]
     with db.begin() as c:
         docs = {r.slot: r for r in c.execute(sa.select(db.documents).where(db.documents.c.application_id == kavya["id"]))}

@@ -48,12 +48,14 @@ class MockNirnayApi implements NirnayApi {
   final _rng = math.Random(7);
   Persona _persona = demoPersonas['9876500001']!;
   String _pan = 'ABXXX1234X', _aadhaar = 'XXXX XXXX 0000';
+  final _docScores = <DocSlot, int>{}; // each document's verification score, for the decision
 
   Future<void> _wait() => Future.delayed(delay);
 
   @override
   Future<String?> sendOtp(String phone) async {
     await _wait();
+    _docScores.clear();
     _persona = demoPersonas[phone] ??
         Persona(phone: phone, name: 'Priya Nair', dob: DateTime(1990, 5, 9), employment: Employment.salaried,
             employer: 'Orchid Health Systems Ltd', income: 85000, existingEmi: 5000, score: 748);
@@ -78,23 +80,67 @@ class MockNirnayApi implements NirnayApi {
     lastConsent = consent;
   }
 
+  // A stand-in DigiLocker: "sharing" happens at once, with no page to open.
+  bool _digiLockerShared = false;
+  static const _demoPans = {'9876500001': 'BXRPK4821K', '9876500002': 'AFRPS4821K', '9876500003': 'CMHPM6610Q'};
+  String get _demoPan => _demoPans[_persona.phone] ?? 'DNRPN7731F';
+
+  @override
+  Future<Connections> connections() async => const Connections(digilocker: 'sample', bureau: 'sample');
+
+  @override
+  Future<String?> startDigiLocker(Session session, {bool returnToApp = true}) async {
+    await _wait();
+    _digiLockerShared = true;
+    return null;
+  }
+
+  @override
+  Future<DigiLockerShare> digiLockerStatus(Session session) async {
+    if (!_digiLockerShared) return DigiLockerShare(status: 'none');
+    final pan = _demoPan;
+    return DigiLockerShare(
+      status: 'done',
+      name: _persona.name,
+      dateOfBirth: _persona.dob,
+      address: _demoAddress,
+      pan: pan,
+      panMasked: '${pan.substring(0, 2)}XXX${pan.substring(5, 9)}X',
+      aadhaarMasked: 'XXXX XXXX 4821',
+      hasPan: true,
+      hasAadhaar: true,
+      requiredDocuments: _incomeDocs, // shared after the details: only the income papers are left
+    );
+  }
+
+  List<DocSlot>? _incomeDocs; // set once the details are saved
+
+  static const _demoAddress = 'Flat 304, Lake View Road, Pune, Maharashtra 411038';
+
   @override
   Future<Profile> fetchProfile(Session session, String pan, {Declaration? declared}) async {
     await _wait();
     final p = _persona;
     _pan = '${pan.substring(0, 2)}XXX${pan.substring(5, 9)}X';
-    _aadhaar = 'XXXX XXXX ${(4000 + _rng.nextInt(5999)).toString()}';
+    _aadhaar = _digiLockerShared ? 'XXXX XXXX 4821' : 'XXXX XXXX ${(4000 + _rng.nextInt(5999)).toString()}';
+    final income = p.employment == Employment.selfEmployed ? [DocSlot.itr, DocSlot.gst] : [DocSlot.salarySlip, DocSlot.form16];
+    _incomeDocs = income;
     return Profile(
       name: p.name,
       dateOfBirth: p.dob,
       panMasked: _pan,
       aadhaarMasked: _aadhaar,
-      address: 'Flat 304, Lake View Road, Pune, Maharashtra 411038',
+      address: _demoAddress,
       employment: p.employment,
       employer: p.employer,
       monthlyIncome: p.income,
       existingEmi: p.existingEmi,
       bureauScore: p.score,
+      // PAN and Aadhaar came from DigiLocker: no cards to photograph.
+      requiredDocuments: _digiLockerShared ? income : null,
+      identitySource: _digiLockerShared ? 'digilocker' : null,
+      bureauStatus: p.score == null ? 'no_history' : 'scored',
+      bureauSource: 'sample',
     );
   }
 
@@ -103,6 +149,23 @@ class MockNirnayApi implements NirnayApi {
     await _wait();
     final ok = jpeg.length > 1000; // the real check runs face detection, MiniFASNet liveness and face matching
     return SelfieResult(faceFound: ok, live: ok, livenessScore: ok ? 0.97 : 0.2, faceMatch: ok, matchScore: ok ? 0.91 : 0.0);
+  }
+
+  @override
+  Future<SelfieChallenge> selfieChallenge(Session session) async {
+    final turns = _rng.nextBool() ? ['left', 'right'] : ['right', 'left'];
+    return SelfieChallenge(id: 'demo-${_rng.nextInt(1 << 30)}', steps: ['center', ...turns]);
+  }
+
+  @override
+  Future<SelfieResult> checkLiveSelfie(Session session, String challengeId, List<Uint8List> frames) async {
+    await _wait();
+    // The real check finds the face in each frame, runs MiniFASNet and reads the head turn from the landmarks.
+    final ok = frames.length == 3 && frames.every((f) => f.length > 1000);
+    return SelfieResult(
+      faceFound: ok, live: ok, livenessScore: ok ? 0.96 : 0.2, faceMatch: ok, matchScore: ok ? 0.9 : 0.0,
+      liveSelfie: true, headTurn: ok,
+    );
   }
 
   @override
@@ -118,10 +181,24 @@ class MockNirnayApi implements NirnayApi {
       DocSlot.salarySlip => {'employer': p.employer, 'name': p.name, 'period': 'Oct 2026', 'netPay': pay},
       DocSlot.form16 => {'employer': p.employer, 'name': p.name, 'year': 'FY 2025-26'},
       DocSlot.itr => {'name': p.name, 'year': 'AY 2026-27', 'income': rupees(p.income * 12)},
-      DocSlot.gst => {'business': p.employer, 'gstin': '27${_pan.substring(0, 5)}1Z5'},
+      DocSlot.gst => {'business': p.employer},
       _ => <String, String>{},
     };
-    return DocResult(slot: slot, detectedType: slot.name, confidence: 0.93 + _rng.nextDouble() * 0.06, accepted: true, fields: fields);
+    final confidence = 0.93 + _rng.nextDouble() * 0.06;
+    final score = _docScores[slot] = (confidence * 100).round();
+    return DocResult(
+      slot: slot,
+      detectedType: slot.name,
+      confidence: confidence,
+      accepted: true,
+      fields: fields,
+      verification: DocVerification(verdict: 'verified', score: score, checks: {
+        'type': true,
+        'readable': true,
+        if (fields.containsKey('name')) 'name': true,
+        if (slot == DocSlot.pan) 'pan': true,
+      }),
+    );
   }
 
   @override
@@ -172,7 +249,10 @@ class MockNirnayApi implements NirnayApi {
     }
     return _last = Decision(stage: 'in_principle', outcome: outcome, amount: e.eligible, years: years, ratePct: e.ratePct,
         emi: e.emi, reasons: reasons, keyFacts: KeyFacts.compute(e.eligible, e.emi, years),
-        score: scorecard(p.score, _historyYears[p.phone] ?? 6, e.eligible / request.propertyValue * 100), reference: _ref());
+        score: scorecard(p.score, _historyYears[p.phone] ?? 6, e.eligible / request.propertyValue * 100), reference: _ref(),
+        credit: CreditScore(score: p.score, status: p.score == null ? 'no_history' : 'scored'),
+        verification: VerificationScore(
+            score: _docScores.isEmpty ? null : _docScores.values.reduce(math.min), documents: Map.of(_docScores)));
   }
 
   /// Years since the first loan for the demo customers (the bureau report would say).
@@ -267,7 +347,8 @@ class MockNirnayApi implements NirnayApi {
         ..add(Reason(code: 'OK-TITLE', positive: true));
     }
     return _last = Decision(stage: 'final', outcome: outcome, amount: first.amount, years: first.years, ratePct: first.ratePct,
-        emi: first.emi, reasons: reasons, valuation: valuation, keyFacts: first.keyFacts, score: first.score, reference: _ref());
+        emi: first.emi, reasons: reasons, valuation: valuation, keyFacts: first.keyFacts, score: first.score, reference: _ref(),
+        credit: first.credit, verification: first.verification);
   }
 
   static String _pct(double x) => '${(x * 100).toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '')}%';

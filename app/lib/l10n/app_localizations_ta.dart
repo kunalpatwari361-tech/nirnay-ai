@@ -905,9 +905,6 @@ class AppLocalizationsTa extends AppLocalizations {
   String get fieldBusiness => 'தொழில்';
 
   @override
-  String get fieldGstin => 'GSTIN';
-
-  @override
   String get consentSectionRequired => 'உங்கள் கடனுக்குத் தேவை';
 
   @override
@@ -1215,4 +1212,159 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get otpTooManySends =>
       'மிக அதிகமான குறியீடுகள் கேட்கப்பட்டன. 15 நிமிடம் காத்திருந்து மீண்டும் முயலுங்கள்.';
+
+  @override
+  String get dlTitle => 'டிஜிலாக்கரிலிருந்து உங்கள் விவரங்களைப் பெறுங்கள்';
+
+  @override
+  String get dlBody =>
+      'உங்கள் பெயர், பிறந்த தேதி, PAN, ஆதார் நேரடியாக டிஜிலாக்கரிலிருந்து வரும், அதனால் அவற்றைத் தட்டச்சு செய்யவோ அட்டைகளைப் பதிவேற்றவோ வேண்டாம்.';
+
+  @override
+  String get dlOpen => 'டிஜிலாக்கரைத் திற';
+
+  @override
+  String get dlWaiting => 'டிஜிலாக்கரில் முடித்துவிட்டு இங்கே திரும்புங்கள்.';
+
+  @override
+  String get dlCheck => 'மீண்டும் பார்';
+
+  @override
+  String get dlDone => 'டிஜிலாக்கரிலிருந்து பெறப்பட்டது';
+
+  @override
+  String get dlDenied =>
+      'டிஜிலாக்கரிலிருந்து எதுவும் பகிரப்படவில்லை. மீண்டும் முயலுங்கள், அல்லது கீழே உங்கள் விவரங்களைத் தட்டச்சு செய்யுங்கள்.';
+
+  @override
+  String get dlFailed =>
+      'டிஜிலாக்கரிலிருந்து உங்கள் விவரங்களைப் பெற முடியவில்லை. ஒரு நிமிடம் கழித்து மீண்டும் முயலுங்கள், அல்லது கீழே தட்டச்சு செய்யுங்கள்.';
+
+  @override
+  String get bureauAuto =>
+      'கடன் மதிப்பெண்ணை நீங்கள் உள்ளிட வேண்டாம். உங்கள் PAN மூலம் கடன் தகவல் நிறுவனத்திடமிருந்து உங்கள் கடன் அறிக்கையை நாங்கள் பெறுகிறோம்.';
+
+  @override
+  String get bureauFetched =>
+      'கடன் தகவல் நிறுவனத்திடமிருந்து கடன் அறிக்கை பெறப்பட்டது';
+
+  @override
+  String get bureauLater =>
+      'முடிவுக்கு முன் கடன் தகவல் நிறுவனத்திடமிருந்து உங்கள் கடன் அறிக்கையைப் பெறுவோம்.';
+
+  @override
+  String get fillWorkDetails =>
+      'உங்கள் வேலை, பணியமர்த்துபவர், வருமானத்தை நிரப்புங்கள்.';
+
+  @override
+  String get liveSelfieStart => 'நேரடி செல்ஃபியைத் தொடங்கு';
+
+  @override
+  String get liveSelfieBody =>
+      'இது நேரடிச் சோதனை, புகைப்படம் அல்ல. உங்கள் முகத்தை நீள்வட்டத்துக்குள் வைத்து, அறிவுறுத்தல்களைப் பின்பற்றுங்கள். சுமார் 8 விநாடிகள் ஆகும்.';
+
+  @override
+  String get liveLookStraight => 'நேராகக் கேமராவைப் பாருங்கள்';
+
+  @override
+  String get liveTurnLeft => 'மெதுவாக உங்கள் தலையை இடப்பக்கம் திருப்புங்கள்';
+
+  @override
+  String get liveTurnRight => 'மெதுவாக உங்கள் தலையை வலப்பக்கம் திருப்புங்கள்';
+
+  @override
+  String get liveChecking => 'இது உண்மையில் நீங்கள்தானா எனச் சரிபார்க்கிறோம்…';
+
+  @override
+  String get checkHeadTurn =>
+      'தலையைத் திருப்பும் அறிவுறுத்தல் பின்பற்றப்பட்டது';
+
+  @override
+  String get cameraUnavailable =>
+      'முன் கேமராவைத் திறக்க முடியவில்லை. உங்கள் ஃபோன் அமைப்புகளில் Nirnay-க்கு கேமரா அனுமதி கொடுத்து, மீண்டும் முயலுங்கள்.';
+
+  @override
+  String get docsDlTitle =>
+      'உங்கள் PAN மற்றும் இ-ஆதாரை DigiLocker-இலிருந்து பெறுங்கள்';
+
+  @override
+  String get docsDlBody =>
+      'அட்டைகளின் புகைப்படம் வேண்டாம்: DigiLocker-இல் உள்நுழைந்து பகிர அனுமதியுங்கள். உங்கள் PAN, இ-ஆதார் நேரடியாக அரசுப் பதிவுகளிலிருந்து வரும்.';
+
+  @override
+  String get docsDlDone =>
+      'PAN மற்றும் இ-ஆதார் DigiLocker-இலிருந்து பெறப்பட்டன';
+
+  @override
+  String get docsDlRetry =>
+      'DigiLocker-இலிருந்து எதுவும் வரவில்லை. மீண்டும் முயலுங்கள், அல்லது கீழே அட்டைகளைப் படம் எடுங்கள்.';
+
+  @override
+  String get dlPanMismatch =>
+      'உங்கள் DigiLocker-இல் உள்ள PAN நீங்கள் உள்ளிட்டது அல்ல, அதனால் அது பயன்படுத்தப்படவில்லை. கீழே உங்கள் PAN அட்டையைப் படம் எடுங்கள்.';
+
+  @override
+  String docVerified(String type) {
+    return 'சரிபார்க்கப்பட்டது: $type';
+  }
+
+  @override
+  String get docFailed => 'இந்த ஆவணம் சரிபார்ப்பில் தேர்ச்சி பெறவில்லை';
+
+  @override
+  String get docFailedBody =>
+      'ஏதேனும் ஒரு ஆவணம் சரிபார்ப்பில் தோல்வியடைந்த விண்ணப்பம் நிராகரிக்கப்படும். இந்த முடிவை ஒருவர் மறுபரிசீலனை செய்யுமாறு நீங்கள் கேட்கலாம்.';
+
+  @override
+  String verifyScore(String score) {
+    return 'மதிப்பெண் $score/100';
+  }
+
+  @override
+  String get checkName => 'பெயர் உங்கள் விவரங்களுடன் பொருந்துகிறது';
+
+  @override
+  String get checkPan => 'PAN நீங்கள் உள்ளிட்டதுதான்';
+
+  @override
+  String get seeDecision => 'முடிவைப் பாருங்கள்';
+
+  @override
+  String get yourScores => 'உங்கள் மதிப்பெண்கள்';
+
+  @override
+  String get creditNotPulled =>
+      'இன்னும் பெறப்படவில்லை: ஒரு அலுவலர் உங்கள் கடன் அறிக்கையைப் பெறுவார்';
+
+  @override
+  String get creditNoHistory =>
+      'கடன் பணியகத்திடம் உங்கள் கடன் வரலாறு எதுவும் இல்லை';
+
+  @override
+  String get verificationTitle => 'சரிபார்ப்பு மதிப்பெண்';
+
+  @override
+  String get verificationFrom =>
+      'உங்கள் ஆவணங்களில் மிகக் குறைந்த மதிப்பெண், 100-இல்';
+
+  @override
+  String get reasonDoc05 =>
+      'உங்கள் ஆவணங்களில் ஒன்று எங்கள் சரிபார்ப்பில் தேர்ச்சி பெறவில்லை.';
+
+  @override
+  String get cardAsked => 'நீங்கள் கேட்ட தொகை';
+
+  @override
+  String get cardSanctionedAmount => 'அனுமதிக்கப்பட்ட தொகை';
+
+  @override
+  String get cardSanctionLater =>
+      'கடன் ஒப்புதல் பெற்ற பிறகு உங்கள் அனுமதிக்கப்பட்ட தொகை, வட்டி விகிதம் மற்றும் EMI இங்கே தெரியும்.';
+
+  @override
+  String get cardNotStarted =>
+      'விண்ணப்பத்தைத் தொடங்குங்கள், உங்கள் விவரங்கள் இங்கே தெரியும்.';
+
+  @override
+  String get statusInProgress => 'நடைபெறுகிறது';
 }

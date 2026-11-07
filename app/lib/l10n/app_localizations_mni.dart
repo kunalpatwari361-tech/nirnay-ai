@@ -897,9 +897,6 @@ class AppLocalizationsMni extends AppLocalizations {
   String get fieldBusiness => 'সুবৈ';
 
   @override
-  String get fieldGstin => 'GSTIN';
-
-  @override
   String get consentSectionRequired => 'নহাক্কী লোনগীদমক মথৌ তাবা';
 
   @override
@@ -1205,4 +1202,153 @@ class AppLocalizationsMni extends AppLocalizations {
   @override
   String get otpTooManySends =>
       'কোড য়াম্না কৌখ্রে। মিনিত 15 ঙাইরগা অমুক হন্না হোৎনবীয়ু।';
+
+  @override
+  String get dlTitle => 'দিজিলোকরদগী নহাক্কী মরোলশিং লৌবীয়ু';
+
+  @override
+  String get dlBody =>
+      'নহাক্কী মমিং, পোকপগী তারিখ, PAN অমসুং আধার অসি দিজিলোকরদগী চপ্পা লাক্কনি, মরম অদুনা মখোয় তাইপ তৌবা নত্ত্রগা কার্দ অপলোদ তৌবা মথৌ তাদে।';
+
+  @override
+  String get dlOpen => 'দিজিলোকর হাংদোকপীয়ু';
+
+  @override
+  String get dlWaiting => 'দিজিলোকরদা লোইশিনবীয়ু, মতুংদা মফম অসিদা হল্লক্লো।';
+
+  @override
+  String get dlCheck => 'অমুক হন্না য়েংবীয়ু';
+
+  @override
+  String get dlDone => 'দিজিলোকরদগী ফংখ্রে';
+
+  @override
+  String get dlDenied =>
+      'দিজিলোকরদগী করিসু শেয়র তৌদ্রে। অমুক হন্না হোৎনবীয়ু, নত্ত্রগা মখাদা নহাক্কী মরোলশিং ইবীয়ু।';
+
+  @override
+  String get dlFailed =>
+      'দিজিলোকরদগী নহাক্কী মরোলশিং ফংবা ঙমদ্রে। মিনিৎ অমগী মতুংদা অমুক হন্না হোৎনবীয়ু, নত্ত্রগা মখাদা ইবীয়ু।';
+
+  @override
+  String get bureauAuto =>
+      'নহাক্না ক্রেদিৎ স্কোর হাপচিনবা মথৌ তাদে। নহাক্কী PAN শিজিন্নদুনা ক্রেদিৎ ব্যুরোদগী নহাক্কী ক্রেদিৎ রিপোর্ত ঐখোয়না লৌই।';
+
+  @override
+  String get bureauFetched => 'ক্রেদিৎ ব্যুরোদগী ক্রেদিৎ রিপোর্ত লৌখ্রে';
+
+  @override
+  String get bureauLater =>
+      'ৱারেপ লৌদ্রিঙৈদা ঐখোয়না ক্রেদিৎ ব্যুরোদগী নহাক্কী ক্রেদিৎ রিপোর্ত লৌগনি।';
+
+  @override
+  String get fillWorkDetails =>
+      'চানবিদুনা নহাক্কী থবক, থবক পীরিবা মী অমসুং শেন্থোক মেনবীয়ু।';
+
+  @override
+  String get liveSelfieStart => 'লাইভ সেল্ফি হৌদোকপীয়ু';
+
+  @override
+  String get liveSelfieBody =>
+      'মসি লাইভ চেকপনি, ফোতো নত্তে। নহাক্কী মমৈ অন্দাকারগী মনুংদা থম্বীয়ু অমসুং ইরাং-পাউশিং ইন্না চৎলু। চেকেন্দ 8 হেক চাই।';
+
+  @override
+  String get liveLookStraight => 'কেমেরাদা চপ্পা য়েংবীয়ু';
+
+  @override
+  String get liveTurnLeft => 'খুদং খুদং কোক অদু ওইথংদা ওন্থোকপীয়ু';
+
+  @override
+  String get liveTurnRight => 'খুদং খুদং কোক অদু য়েৎথংদা ওন্থোকপীয়ু';
+
+  @override
+  String get liveChecking => 'মসি তশেংনা নহাকনি হায়বা চেক তৌরি…';
+
+  @override
+  String get checkHeadTurn => 'কোক ওন্থোকপগী ইরাং-পাউ ইন্না চৎখ্রে';
+
+  @override
+  String get cameraUnavailable =>
+      'মমাংগী কেমেরা হাংদোকপা ঙমদ্রে। ফোনগী সেত্তিংদা Nirnay-দা কেমেরাগী অয়াবা পীবীয়ু, মতুংদা অমুক হন্না হোৎনবীয়ু।';
+
+  @override
+  String get docsDlTitle => 'নহাক্কী PAN অমসুং ই-আধার DigiLocker দগী লৌবীয়ু';
+
+  @override
+  String get docsDlBody =>
+      'কার্দকী ফোতো মথৌ তাদে: DigiLocker দা সাইন ইন তৌবীয়ু অমসুং শেয়র তৌনবা য়াবা পীবীয়ু। নহাক্কী PAN অমসুং ই-আধার চপ্পা সরকারগী রেকর্দতগী লাক্নি।';
+
+  @override
+  String get docsDlDone => 'PAN অমসুং ই-আধার DigiLocker দগী ফংখ্রে';
+
+  @override
+  String get docsDlRetry =>
+      'DigiLocker দগী করিসু লাক্তে। অমুক হন্না হোৎনবীয়ু, নত্রগা মখাদা কার্দকী ফোতো লৌবীয়ু।';
+
+  @override
+  String get dlPanMismatch =>
+      'নহাক্কী DigiLocker দা লৈবা PAN অসি নহাক্না হাপখিবা নত্তে, মরম অদুনা শিজিন্নখিদে। মখাদা নহাক্কী PAN কার্দকী ফোতো লৌবীয়ু।';
+
+  @override
+  String docVerified(String type) {
+    return 'চেক তৌরে: $type';
+  }
+
+  @override
+  String get docFailed => 'লাইরিক অসি চেকপদা মায় পাক্তে';
+
+  @override
+  String get docFailedBody =>
+      'লাইরিক অমত্তা চেকপদা মায় পাক্তবা এপ্লিকেসন অদু হনশিনখ্রে। নহাক্না মীওই অমদা ৱারেপ অসি অমুক হন্না য়েংনবা হায়বা য়াই।';
+
+  @override
+  String verifyScore(String score) {
+    return 'স্কোর $score/100';
+  }
+
+  @override
+  String get checkName => 'মমিং অসি নহাক্কী ৱাফমগা মান্নৈ';
+
+  @override
+  String get checkPan => 'PAN অসি নহাক্না হাপখিবা অদুনি';
+
+  @override
+  String get seeDecision => 'ৱারেপ য়েংবীয়ু';
+
+  @override
+  String get yourScores => 'নহাক্কী স্কোরশিং';
+
+  @override
+  String get creditNotPulled =>
+      'হৌজিক ফাওবা লৌখিদ্রি: অফিসর অমনা নহাক্কী ক্রেডিট রিপোর্ট লৌগনি';
+
+  @override
+  String get creditNoHistory => 'ব্যুরোদা নহাক্কী ক্রেডিট হিস্টরী অমত্তা লৈতে';
+
+  @override
+  String get verificationTitle => 'চেক তৌবগী স্কোর';
+
+  @override
+  String get verificationFrom =>
+      'নহাক্কী লাইরিকশিংগী মরক্তা খ্বাইদগী নেমবা স্কোর, 100 গী মনুংদা';
+
+  @override
+  String get reasonDoc05 => 'নহাক্কী লাইরিক অমা ঐখোয়গী চেকপদা মায় পাক্তে।';
+
+  @override
+  String get cardAsked => 'নহাক্না হায়জখিবা শেল';
+
+  @override
+  String get cardSanctionedAmount => 'সেঙ্কসন তৌখিবা শেল';
+
+  @override
+  String get cardSanctionLater =>
+      'লোন অয়াবা পীরবা মতুংদা নহাক্কী সেঙ্কসন তৌখিবা শেল, ইন্টরেস্ট রেট অমসুং EMI মফম অসিদা উনগনি।';
+
+  @override
+  String get cardNotStarted =>
+      'এপ্লিকেসন হৌবীয়ু, নহাক্কী ৱাফমশিং মফম অসিদা উনগনি।';
+
+  @override
+  String get statusInProgress => 'চত্থরি';
 }

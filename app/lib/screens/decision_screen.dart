@@ -129,6 +129,11 @@ class DecisionScreen extends StatelessWidget {
               ),
             ),
           ],
+          if (d.credit != null || d.verification != null) ...[
+            const SizedBox(height: 20),
+            SectionTitle(t.yourScores),
+            _Scores(credit: d.credit, verification: d.verification),
+          ],
           if (d.score != null) ...[
             const SizedBox(height: 20),
             SectionTitle(t.scoreTitle),
@@ -318,6 +323,94 @@ class DecisionScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The credit bureau's score, and the score after the documents were verified (the lowest
+/// document's), with each document's score below.
+class _Scores extends StatelessWidget {
+  const _Scores({this.credit, this.verification});
+  final CreditScore? credit;
+  final VerificationScore? verification;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final c = credit?.score;
+    final v = verification?.score;
+    final docs = verification?.documents ?? const <DocSlot, int>{};
+    Tone docTone(int x) => x >= 80 ? Tone.good : x > 10 ? Tone.warn : Tone.bad;
+    return Column(
+      children: [
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _ScoreTile(
+                  key: const Key('credit-score'),
+                  title: t.factorBureau,
+                  value: c == null ? '—' : '$c',
+                  note: c != null ? t.scoreOutOf : credit?.status == 'no_history' ? t.creditNoHistory : t.creditNotPulled,
+                  tone: c == null ? Tone.warn : c >= 700 ? Tone.good : Tone.warn,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _ScoreTile(
+                  key: const Key('verification-score'),
+                  title: t.verificationTitle,
+                  value: v == null ? '—' : '$v',
+                  note: t.verificationFrom,
+                  tone: v == null ? Tone.info : docTone(v),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (docs.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          SectionCard(
+            padding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
+            child: Column(
+              children: [
+                for (final e in docs.entries)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(docName(t, e.key), style: const TextStyle(fontSize: 13.5))),
+                        Text('${e.value}/100', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: docTone(e.value).ink)),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _ScoreTile extends StatelessWidget {
+  const _ScoreTile({super.key, required this.title, required this.value, required this.note, required this.tone});
+  final String title, value, note;
+  final Tone tone;
+
+  @override
+  Widget build(BuildContext context) => SectionCard(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: C.muted)),
+            const SizedBox(height: 4),
+            Text(value, style: serif(30).copyWith(color: tone.ink)),
+            const SizedBox(height: 2),
+            Text(note, style: const TextStyle(fontSize: 12, color: C.muted, height: 1.3)),
+          ],
+        ),
+      );
 }
 
 /// How model 1 (the credit scorecard) reached the score: start, points per factor, score and grade.

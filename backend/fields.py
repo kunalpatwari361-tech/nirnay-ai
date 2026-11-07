@@ -10,7 +10,6 @@ import re
 
 MONTHS = "jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec"
 PAN = re.compile(r"\b([A-Z]{5}[0-9]{4}[A-Z])\b")
-GSTIN = re.compile(r"\b([0-3][0-9][A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z])\b")
 AADHAAR = re.compile(r"\b(?:[0-9X]{4}\s?[0-9X]{4}\s?([0-9]{4}))\b")
 DATE = re.compile(r"\b(\d{2})[/-](\d{2})[/-](\d{4})\b")
 AMOUNT = r"([0-9][0-9,]*(?:\.[0-9]{1,2})?)"
@@ -115,9 +114,7 @@ def extract(slot: str, text: str) -> dict[str, str]:
         m = re.search(r"(?<!gross\s)(?<!gross)total\s*income\s*[:.]?\s*(?:rs\.?)?\s*" + AMOUNT, text, re.I)
         if m:
             out["income"] = m.group(1)
-    if slot == "gst":
-        if _find(GSTIN, up):
-            out["gstin"] = _find(GSTIN, up)
+    if slot == "gst":                  # the GST number itself isn't read or kept: only the business name
         trade = _after(r"trade\s*name(?:,?\s*if\s*any)?", text)
         if trade:
             out["business"] = trade

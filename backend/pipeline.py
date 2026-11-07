@@ -54,13 +54,20 @@ def gather(store: Store, app: Application, req: dict, prop: dict | None = None, 
         "pan_name_score": round(fields.name_score(prof["pan_name"], prof["name"]), 1) if prof.get("pan_name") else None,
         "document_name_scores": {s: d["name_score"] for s, d in docs.items() if d.get("name_score") is not None},
         "pan_on_card_matches": docs.get("pan", {}).get("pan_matches"),
+        # DigiLocker shared after the details were typed: how close the typed name and date of birth were.
+        "typed_vs_digilocker": (app.sources.get("digilocker") or {}).get("typed_vs_digilocker"),
+        "digilocker_mobile_matches": (app.sources.get("digilocker") or {}).get("mobile_matches"),
     }
     ev["aml"] = aml.screen(prof["name"], date.fromisoformat(prof["dob"]), sandbox_pep=not real)
     ev["required_documents"] = intake.required_documents(app)
-    ev["documents"] = {s: {"accepted": d["accepted"], "reason_code": d["reason_code"],
-                           "type": d["classifier"]["document_type"], "confidence": d["classifier"]["confidence"],
-                           "tamper_signals": d["tamper"]["signals"], "reused_from": d.get("reuse", {}).get("reused_from", []),
-                           "name_score": d.get("name_score")} for s, d in docs.items()}
+    ev["documents"] = {}
+    for s, d in docs.items():
+        v = intake.verification(d)
+        ev["documents"][s] = {"accepted": d["accepted"], "reason_code": d["reason_code"],
+                              "type": d["classifier"]["document_type"], "confidence": d["classifier"]["confidence"],
+                              "tamper_signals": d["tamper"]["signals"], "reused_from": d.get("reuse", {}).get("reused_from", []),
+                              "name_score": d.get("name_score"), "verdict": v["verdict"], "verification_score": v["score"],
+                              "problems": v["problems"], "failed_before": bool(d.get("failed_before"))}
     s = (bank or {}).get("summary") or {"months": [], "avg_monthly_salary": 0.0, "salary_months": 0, "avg_monthly_emi": 0.0,
                                         "avg_monthly_rent": 0.0, "bounces": 0, "cash_deposit_share_of_credits": None,
                                         "entries_needing_review": 0, "avg_monthly_credits": 0.0}
@@ -206,6 +213,8 @@ def _customer_reasons(ev: dict, gs: list, offer: dict, e: pol.Eligibility) -> li
             out.append({"code": "OK-TITLE", "positive": True, "values": {}})
         return out
     ranked = sorted((r for g in gs for r in g.reasons), key=lambda r: -gates.SEVERITY[r["outcome"]])
+    if offer["outcome"] == "reject":    # a rejection gives its reasons, not the checks an officer would also have made
+        ranked = [r for r in ranked if r["outcome"] == "reject"] or ranked
     seen, out = set(), []
     for r in ranked:
         c = customer_code(r["code"])
@@ -274,7 +283,21 @@ def app_decision(result: dict) -> dict:
         val = {"estimate": a["estimate"], "low": a["low"], "high": a["high"], "valueForLtv": o["value_for_ltv"]}
     return {"stage": result["stage"], "outcome": o["outcome"], "amount": o["amount"], "years": o["years"],
             "ratePct": o["rate_pct"], "emi": o["emi"], "reasons": result["customer_reasons"], "valuation": val,
-            "kfs": o["kfs"], "record": result["record"], "score": customer_score(result["evidence"])}
+            "kfs": o["kfs"], "record": result["record"], "score": customer_score(result["evidence"]),
+            "credit": customer_credit(result["evidence"]), "verification": customer_verification(result["evidence"])}
+
+
+def customer_credit(ev: dict) -> dict:
+    """The credit bureau's score, and how the report was got (scored, no_history, not_pulled, unavailable)."""
+    b = ev["profile"]["bureau"]
+    return {"score": b.get("score"), "status": b.get("status")}
+
+
+def customer_verification(ev: dict) -> dict:
+    """The document verification score: the weakest uploaded document's, since one bad document decides.
+    Only the scores go to the app; which check failed stays in the record for officers."""
+    scores = {s: d["verification_score"] for s, d in ev["documents"].items() if d.get("verification_score") is not None}
+    return {"score": min(scores.values()) if scores else None, "documents": scores}
 
 
 def customer_score(ev: dict) -> dict:

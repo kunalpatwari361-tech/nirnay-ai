@@ -895,9 +895,6 @@ class AppLocalizationsKs extends AppLocalizations {
   String get fieldBusiness => 'کاروبار';
 
   @override
-  String get fieldGstin => 'GSTIN';
-
-  @override
   String get consentSectionRequired => 'تُہٕندِس لونس خٲطرٕ ضروری';
 
   @override
@@ -1202,4 +1199,154 @@ class AppLocalizationsKs extends AppLocalizations {
   @override
   String get otpTooManySends =>
       'واریاہ کوڈ آیہِ منگنہٕ۔ 15 منٹ پرارِتھ کٔرِو بیٚیہِ کوشش۔';
+
+  @override
+  String get dlTitle => 'ڈِجی لاکرٕ پیٚٹھٕ ہیٚیِو پنٕنۍ تفصیل';
+
+  @override
+  String get dlBody =>
+      'توٚہیٚ سُند ناو، زٕنمٕچ تٲریخ، PAN تہٕ آدھار چھِ سیٚدھٕ ڈِجی لاکرٕ پیٚٹھٕ یِوان، تیٚلہِ چھُنہٕ یِمن ٹایپ کرنٕچ یا کارڈ اپلوڈ کرنٕچ ضرورت۔';
+
+  @override
+  String get dlOpen => 'ڈِجی لاکر کھولِو';
+
+  @override
+  String get dlWaiting => 'ڈِجی لاکرس منٛز کٔرِو مکمل، پتہٕ یِیِو یوٚر واپس۔';
+
+  @override
+  String get dlCheck => 'بیٚیہِ وُچھِو';
+
+  @override
+  String get dlDone => 'ڈِجی لاکرٕ پیٚٹھٕ میوٗل';
+
+  @override
+  String get dlDenied =>
+      'ڈِجی لاکرٕ پیٚٹھٕ آو نہٕ کینْہہ شیئر کرنہٕ۔ بیٚیہِ کٔرِو کوشش، یا لیکھِو بوٚنہٕ پنٕنۍ تفصیل۔';
+
+  @override
+  String get dlFailed =>
+      'أسۍ ہیٚکٕو نہٕ ڈِجی لاکرٕ پیٚٹھٕ توٚہیٚ سٕنٛز تفصیل حٲصِل کٔرِتھ۔ اکھ منٹ پتہٕ کٔرِو بیٚیہِ کوشش، یا لیکھِو بوٚنہٕ۔';
+
+  @override
+  String get bureauAuto =>
+      'توٚہیہِ چھُنہٕ کریڈٹ سکور درج کرنٕچ ضرورت۔ أسۍ چھِ توٚہیٚ سٕنٛدِ PAN سٕتۍ کریڈٹ بیورو پیٚٹھٕ توٚہیٚ سٕنٛز کریڈٹ رپورٹ ہیوان۔';
+
+  @override
+  String get bureauFetched => 'کریڈٹ بیورو پیٚٹھٕ آیہِ کریڈٹ رپورٹ ہینہٕ';
+
+  @override
+  String get bureauLater =>
+      'فیصلہٕ برونٛہہ ہیمَو أسۍ کریڈٹ بیورو پیٚٹھٕ توٚہیٚ سٕنٛز کریڈٹ رپورٹ۔';
+
+  @override
+  String get fillWorkDetails =>
+      'مہربٲنی کٔرِتھ بٔرِو پنُن کٲم، مالِک تہٕ آمدنی۔';
+
+  @override
+  String get liveSelfieStart => 'لایو سیلفی کٔرِو شروٗع';
+
+  @override
+  String get liveSelfieBody =>
+      'یہِ چھےٚ لایو جانچ، فوٹو چھُنہٕ۔ پنُن بُتھ تھٲوِو انڈٕ شکلہِ اندر تہٕ ہدایاتن پٔتھ کٔرِو عمل۔ امہِ منٛز چھِ تقریباً 8 سیکنڈ لگان۔';
+
+  @override
+  String get liveLookStraight => 'سیدٕ کیمرس کُن وُچھِو';
+
+  @override
+  String get liveTurnLeft => 'آہستہ آہستہ پنُن کَلہٕ کھوٚورِ طرفہٕ پھِرِو';
+
+  @override
+  String get liveTurnRight => 'آہستہ آہستہ پنُن کَلہٕ دٔچھِنہِ طرفہٕ پھِرِو';
+
+  @override
+  String get liveChecking => 'جانچان زِ یہِ چھِوا توٚہۍ پانہٕ…';
+
+  @override
+  String get checkHeadTurn => 'کَلہٕ پھِرنُک ہدایت آو پوٗرٕ کرنہٕ';
+
+  @override
+  String get cameraUnavailable =>
+      'أسۍ ہیٚکٕو نہٕ برونٛہہ کُن کیمرا کھولِتھ۔ فونٕچن سیٹنگن منٛز دِیِو Nirnay کیمرٕچ اجازت، پتہٕ کٔرِو بیٚیہِ کوشش۔';
+
+  @override
+  String get docsDlTitle => 'پنُن PAN تہٕ ای-آدھار نِیِو DigiLocker پیٚٹھٕ';
+
+  @override
+  String get docsDlBody =>
+      'کارڑن ہنٛد فوٹو چھُ نہٕ ضروٗری: DigiLocker منٛز کٔرِو سائن اِن تہٕ دِیِو شیئر کرنُک اجازت۔ تُہُند PAN تہٕ ای-آدھار چھِ سیدٕ سرکٲری ریکارڑ پیٚٹھٕ یِوان۔';
+
+  @override
+  String get docsDlDone => 'PAN تہٕ ای-آدھار آیہِ DigiLocker پیٚٹھٕ';
+
+  @override
+  String get docsDlRetry =>
+      'DigiLocker پیٚٹھٕ آو نہٕ کہِنہٕ۔ بیٚیہِ کٔرِو کوشش، یا تُلِو بۄن کارڑن ہنٛد فوٹو۔';
+
+  @override
+  String get dlPanMismatch =>
+      'تُہٕنٛدِس DigiLocker منٛز PAN چھُ نہٕ سُہ یُس توٚہۍ دِیُت، امہِ موجوب آو نہٕ استعمال۔ تُلِو بۄن پنٕنِس PAN کارڑُک فوٹو۔';
+
+  @override
+  String docVerified(String type) {
+    return 'تصدیق گوو: $type';
+  }
+
+  @override
+  String get docFailed => 'یہِ دستاویز گوو نہٕ تصدیقہِ منٛز پاس';
+
+  @override
+  String get docFailedBody =>
+      'یَمہِ درخواستہِ ہُنْد کانٛہہ دستاویز تصدیقہِ منٛز ناکام گژھِ، سۄ درخواست چھےٚ مسترد کرنہٕ یِوان۔ تُہۍ ہیٚکِو کٲنٛسہِ انسانس یَتھ فیصلس پیٹھ نظرثانی کرنہٕ خٲطرٕ وٕنِتھ۔';
+
+  @override
+  String verifyScore(String score) {
+    return 'اسکور $score/100';
+  }
+
+  @override
+  String get checkName => 'ناو چھُ تُہٕنزِ تفصیلہٕ سٟتۍ مېلان';
+
+  @override
+  String get checkPan => 'PAN چھُ سُے یُس تۄہۍ دِیُتھ';
+
+  @override
+  String get seeDecision => 'فیصلہ وُچھِو';
+
+  @override
+  String get yourScores => 'تُہٕندۍ اسکور';
+
+  @override
+  String get creditNotPulled =>
+      'وُنۍ تام نہٕ اَنِتھ: اکھ افسر اَنہِ تُہٕنز کریڈٹ رپورٹ';
+
+  @override
+  String get creditNoHistory => 'بیورو نِش چھےٚ نہٕ تُہٕنز کانٛہہ کریڈٹ تاریخ';
+
+  @override
+  String get verificationTitle => 'تصدیقی اسکور';
+
+  @override
+  String get verificationFrom =>
+      'تُہٕندیٚن دستاویزن منٛز سارِوٕے کھۄتہٕ کم اسکور، 100 منٛزٕ';
+
+  @override
+  String get reasonDoc05 =>
+      'تُہُند اکھ دستاویز گوو نہٕ سانہِ تصدیقی جانٛچہِ منٛز پاس۔';
+
+  @override
+  String get cardAsked => 'تُہُند مونٛگمُت رقم';
+
+  @override
+  String get cardSanctionedAmount => 'منظور شُدہ رقم';
+
+  @override
+  String get cardSanctionLater =>
+      'لون منظور گژھنہٕ پتہٕ یِیہِ تُہُند منظور شُدہ رقم، سودٕچ شرح تہٕ EMI یَتہِ نَظرِ۔';
+
+  @override
+  String get cardNotStarted =>
+      'درخواست شروٗع کٔرِو، تُہٕنز تفصیل یِیہِ یَتہِ نَظرِ۔';
+
+  @override
+  String get statusInProgress => 'جٲری';
 }

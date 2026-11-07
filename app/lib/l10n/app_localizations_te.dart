@@ -900,9 +900,6 @@ class AppLocalizationsTe extends AppLocalizations {
   String get fieldBusiness => 'వ్యాపారం';
 
   @override
-  String get fieldGstin => 'GSTIN';
-
-  @override
   String get consentSectionRequired => 'మీ లోన్‌కు అవసరం';
 
   @override
@@ -1208,4 +1205,152 @@ class AppLocalizationsTe extends AppLocalizations {
   @override
   String get otpTooManySends =>
       'చాలా ఎక్కువ కోడ్‌లు అడిగారు. 15 నిమిషాలు ఆగి మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String get dlTitle => 'డిజిలాకర్ నుంచి మీ వివరాలు పొందండి';
+
+  @override
+  String get dlBody =>
+      'మీ పేరు, పుట్టిన తేదీ, PAN, ఆధార్ నేరుగా డిజిలాకర్ నుంచి వస్తాయి, కాబట్టి మీరు వాటిని టైప్ చేయాల్సిన లేదా కార్డులు అప్‌లోడ్ చేయాల్సిన అవసరం లేదు.';
+
+  @override
+  String get dlOpen => 'డిజిలాకర్ తెరవండి';
+
+  @override
+  String get dlWaiting => 'డిజిలాకర్‌లో పూర్తి చేసి, ఇక్కడికి తిరిగి రండి.';
+
+  @override
+  String get dlCheck => 'మళ్లీ చూడండి';
+
+  @override
+  String get dlDone => 'డిజిలాకర్ నుంచి అందింది';
+
+  @override
+  String get dlDenied =>
+      'డిజిలాకర్ నుంచి ఏమీ పంచుకోలేదు. మళ్లీ ప్రయత్నించండి, లేదా కింద మీ వివరాలు టైప్ చేయండి.';
+
+  @override
+  String get dlFailed =>
+      'డిజిలాకర్ నుంచి మీ వివరాలు పొందలేకపోయాం. ఒక నిమిషం తర్వాత మళ్లీ ప్రయత్నించండి, లేదా కింద టైప్ చేయండి.';
+
+  @override
+  String get bureauAuto =>
+      'మీరు క్రెడిట్ స్కోర్ ఇవ్వాల్సిన అవసరం లేదు. మీ PAN తో క్రెడిట్ బ్యూరో నుంచి మీ క్రెడిట్ రిపోర్ట్ మేమే తీసుకుంటాం.';
+
+  @override
+  String get bureauFetched =>
+      'క్రెడిట్ బ్యూరో నుంచి క్రెడిట్ రిపోర్ట్ తీసుకున్నాం';
+
+  @override
+  String get bureauLater =>
+      'నిర్ణయానికి ముందు క్రెడిట్ బ్యూరో నుంచి మీ క్రెడిట్ రిపోర్ట్ తీసుకుంటాం.';
+
+  @override
+  String get fillWorkDetails => 'దయచేసి మీ పని, యజమాని, ఆదాయం నింపండి.';
+
+  @override
+  String get liveSelfieStart => 'లైవ్ సెల్ఫీ ప్రారంభించండి';
+
+  @override
+  String get liveSelfieBody =>
+      'ఇది లైవ్ తనిఖీ, ఫోటో కాదు. మీ ముఖాన్ని అండాకారం లోపల ఉంచి సూచనలను పాటించండి. దీనికి సుమారు 8 సెకన్లు పడుతుంది.';
+
+  @override
+  String get liveLookStraight => 'నేరుగా కెమెరా వైపు చూడండి';
+
+  @override
+  String get liveTurnLeft => 'నెమ్మదిగా మీ తలను ఎడమ వైపుకు తిప్పండి';
+
+  @override
+  String get liveTurnRight => 'నెమ్మదిగా మీ తలను కుడి వైపుకు తిప్పండి';
+
+  @override
+  String get liveChecking => 'ఇది నిజంగా మీరేనా అని తనిఖీ చేస్తున్నాం…';
+
+  @override
+  String get checkHeadTurn => 'తల తిప్పే సూచన పాటించారు';
+
+  @override
+  String get cameraUnavailable =>
+      'ముందు కెమెరా తెరవలేకపోయాం. ఫోన్ సెట్టింగ్స్‌లో Nirnay కి కెమెరా అనుమతి ఇచ్చి, మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String get docsDlTitle => 'మీ PAN, ఇ-ఆధార్‌ను DigiLocker నుండి పొందండి';
+
+  @override
+  String get docsDlBody =>
+      'కార్డుల ఫోటోలు అవసరం లేదు: DigiLocker లో సైన్ ఇన్ చేసి షేర్ చేయడానికి అనుమతించండి. మీ PAN, ఇ-ఆధార్ నేరుగా ప్రభుత్వ రికార్డుల నుండి వస్తాయి.';
+
+  @override
+  String get docsDlDone => 'PAN, ఇ-ఆధార్ DigiLocker నుండి అందాయి';
+
+  @override
+  String get docsDlRetry =>
+      'DigiLocker నుండి ఏమీ రాలేదు. మళ్లీ ప్రయత్నించండి, లేదా కింద కార్డుల ఫోటోలు తీయండి.';
+
+  @override
+  String get dlPanMismatch =>
+      'మీ DigiLocker లోని PAN మీరు ఇచ్చినది కాదు, కాబట్టి దాన్ని ఉపయోగించలేదు. కింద మీ PAN కార్డు ఫోటో తీయండి.';
+
+  @override
+  String docVerified(String type) {
+    return 'ధృవీకరించబడింది: $type';
+  }
+
+  @override
+  String get docFailed => 'ఈ పత్రం ధృవీకరణలో ఉత్తీర్ణం కాలేదు';
+
+  @override
+  String get docFailedBody =>
+      'ఏదైనా పత్రం ధృవీకరణలో విఫలమైన దరఖాస్తు తిరస్కరించబడుతుంది. ఈ నిర్ణయాన్ని ఒక వ్యక్తి సమీక్షించాలని మీరు అడగవచ్చు.';
+
+  @override
+  String verifyScore(String score) {
+    return 'స్కోర్ $score/100';
+  }
+
+  @override
+  String get checkName => 'పేరు మీ వివరాలతో సరిపోతుంది';
+
+  @override
+  String get checkPan => 'PAN మీరు ఇచ్చినదే';
+
+  @override
+  String get seeDecision => 'నిర్ణయం చూడండి';
+
+  @override
+  String get yourScores => 'మీ స్కోర్లు';
+
+  @override
+  String get creditNotPulled =>
+      'ఇంకా తీసుకోలేదు: ఒక అధికారి మీ క్రెడిట్ రిపోర్ట్ తీసుకుంటారు';
+
+  @override
+  String get creditNoHistory => 'బ్యూరో వద్ద మీ క్రెడిట్ చరిత్ర ఏదీ లేదు';
+
+  @override
+  String get verificationTitle => 'ధృవీకరణ స్కోర్';
+
+  @override
+  String get verificationFrom => 'మీ పత్రాలలో అత్యల్ప స్కోర్, 100 లో';
+
+  @override
+  String get reasonDoc05 => 'మీ పత్రాలలో ఒకటి మా ధృవీకరణలో ఉత్తీర్ణం కాలేదు.';
+
+  @override
+  String get cardAsked => 'మీరు అడిగిన మొత్తం';
+
+  @override
+  String get cardSanctionedAmount => 'మంజూరైన మొత్తం';
+
+  @override
+  String get cardSanctionLater =>
+      'లోన్ ఆమోదం పొందిన తర్వాత మీ మంజూరైన మొత్తం, వడ్డీ రేటు, EMI ఇక్కడ కనిపిస్తాయి.';
+
+  @override
+  String get cardNotStarted =>
+      'దరఖాస్తు ప్రారంభించండి, మీ వివరాలు ఇక్కడ కనిపిస్తాయి.';
+
+  @override
+  String get statusInProgress => 'కొనసాగుతోంది';
 }

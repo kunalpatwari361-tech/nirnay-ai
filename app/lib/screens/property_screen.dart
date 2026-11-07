@@ -49,6 +49,7 @@ class _PropertyScreenState extends State<PropertyScreen> {
       final r = await state.api.uploadDocument(state.session!, DocSlot.saleDeed, bytes, isPdf(bytes) ? 'saleDeed.pdf' : 'saleDeed.jpg');
       state.update(() => state.documents[DocSlot.saleDeed] = r);
       if (!r.accepted) _deedProblem = r.reasonCode == 'R-DOC-02' ? t.docUnreadable : t.docWrong(t.docSaleDeed);
+      if (r.failed) _deedProblem = t.docFailed; // the final decision rejects the application
     } catch (_) {
       _deedProblem = t.errorGeneric;
     } finally {
@@ -60,7 +61,10 @@ class _PropertyScreenState extends State<PropertyScreen> {
     final t = AppLocalizations.of(context);
     final r = context.watch<AppState>().documents[DocSlot.saleDeed];
     final ok = r?.accepted ?? false;
-    final status = _deedBusy ? t.checking : _deedProblem ?? (ok ? t.docAccepted(t.docSaleDeed) : null);
+    final score = r?.score;
+    final status = _deedBusy
+        ? t.checking
+        : _deedProblem ?? (ok ? '${t.docVerified(t.docSaleDeed)}${score == null ? '' : ' · ${t.verifyScore('$score')}'}' : null);
     return SectionCard(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       child: Column(

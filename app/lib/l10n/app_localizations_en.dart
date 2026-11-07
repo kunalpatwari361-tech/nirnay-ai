@@ -893,9 +893,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fieldBusiness => 'Business';
 
   @override
-  String get fieldGstin => 'GSTIN';
-
-  @override
   String get consentSectionRequired => 'Needed for your loan';
 
   @override
@@ -1199,4 +1196,153 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get otpTooManySends =>
       'Too many codes asked for. Please wait 15 minutes and try again.';
+
+  @override
+  String get dlTitle => 'Get your details from DigiLocker';
+
+  @override
+  String get dlBody =>
+      'Your name, date of birth, PAN and Aadhaar come straight from DigiLocker, so you don\'t type them or upload the cards.';
+
+  @override
+  String get dlOpen => 'Open DigiLocker';
+
+  @override
+  String get dlWaiting => 'Finish in DigiLocker, then come back here.';
+
+  @override
+  String get dlCheck => 'Check again';
+
+  @override
+  String get dlDone => 'Received from DigiLocker';
+
+  @override
+  String get dlDenied =>
+      'Nothing was shared from DigiLocker. Try again, or type your details below.';
+
+  @override
+  String get dlFailed =>
+      'We couldn\'t get your details from DigiLocker. Try again in a minute, or type them below.';
+
+  @override
+  String get bureauAuto =>
+      'You don\'t need to enter a credit score. We get your credit report from the credit bureau using your PAN.';
+
+  @override
+  String get bureauFetched => 'Credit report fetched from the credit bureau';
+
+  @override
+  String get bureauLater =>
+      'We\'ll get your credit report from the credit bureau before the decision.';
+
+  @override
+  String get fillWorkDetails =>
+      'Please fill in your work, employer and income.';
+
+  @override
+  String get liveSelfieStart => 'Start live selfie';
+
+  @override
+  String get liveSelfieBody =>
+      'This is a live check, not a photo. Keep your face inside the oval and follow the prompts. It takes about 8 seconds.';
+
+  @override
+  String get liveLookStraight => 'Look straight at the camera';
+
+  @override
+  String get liveTurnLeft => 'Slowly turn your head to your left';
+
+  @override
+  String get liveTurnRight => 'Slowly turn your head to your right';
+
+  @override
+  String get liveChecking => 'Checking it\'s really you…';
+
+  @override
+  String get checkHeadTurn => 'Head turn followed';
+
+  @override
+  String get cameraUnavailable =>
+      'We couldn\'t open the front camera. Allow camera access for Nirnay in your phone\'s settings, then try again.';
+
+  @override
+  String get docsDlTitle => 'Get your PAN and e-Aadhaar from DigiLocker';
+
+  @override
+  String get docsDlBody =>
+      'No photos of the cards: sign in to DigiLocker and allow sharing. Your PAN and e-Aadhaar come straight from the government\'s records.';
+
+  @override
+  String get docsDlDone => 'PAN and e-Aadhaar received from DigiLocker';
+
+  @override
+  String get docsDlRetry =>
+      'Nothing came from DigiLocker. Try again, or photograph the cards below.';
+
+  @override
+  String get dlPanMismatch =>
+      'The PAN in your DigiLocker isn\'t the one you entered, so it wasn\'t used. Photograph your PAN card below.';
+
+  @override
+  String docVerified(String type) {
+    return 'Verified: $type';
+  }
+
+  @override
+  String get docFailed => 'This document didn\'t pass verification';
+
+  @override
+  String get docFailedBody =>
+      'An application with a document that fails verification is rejected. You can ask a person to review the decision.';
+
+  @override
+  String verifyScore(String score) {
+    return 'Score $score/100';
+  }
+
+  @override
+  String get checkName => 'The name matches your details';
+
+  @override
+  String get checkPan => 'The PAN matches the one you entered';
+
+  @override
+  String get seeDecision => 'See the decision';
+
+  @override
+  String get yourScores => 'Your scores';
+
+  @override
+  String get creditNotPulled =>
+      'Not pulled yet: an officer pulls your credit report';
+
+  @override
+  String get creditNoHistory => 'The bureau has no credit history for you';
+
+  @override
+  String get verificationTitle => 'Verification score';
+
+  @override
+  String get verificationFrom => 'Your lowest document score, out of 100';
+
+  @override
+  String get reasonDoc05 =>
+      'One of your documents didn\'t pass our verification checks.';
+
+  @override
+  String get cardAsked => 'You asked for';
+
+  @override
+  String get cardSanctionedAmount => 'Sanctioned amount';
+
+  @override
+  String get cardSanctionLater =>
+      'Your sanctioned amount, rate and EMI show here once your loan is approved.';
+
+  @override
+  String get cardNotStarted =>
+      'Start an application and your details show here.';
+
+  @override
+  String get statusInProgress => 'In progress';
 }

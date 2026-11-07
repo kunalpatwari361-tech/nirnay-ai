@@ -16,12 +16,29 @@ abstract class NirnayApi {
   /// Saves the consent choices. The engine fetches nothing until the needed consents are recorded.
   Future<void> recordConsents(Session session, ConsentRecord consent);
 
+  /// What this engine can do: identity from DigiLocker, and the credit report from the bureau.
+  Future<Connections> connections();
+
+  /// DigiLocker's sign-in and consent page for this application, to open in the browser. With
+  /// [returnToApp] the engine sends the browser back to nirnay://digilocker when it's done.
+  /// Null: nothing to open (the sample engine shares straight away).
+  Future<String?> startDigiLocker(Session session, {bool returnToApp = true});
+
+  /// What DigiLocker shared, once the customer has been there.
+  Future<DigiLockerShare> digiLockerStatus(Session session);
+
   /// PAN + Aadhaar eKYC / DigiLocker + bureau + Account Aggregator, after consent.
   /// In real mode [declared] carries what the customer typed in; the sample engine ignores it.
   Future<Profile> fetchProfile(Session session, String pan, {Declaration? declared});
 
-  /// Face found, passive liveness and 1:1 match with the eKYC photo.
+  /// Face found, passive liveness and 1:1 match with the eKYC photo (a single photo: the demo's sample).
   Future<SelfieResult> checkSelfie(Session session, Uint8List jpeg);
+
+  /// The live selfie's head-turn steps, in an order the engine picks.
+  Future<SelfieChallenge> selfieChallenge(Session session);
+
+  /// One frame from the app's camera per challenge step, in order: liveness, head turn, face match.
+  Future<SelfieResult> checkLiveSelfie(Session session, String challengeId, List<Uint8List> frames);
 
   /// OCR + document classifier (model 6) + tamper checks.
   Future<DocResult> uploadDocument(Session session, DocSlot slot, Uint8List bytes, String fileName);

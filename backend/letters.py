@@ -19,7 +19,7 @@ from .store import Application
 CODE_KEYS = {"R-KYC-01": "reasonKyc01", "R-FRD-02": "reasonFrd02", "R-FRD-03": "reasonFrd03", "R-POL-01": "reasonPol01",
              "R-POL-02": "reasonPol02", "R-BUR-01": "reasonBur01", "R-BUR-04": "reasonBur04", "R-BUR-05": "reasonBur05",
              "R-PRP-01": "reasonPrp01", "R-PRP-03": "reasonPrp03", "R-PRP-04": "reasonPrp04", "R-AFF-01": "reasonAff01",
-             "R-AUT-01": "reasonAut01", "R-RSK-01": "reasonRsk01", "R-RSK-02": "reasonRsk02", "OK-SCORE": "okScore",
+             "R-AUT-01": "reasonAut01", "R-DOC-05": "reasonDoc05", "R-RSK-01": "reasonRsk01", "R-RSK-02": "reasonRsk02", "OK-SCORE": "okScore",
              "OK-FOIR": "okFoir", "OK-LTV": "okLtv", "OK-TITLE": "okTitle"}
 
 FAQ = [

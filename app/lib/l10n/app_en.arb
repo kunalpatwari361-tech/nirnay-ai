@@ -525,7 +525,6 @@
   "fieldYear": "Year",
   "fieldIncome": "Income",
   "fieldBusiness": "Business",
-  "fieldGstin": "GSTIN",
   "consentSectionRequired": "Needed for your loan",
   "consentSectionOptional": "Optional: off unless you turn them on",
   "advancedOptions": "Options",
@@ -703,5 +702,62 @@
   "newOtpSent": "New code sent.",
   "otpExpired": "This code has expired. Tap Send a new code.",
   "otpTooManyTries": "Too many wrong tries. Tap Send a new code.",
-  "otpTooManySends": "Too many codes asked for. Please wait 15 minutes and try again."
+  "otpTooManySends": "Too many codes asked for. Please wait 15 minutes and try again.",
+  "dlTitle": "Get your details from DigiLocker",
+  "dlBody": "Your name, date of birth, PAN and Aadhaar come straight from DigiLocker, so you don't type them or upload the cards.",
+  "dlOpen": "Open DigiLocker",
+  "dlWaiting": "Finish in DigiLocker, then come back here.",
+  "dlCheck": "Check again",
+  "dlDone": "Received from DigiLocker",
+  "dlDenied": "Nothing was shared from DigiLocker. Try again, or type your details below.",
+  "dlFailed": "We couldn't get your details from DigiLocker. Try again in a minute, or type them below.",
+  "bureauAuto": "You don't need to enter a credit score. We get your credit report from the credit bureau using your PAN.",
+  "bureauFetched": "Credit report fetched from the credit bureau",
+  "bureauLater": "We'll get your credit report from the credit bureau before the decision.",
+  "fillWorkDetails": "Please fill in your work, employer and income.",
+  "liveSelfieStart": "Start live selfie",
+  "liveSelfieBody": "This is a live check, not a photo. Keep your face inside the oval and follow the prompts. It takes about 8 seconds.",
+  "liveLookStraight": "Look straight at the camera",
+  "liveTurnLeft": "Slowly turn your head to your left",
+  "liveTurnRight": "Slowly turn your head to your right",
+  "liveChecking": "Checking it's really you…",
+  "checkHeadTurn": "Head turn followed",
+  "cameraUnavailable": "We couldn't open the front camera. Allow camera access for Nirnay in your phone's settings, then try again.",
+  "docsDlTitle": "Get your PAN and e-Aadhaar from DigiLocker",
+  "docsDlBody": "No photos of the cards: sign in to DigiLocker and allow sharing. Your PAN and e-Aadhaar come straight from the government's records.",
+  "docsDlDone": "PAN and e-Aadhaar received from DigiLocker",
+  "docsDlRetry": "Nothing came from DigiLocker. Try again, or photograph the cards below.",
+  "dlPanMismatch": "The PAN in your DigiLocker isn't the one you entered, so it wasn't used. Photograph your PAN card below.",
+  "docVerified": "Verified: {type}",
+  "@docVerified": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "docFailed": "This document didn't pass verification",
+  "docFailedBody": "An application with a document that fails verification is rejected. You can ask a person to review the decision.",
+  "verifyScore": "Score {score}/100",
+  "@verifyScore": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "checkName": "The name matches your details",
+  "checkPan": "The PAN matches the one you entered",
+  "seeDecision": "See the decision",
+  "yourScores": "Your scores",
+  "creditNotPulled": "Not pulled yet: an officer pulls your credit report",
+  "creditNoHistory": "The bureau has no credit history for you",
+  "verificationTitle": "Verification score",
+  "verificationFrom": "Your lowest document score, out of 100",
+  "reasonDoc05": "One of your documents didn't pass our verification checks.",
+  "cardAsked": "You asked for",
+  "cardSanctionedAmount": "Sanctioned amount",
+  "cardSanctionLater": "Your sanctioned amount, rate and EMI show here once your loan is approved.",
+  "cardNotStarted": "Start an application and your details show here.",
+  "statusInProgress": "In progress"
 }

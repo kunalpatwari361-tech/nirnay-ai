@@ -60,7 +60,15 @@ def identity(ev: dict) -> Gate:
         g.notes.append("no face in the selfie")
     elif not s["live"]:
         g.refer("R-KYC-01", liveness=s["liveness"]["score"])
-        g.notes.append("liveness failed: possible photo or screen")
+        if s.get("method") == "live" and s.get("problems"):
+            g.notes.append("live selfie failed: " + "; ".join(s["problems"]))
+        else:
+            g.notes.append("liveness failed: possible photo or screen")
+    elif s.get("method") != "live" and not ev["sandbox"]:
+        g.refer("R-KYC-01")                 # real mode: a photo alone can be an old picture; the live check can't
+        g.notes.append("the selfie wasn't taken live in the app (no head-turn check): do a video KYC call")
+    if s and s.get("method") == "live":
+        g.facts["live_selfie"] = {"head_turn": s["head_turn"]["direction"], "steps": s["steps"]}
     fm = ev["identity"]["face_match"]
     if fm is None:
         if ev["sandbox"]:
@@ -80,6 +88,14 @@ def identity(ev: dict) -> Gate:
     if ev["identity"]["pan_on_card_matches"] is False:
         g.refer("R-KYC-02", documents="pan")
         g.notes.append("PAN on the card differs from the PAN entered")
+    typed = ev["identity"].get("typed_vs_digilocker") or {}
+    if typed.get("name_score") is not None and typed["name_score"] < 80:
+        g.refer("R-KYC-02", documents="digilocker")
+        g.notes.append("the name typed in differs from the name in DigiLocker")
+    if typed.get("dob_matches") is False:
+        g.notes.append("the date of birth typed in differs from DigiLocker's; DigiLocker's is used")
+    if ev["identity"].get("digilocker_mobile_matches") is False:
+        g.notes.append("the mobile number on the DigiLocker account isn't the one the applicant signed in with")
     return g
 
 
@@ -116,6 +132,11 @@ def fraud_documents(ev: dict, p: dict) -> Gate:
         elif not d["accepted"]:
             g.refer(d["reason_code"] or "R-DOC-01", document=slot)
     for slot, d in docs.items():
+        # A document that failed verification rejects: edited, reused from another applicant, or
+        # not the applicant's (backend/intake.py verify). Records from before verdicts have none.
+        if d.get("verdict") == "failed" or d.get("failed_before"):
+            g.reject("R-DOC-05", document=slot)
+            g.notes.append(f"{slot}: failed verification: " + "; ".join(d.get("problems") or ["an earlier upload failed"]))
         if d["tamper_signals"]:
             g.refer("R-DOC-03", document=slot)
             g.notes.append(f"{slot}: " + "; ".join(d["tamper_signals"]))
@@ -150,9 +171,22 @@ def policy_rules(ev: dict, p: dict) -> Gate:
         g.refer("R-POL-02", age_at_end=int(age + req["years"]))
     b = prof["bureau"]
     score = b.get("score")
+    source = str(b.get("source") or "")
+    g.facts["bureau_source"] = source or None
     if b.get("status") == "self_declared":
         g.notes.append("credit score is self-declared: no bureau is connected")
-    if not score:
+    elif "staging" in source:
+        g.refer("R-BUR-06")
+        g.notes.append(f"credit report is test data from the provider's staging server ({source})")
+    elif source.startswith("decentro"):
+        g.notes.append(f"credit report pulled from the bureau with the applicant's consent ({source})")
+    if b.get("status") == "unavailable":
+        g.refer("R-BUR-06")
+        g.notes.append(f"the credit report could not be pulled ({b.get('error') or 'bureau error'})")
+    elif b.get("status") == "not_pulled":
+        g.refer("R-BUR-06")
+        g.notes.append("no credit bureau is connected, so the report was not pulled: an officer pulls it with PAN")
+    elif not score:
         g.refer("R-BUR-04")
     elif score < p["bureau_reject_below"]:
         g.reject("R-BUR-01", score=score)

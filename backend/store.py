@@ -75,6 +75,7 @@ class Application:
     id_fingerprint: Any = None
     id_photo_slot: str | None = None
     face_match: dict | None = None
+    digilocker: dict | None = None       # the DigiLocker sign-in: status pending / done / denied / failed
     documents: dict[str, dict] = field(default_factory=dict)
     photo_hashes: set[str] = field(default_factory=set)    # pHash of property photos
     file_digests: set[str] = field(default_factory=set)    # SHA-256 of uploaded documents
@@ -83,7 +84,7 @@ class Application:
     records: list[int] = field(default_factory=list)   # decision record numbers
 
     _FIELDS = ("consents", "consent_log", "pan", "declared", "profile", "bank", "sources", "selfie", "id_photo_slot",
-               "face_match", "documents", "in_principle", "final", "records")
+               "face_match", "digilocker", "documents", "in_principle", "final", "records")
 
     def identity(self) -> dict:
         email = (self.profile or {}).get("email")

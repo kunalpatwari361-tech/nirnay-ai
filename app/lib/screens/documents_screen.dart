@@ -6,6 +6,7 @@ import '../config.dart';
 import '../l10n/app_localizations.dart';
 import '../reasons.dart';
 import 'doc_read_screen.dart';
+import '../services/browser.dart';
 import '../services/capture.dart';
 import '../services/image_checks.dart' as checks;
 import '../services/models.dart';
@@ -15,6 +16,8 @@ import '../widgets/common.dart';
 
 /// Income and KYC papers. Each photo is checked on the phone for blur, glare and darkness
 /// before it is sent; the engine then reads it (OCR) and checks it's the right document (model 6).
+/// When the engine is connected to DigiLocker, the PAN and e-Aadhaar can come from there instead
+/// of photos of the cards.
 class DocumentsScreen extends StatefulWidget {
   const DocumentsScreen({super.key});
 
@@ -22,10 +25,79 @@ class DocumentsScreen extends StatefulWidget {
   State<DocumentsScreen> createState() => _DocumentsScreenState();
 }
 
-class _DocumentsScreenState extends State<DocumentsScreen> {
+class _DocumentsScreenState extends State<DocumentsScreen> with WidgetsBindingObserver {
   final _busy = <DocSlot>{};
   final _problems = <DocSlot, String>{};
   bool _deciding = false;
+  Connections _links = const Connections(); // is the engine connected to DigiLocker?
+  bool _dlBusy = false, _dlWaiting = false;
+  String? _dlProblem;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadLinks());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // Back from DigiLocker in the browser: ask the engine what was shared.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState s) {
+    if (s == AppLifecycleState.resumed && _dlWaiting) _checkDigiLocker();
+  }
+
+  Future<void> _loadLinks() async {
+    try {
+      final links = await context.read<AppState>().api.connections();
+      if (mounted) setState(() => _links = links);
+    } catch (_) {
+      // No answer: the cards are photographed as before.
+    }
+  }
+
+  Future<void> _openDigiLocker() async {
+    final state = context.read<AppState>();
+    setState(() {
+      _dlBusy = true;
+      _dlProblem = null;
+    });
+    try {
+      final url = await state.api.startDigiLocker(state.session!, returnToApp: !kIsWeb);
+      if (url != null) {
+        setState(() => _dlWaiting = true);
+        await openSignInPage(url);
+      }
+      await _checkDigiLocker();
+    } catch (_) {
+      if (mounted) setState(() => _dlProblem = AppLocalizations.of(context).docsDlRetry);
+    } finally {
+      if (mounted) setState(() => _dlBusy = false);
+    }
+  }
+
+  Future<void> _checkDigiLocker() async {
+    final t = AppLocalizations.of(context);
+    final state = context.read<AppState>();
+    try {
+      final s = await state.api.digiLockerStatus(state.session!);
+      if (!mounted) return;
+      if (s.done) {
+        state.update(() => state.digiLocker = s);
+        setState(() => _dlWaiting = false);
+      } else if (s.status != 'pending') {
+        setState(() {
+          _dlWaiting = false;
+          _dlProblem = s.error == 'pan_mismatch' ? t.dlPanMismatch : t.docsDlRetry;
+        });
+      }
+    } catch (_) {}
+  }
 
   Future<void> _add(DocSlot slot, Future<Uint8List?> Function() source) async {
     final t = AppLocalizations.of(context);
@@ -61,13 +133,16 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     } finally {
       if (mounted) setState(() => _busy.remove(slot));
     }
-    // Show what the engine read; the customer can retake the photo from there.
+    // Show the engine's check. No one confirms what was read: a document that couldn't be checked
+    // is retaken, and one that failed verification goes straight to the decision.
     if (read == null || !mounted) return;
-    final retake = await Navigator.push<bool>(
+    final next = await Navigator.push<DocReadNext>(
       context,
       MaterialPageRoute(builder: (_) => DocReadScreen(slot: slot, bytes: bytes, result: read!)),
     );
-    if (retake == true && mounted) await _add(slot, source);
+    if (!mounted) return;
+    if (next == DocReadNext.retake) await _add(slot, source);
+    if (next == DocReadNext.decide) await _decide();
   }
 
   Future<void> _decide() async {
@@ -123,6 +198,10 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             ),
           ),
           const SizedBox(height: 14),
+          if (state.digiLocker != null)
+            _digiLockerDone(t, state.digiLocker!)
+          else if (_links.digilocker != null && state.requiredDocs.any((s) => s == DocSlot.pan || s == DocSlot.aadhaar))
+            _digiLockerCard(t),
           for (final slot in state.requiredDocs) _docCard(context, slot),
           SectionCard(
             padding: const EdgeInsets.all(14),
@@ -148,15 +227,103 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     );
   }
 
+  /// DigiLocker instead of photographing the PAN and Aadhaar cards.
+  Widget _digiLockerCard(AppLocalizations t) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: SectionCard(
+        key: const Key('docs-digilocker'),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const IconBadge(Icons.badge_outlined),
+                const SizedBox(width: 12),
+                Expanded(child: Text(t.docsDlTitle, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800))),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(t.docsDlBody, style: const TextStyle(fontSize: 13, color: C.muted, height: 1.4)),
+            if (_dlProblem != null) ...[
+              const SizedBox(height: 10),
+              Notice(key: const Key('docs-digilocker-problem'), tone: Tone.warn, icon: Icons.info_outline, body: _dlProblem!),
+            ],
+            if (_dlWaiting) ...[
+              const SizedBox(height: 10),
+              Text(t.dlWaiting, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            ],
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton.icon(
+                    key: const Key('docs-digilocker-open'),
+                    onPressed: _dlBusy ? null : _openDigiLocker,
+                    icon: const Icon(Icons.open_in_new, size: 18),
+                    label: Text(t.dlOpen),
+                  ),
+                ),
+                if (_dlWaiting) ...[
+                  const SizedBox(width: 8),
+                  OutlinedButton(key: const Key('docs-digilocker-check'), onPressed: _dlBusy ? null : _checkDigiLocker, child: Text(t.dlCheck)),
+                ],
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _digiLockerDone(AppLocalizations t, DigiLockerShare s) {
+    final ids = [
+      if ((s.panMasked ?? '').isNotEmpty) 'PAN ${s.panMasked}',
+      if ((s.aadhaarMasked ?? '').isNotEmpty) 'Aadhaar ${s.aadhaarMasked}',
+    ];
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: SectionCard(
+        key: const Key('docs-digilocker-done'),
+        tone: Tone.good,
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            const IconBadge(Icons.verified_user_outlined, tone: Tone.good),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(t.docsDlDone, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800, color: C.goodInk)),
+                  if (s.name != null) Text(s.name!, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                  if (ids.isNotEmpty) Text(ids.join(' · '), style: const TextStyle(fontSize: 12.5, color: C.muted)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _docCard(BuildContext context, DocSlot slot) {
     final t = AppLocalizations.of(context);
     final result = context.watch<AppState>().documents[slot];
     final problem = _problems[slot];
     final busy = _busy.contains(slot);
     final ok = result?.accepted ?? false;
-    final status = busy ? t.checking : problem ?? (ok ? '${t.docAccepted(docName(t, slot))} · ${(result!.confidence * 100).round()}%' : null);
+    final failed = result?.failed ?? false;
+    final score = result?.score;
+    final status = busy
+        ? t.checking
+        : failed
+        ? t.docFailed
+        : problem ?? (ok && score != null ? t.verifyScore('$score') : null);
     final (pill, tone) = busy
         ? (t.checking, Tone.info)
+        : failed
+        ? (t.verifyScore('${score ?? 0}'), Tone.bad)
         : problem != null
         ? (t.docTryAgain, Tone.bad)
         : ok
@@ -172,7 +339,10 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           children: [
             Row(
               children: [
-                IconBadge(ok ? Icons.task_alt : Icons.description_outlined, tone: ok ? Tone.good : (problem != null ? Tone.bad : Tone.info)),
+                IconBadge(
+                  failed ? Icons.gpp_bad_outlined : ok ? Icons.task_alt : Icons.description_outlined,
+                  tone: failed || problem != null ? Tone.bad : ok ? Tone.good : Tone.info,
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(docName(t, slot), style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700)),
@@ -183,7 +353,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             if (status != null)
               Padding(
                 padding: const EdgeInsets.only(left: 52, top: 4),
-                child: Text(status, style: TextStyle(fontSize: 12.5, color: problem != null ? C.badInk : C.muted)),
+                child: Text(status, style: TextStyle(fontSize: 12.5, color: problem != null || failed ? C.badInk : C.muted)),
               ),
             if (!ok) ...[
               const SizedBox(height: 10),

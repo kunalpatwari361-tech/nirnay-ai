@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -7,13 +8,16 @@ import '../config.dart';
 import '../format.dart';
 import '../l10n/app_localizations.dart';
 import '../policy.dart';
+import '../services/browser.dart';
 import '../services/models.dart';
 import '../state.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 
 /// Auto-filled details (sample engine) or the customer's own details (real mode), then the
-/// quick eligibility check, before the full application.
+/// quick eligibility check, before the full application. When the engine is connected to
+/// DigiLocker, name, date of birth, PAN and Aadhaar come from there; the credit report is always
+/// pulled by the engine with the PAN, never asked of the customer.
 class DetailsScreen extends StatefulWidget {
   const DetailsScreen({super.key});
 
@@ -21,40 +25,103 @@ class DetailsScreen extends StatefulWidget {
   State<DetailsScreen> createState() => _DetailsScreenState();
 }
 
-class _DetailsScreenState extends State<DetailsScreen> {
+class _DetailsScreenState extends State<DetailsScreen> with WidgetsBindingObserver {
   final _pan = TextEditingController(text: realMode ? '' : 'ABCPK1234F');
   // Real mode: what the customer tells us. The engine marks it self-declared.
   final _name = TextEditingController(), _email = TextEditingController(), _employer = TextEditingController();
-  final _income = TextEditingController(), _emi = TextEditingController(text: '0'), _score = TextEditingController();
+  final _income = TextEditingController(), _emi = TextEditingController(text: '0');
   final _address = TextEditingController();
   DateTime? _dob;
   Employment _work = Employment.salaried;
   bool _busy = false;
+  Connections _links = const Connections(); // what the engine can fetch: DigiLocker, the credit bureau
+  DigiLockerShare? _dl; // what DigiLocker shared, once the customer went there
+  bool _dlBusy = false;
+
+  DigiLockerShare? get _shared => _dl?.done == true ? _dl : null;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _loadLinks();
+  }
 
   @override
   void dispose() {
-    for (final c in [_pan, _name, _email, _employer, _income, _emi, _score, _address]) {
+    WidgetsBinding.instance.removeObserver(this);
+    for (final c in [_pan, _name, _email, _employer, _income, _emi, _address]) {
       c.dispose();
     }
     super.dispose();
   }
 
+  // Back from the browser: ask the engine what DigiLocker shared.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState s) {
+    if (s == AppLifecycleState.resumed && _dl?.status == 'pending') _checkDigiLocker();
+  }
+
+  Future<void> _loadLinks() async {
+    final state = context.read<AppState>();
+    try {
+      final links = await state.api.connections();
+      if (!mounted) return;
+      setState(() => _links = links);
+      if (links.digilocker != null && state.session != null && state.profile == null) await _checkDigiLocker();
+    } catch (_) {
+      // No answer: the customer types and uploads as before.
+    }
+  }
+
+  Future<void> _checkDigiLocker() async {
+    final state = context.read<AppState>();
+    try {
+      final s = await state.api.digiLockerStatus(state.session!);
+      if (!mounted) return;
+      setState(() {
+        _dl = s;
+        if (s.done && s.pan != null) _pan.text = s.pan!;
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _openDigiLocker() async {
+    final t = AppLocalizations.of(context);
+    final state = context.read<AppState>();
+    setState(() => _dlBusy = true);
+    try {
+      await state.api.recordConsents(state.session!, state.consentRecord); // nothing is fetched before consent
+      final url = await state.api.startDigiLocker(state.session!, returnToApp: !kIsWeb);
+      if (url != null) {
+        setState(() => _dl = DigiLockerShare(status: 'pending'));
+        await openSignInPage(url);
+      }
+      await _checkDigiLocker();
+    } catch (_) {
+      if (mounted) showError(context, t.errorGeneric);
+    } finally {
+      if (mounted) setState(() => _dlBusy = false);
+    }
+  }
+
   Declaration? _declaration() {
+    final dl = _shared;
+    final needName = dl?.name == null, needDob = dl?.dateOfBirth == null;
     final income = double.tryParse(_income.text), emi = double.tryParse(_emi.text.isEmpty ? '0' : _emi.text);
-    if (_name.text.trim().length < 2 || _dob == null || _employer.text.trim().length < 2 || income == null || income <= 0 || emi == null) {
+    if ((needName && _name.text.trim().length < 2) || (needDob && _dob == null) || _employer.text.trim().length < 2 ||
+        income == null || income <= 0 || emi == null) {
       return null;
     }
-    final score = int.tryParse(_score.text);
     return Declaration(
-      name: _name.text.trim(),
-      dateOfBirth: _dob!,
+      name: needName ? _name.text.trim() : null,
+      dateOfBirth: needDob ? _dob : null,
       employment: _work,
       employer: _employer.text.trim(),
       monthlyIncome: income,
       existingEmi: emi,
       email: _email.text.trim(),
-      address: _address.text.trim(),
-      creditScore: score != null && score >= 300 && score <= 900 ? score : null,
+      address: (dl?.address ?? '').isEmpty ? _address.text.trim() : null,
     );
   }
 
@@ -76,7 +143,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
     final pan = _pan.text.trim().toUpperCase();
     if (!RegExp(r'^[A-Z]{5}[0-9]{4}[A-Z]$').hasMatch(pan)) return showError(context, t.invalidPan);
     final declared = realMode ? _declaration() : null;
-    if (realMode && declared == null) return showError(context, t.fillDetails);
+    if (realMode && declared == null) return showError(context, _shared?.name != null ? t.fillWorkDetails : t.fillDetails);
     setState(() => _busy = true);
     try {
       state.update(() => state.pan = pan);
@@ -112,16 +179,17 @@ class _DetailsScreenState extends State<DetailsScreen> {
             child: TextField(
               key: const Key('pan'),
               controller: _pan,
-              enabled: p == null,
+              enabled: p == null && _shared?.pan == null, // DigiLocker's PAN record can't be retyped
               textCapitalization: TextCapitalization.characters,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, letterSpacing: 1),
               inputFormatters: [LengthLimitingTextInputFormatter(10)],
               decoration: InputDecoration(
                 hintText: t.panHint,
-                suffixIcon: p != null ? const Icon(Icons.check_circle, color: C.good) : null,
+                suffixIcon: p != null || _shared?.pan != null ? const Icon(Icons.check_circle, color: C.good) : null,
               ),
             ),
           ),
+          if (p == null && _links.digilocker != null) ...[const SizedBox(height: 14), _digiLockerCard(t)],
           if (realMode && p == null) ..._declarationForm(t),
           if (p != null) ...[
             const SizedBox(height: 14),
@@ -151,12 +219,16 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           p.aadhaarMasked.isEmpty ? 'PAN ${p.panMasked}' : 'PAN ${p.panMasked} · Aadhaar ${p.aadhaarMasked}',
                           style: const TextStyle(fontSize: 12.5, color: C.muted),
                         ),
+                        if (p.identitySource == 'digilocker')
+                          Padding(padding: const EdgeInsets.only(top: 6), child: Pill(t.dlDone, tone: Tone.good)),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
+            const SizedBox(height: 10),
+            _bureauLine(t, p),
             const SizedBox(height: 16),
             Labelled(
               label: t.employmentLabel,
@@ -243,6 +315,96 @@ class _DetailsScreenState extends State<DetailsScreen> {
     );
   }
 
+  /// DigiLocker: one tap instead of typing the name and date of birth and photographing the cards.
+  Widget _digiLockerCard(AppLocalizations t) {
+    const muted = TextStyle(fontSize: 12.5, color: C.muted);
+    final dl = _dl, shared = _shared;
+    if (shared != null) {
+      final ids = [
+        if ((shared.panMasked ?? '').isNotEmpty) 'PAN ${shared.panMasked}',
+        if ((shared.aadhaarMasked ?? '').isNotEmpty) 'Aadhaar ${shared.aadhaarMasked}',
+      ];
+      return SectionCard(
+        key: const Key('digilocker-done'),
+        tone: Tone.good,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const IconBadge(Icons.verified_user_outlined, tone: Tone.good),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(t.dlDone, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: C.goodInk)),
+                  if (shared.name != null) Text(shared.name!, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+                  if (shared.dateOfBirth != null) Text('${t.dobLabel}: ${DateFormat('d MMM y').format(shared.dateOfBirth!)}', style: muted),
+                  if (ids.isNotEmpty) Text(ids.join(' · '), style: muted),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    final pending = dl?.status == 'pending';
+    return SectionCard(
+      key: const Key('digilocker'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const IconBadge(Icons.badge_outlined),
+              const SizedBox(width: 12),
+              Expanded(child: Text(t.dlTitle, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800))),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(t.dlBody, style: const TextStyle(fontSize: 13, color: C.muted, height: 1.4)),
+          if (dl?.status == 'denied') ...[const SizedBox(height: 10), Notice(tone: Tone.warn, icon: Icons.info_outline, body: t.dlDenied)],
+          if (dl?.status == 'failed') ...[const SizedBox(height: 10), Notice(tone: Tone.bad, icon: Icons.error_outline, body: t.dlFailed)],
+          if (pending) ...[const SizedBox(height: 10), Text(t.dlWaiting, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600))],
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  key: const Key('digilocker-open'),
+                  onPressed: _dlBusy ? null : _openDigiLocker,
+                  icon: const Icon(Icons.open_in_new, size: 18),
+                  label: Text(t.dlOpen),
+                ),
+              ),
+              if (pending) ...[
+                const SizedBox(width: 8),
+                OutlinedButton(key: const Key('digilocker-check'), onPressed: _dlBusy ? null : _checkDigiLocker, child: Text(t.dlCheck)),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Where the credit report comes from: the bureau, pulled with the PAN. The customer never types a score.
+  Widget _bureauLine(AppLocalizations t, Profile p) {
+    final pulled = p.bureauPulled || p.bureauStatus == null; // older engines always pulled it
+    return Row(
+      children: [
+        Icon(pulled ? Icons.task_alt : Icons.schedule, size: 16, color: pulled ? C.good : C.muted),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            pulled ? t.bureauFetched : t.bureauLater,
+            key: const Key('bureau-line'),
+            style: const TextStyle(fontSize: 12.5, color: C.muted),
+          ),
+        ),
+      ],
+    );
+  }
+
   List<Widget> _declarationForm(AppLocalizations t) {
     Widget text(
       String label,
@@ -279,22 +441,24 @@ class _DetailsScreenState extends State<DetailsScreen> {
       ),
     );
     final dob = _dob;
+    final dl = _shared;
     return [
       const SizedBox(height: 14),
       Notice(tone: Tone.info, icon: Icons.person_outline, body: t.realDetailsIntro),
-      text(t.fullNameLabel, _name, 'decl-name'),
-      Padding(
-        padding: const EdgeInsets.only(top: 14),
-        child: Labelled(
-          label: t.dobLabel,
-          child: OutlinedButton.icon(
-            key: const Key('decl-dob'),
-            onPressed: _pickDob,
-            icon: const Icon(Icons.event_outlined, size: 18),
-            label: Text(dob == null ? t.pickDob : DateFormat('d MMM y').format(dob)),
+      if (dl?.name == null) text(t.fullNameLabel, _name, 'decl-name'),
+      if (dl?.dateOfBirth == null)
+        Padding(
+          padding: const EdgeInsets.only(top: 14),
+          child: Labelled(
+            label: t.dobLabel,
+            child: OutlinedButton.icon(
+              key: const Key('decl-dob'),
+              onPressed: _pickDob,
+              icon: const Icon(Icons.event_outlined, size: 18),
+              label: Text(dob == null ? t.pickDob : DateFormat('d MMM y').format(dob)),
+            ),
           ),
         ),
-      ),
       text(t.emailLabel, _email, 'decl-email', type: TextInputType.emailAddress),
       Padding(
         padding: const EdgeInsets.only(top: 14),
@@ -306,8 +470,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
       text(t.employerLabel, _employer, 'decl-employer'),
       text(t.incomeLabel, _income, 'decl-income', type: TextInputType.number, digits: true, prefix: '₹ '),
       text(t.existingEmiLabel, _emi, 'decl-emi', type: TextInputType.number, digits: true, prefix: '₹ '),
-      text(t.creditScoreLabel, _score, 'decl-score', type: TextInputType.number, digits: true, helper: t.creditScoreHint),
-      text(t.addressLabel, _address, 'decl-address', type: TextInputType.streetAddress),
+      if ((dl?.address ?? '').isEmpty) text(t.addressLabel, _address, 'decl-address', type: TextInputType.streetAddress),
+      const SizedBox(height: 14),
+      Notice(key: const Key('bureau-auto'), tone: Tone.good, icon: Icons.insights_outlined, body: t.bureauAuto),
     ];
   }
 
@@ -342,7 +507,7 @@ class _EligibilityCard extends StatelessWidget {
       key: const Key('eligibility'),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        gradient: brandGradient,
+        color: C.brand,
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [BoxShadow(color: Color(0x330A2550), blurRadius: 20, offset: Offset(0, 8))],
       ),

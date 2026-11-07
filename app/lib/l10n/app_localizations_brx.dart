@@ -896,9 +896,6 @@ class AppLocalizationsBrx extends AppLocalizations {
   String get fieldBusiness => 'बेपार';
 
   @override
-  String get fieldGstin => 'GSTIN';
-
-  @override
   String get consentSectionRequired => 'नोंथांनि लोननि थाखाय नांगौ';
 
   @override
@@ -1205,4 +1202,154 @@ class AppLocalizationsBrx extends AppLocalizations {
   @override
   String get otpTooManySends =>
       'गोबां कड बिनायबाय। 15 मिनिट नेथ्रोबो फिन नाजा।';
+
+  @override
+  String get dlTitle => 'डिजिलकार निफ्राय नोंथांनि फोरमायथिखौ ला';
+
+  @override
+  String get dlBody =>
+      'नोंथांनि मुं, जोनोम अक्ट\', PAN आरो आधार गोसोगोसो डिजिलकार निफ्राय फैयो, बेनि थाखाय बेखौ टाइप खालामनो एबा कार्ड आपल\'ड खालामनो गोनांथि गैया।';
+
+  @override
+  String get dlOpen => 'डिजिलकार खेव';
+
+  @override
+  String get dlWaiting => 'डिजिलकाराव जोबहो, उनाव बेयाव फिनफै।';
+
+  @override
+  String get dlCheck => 'फिन नाय';
+
+  @override
+  String get dlDone => 'डिजिलकार निफ्राय मोनबाय';
+
+  @override
+  String get dlDenied =>
+      'डिजिलकार निफ्राय जेबो रानना होनाय जायाखै। फिन नाजा, एबा गाहायाव नोंथांनि फोरमायथि लिर।';
+
+  @override
+  String get dlFailed =>
+      'जों डिजिलकार निफ्राय नोंथांनि फोरमायथि मोननो हायाखै। मिनिट से उनाव फिन नाजा, एबा गाहायाव लिर।';
+
+  @override
+  String get bureauAuto =>
+      'नोंथांनो क्रेडिट स्क\'र हांनो गोनांथि गैया। जों नोंथांनि PAN जों क्रेडिट ब्युर\' निफ्राय नोंथांनि क्रेडिट रिप\'र्ट लायो।';
+
+  @override
+  String get bureauFetched => 'क्रेडिट ब्युर\' निफ्राय क्रेडिट रिप\'र्ट लाबाय';
+
+  @override
+  String get bureauLater =>
+      'थाखो लानायनि सिगाङाव जों क्रेडिट ब्युर\' निफ्राय नोंथांनि क्रेडिट रिप\'र्ट लागोन।';
+
+  @override
+  String get fillWorkDetails =>
+      'अननानै नोंथांनि हाबा, हाबा होग्रा आरो आयखौ आब।';
+
+  @override
+  String get liveSelfieStart => 'लाइभ सेल्फि जागायजेन';
+
+  @override
+  String get liveSelfieBody =>
+      'बेयो लाइभ नायसंनाय, फटो नङा। नोंथांनि मोखाङखौ आन्दा महराव सिंआव दोन आरो निर्देशनाफोरखौ फालि। बेयाव मोटामुटि 8 सेकेन्ड लागो।';
+
+  @override
+  String get liveLookStraight => 'सोजां कैमेरा थिं नाय';
+
+  @override
+  String get liveTurnLeft => 'लासै लासै नोंथांनि खरखौ आगसि थिं गिदिं';
+
+  @override
+  String get liveTurnRight => 'लासै लासै नोंथांनि खरखौ आगदा थिं गिदिं';
+
+  @override
+  String get liveChecking => 'बेयो थारैनो नोंथां नामा नायसंदों…';
+
+  @override
+  String get checkHeadTurn => 'खर गिदिंनायनि निर्देशना फालिबाय';
+
+  @override
+  String get cameraUnavailable =>
+      'जों सिगांनि कैमेराखौ खेवनो हायाखै। फोननि सेटिंआव Nirnay-खौ कैमेरानि गनायथि हो, उनाव फिन नाजा।';
+
+  @override
+  String get docsDlTitle => 'नोंथांनि PAN आरो ई-आधारखौ DigiLocker निफ्राय ला';
+
+  @override
+  String get docsDlBody =>
+      'कार्डनि फटो नांआ: DigiLocker आव साइन इन खालाम आरो रानसुनो गनायथि हो। नोंथांनि PAN आरो ई-आधारआ सोजाङै सोरकारि रेकर्ड निफ्राय फैयो।';
+
+  @override
+  String get docsDlDone => 'PAN आरो ई-आधारआ DigiLocker निफ्राय मोनबाय';
+
+  @override
+  String get docsDlRetry =>
+      'DigiLocker निफ्राय जेबो फैाखै। फिन नाजा, एबा गाहायाव कार्डनि फटो ला।';
+
+  @override
+  String get dlPanMismatch =>
+      'नोंथांनि DigiLocker नि PAN आ नोंथां होनाय PAN नङा, बेनिखायनो बाहायाखै। गाहायाव नोंथांनि PAN कार्डनि फटो ला।';
+
+  @override
+  String docVerified(String type) {
+    return 'थार खालामबाय: $type';
+  }
+
+  @override
+  String get docFailed => 'बे कागजआ थार खालामनायाव फेल जाबाय';
+
+  @override
+  String get docFailedBody =>
+      'जाय आबेदननि मोनसे कागजआ थार खालामनायाव फेल जायो, बे आबेदनखौ नेवसिनाय जायो। नोंथांआ मोनसे सुबुंनो बे सिद्धान्तखौ फिन नायनो बुङो हायो।';
+
+  @override
+  String verifyScore(String score) {
+    return 'स्कोर $score/100';
+  }
+
+  @override
+  String get checkName => 'मुङा नोंथांनि बिबुंथिजों गोरोबो';
+
+  @override
+  String get checkPan => 'PAN आ नोंथांनि हाबहोनाय PAN जों गोरोबो';
+
+  @override
+  String get seeDecision => 'सिद्धान्तखौ नाय';
+
+  @override
+  String get yourScores => 'नोंथांनि स्कोर';
+
+  @override
+  String get creditNotPulled =>
+      'दासिमबो लाखां: मोनसे हाकिमआ नोंथांनि क्रेडिट रिपर्टखौ लागोन';
+
+  @override
+  String get creditNoHistory => 'ब्युरोआव नोंथांनि जेबो क्रेडिट जारिमिन गैया';
+
+  @override
+  String get verificationTitle => 'थार खालामनाय स्कोर';
+
+  @override
+  String get verificationFrom =>
+      'नोंथांनि कागजफोरनि गेजेराव जोबोद खमसि स्कोर, 100 निफ्राय';
+
+  @override
+  String get reasonDoc05 =>
+      'नोंथांनि मोनसे कागजआ जोंनि थार खालामनाय नायसंनायाव फेल जाबाय।';
+
+  @override
+  String get cardAsked => 'नोंथांनि नागिरनाय रां';
+
+  @override
+  String get cardSanctionedAmount => 'गनायबाय रां';
+
+  @override
+  String get cardSanctionLater =>
+      'नोंथांनि लोन गनायथि होनाय उनाव गनायबाय रां, सुदनि रेट आरो EMI बेयाव नुजाथानो।';
+
+  @override
+  String get cardNotStarted =>
+      'आबेदन जागायहो, नोंथांनि बिबुंथि बेयाव नुजाथानो।';
+
+  @override
+  String get statusInProgress => 'थाबायनो दं';
 }
