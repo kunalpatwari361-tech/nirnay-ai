@@ -171,11 +171,9 @@ The repository contains the following model and processing modules:
 ### 1. Clone the Repository
 
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
-cd IIt-b
+git clone https://github.com/kunalpatwari361-tech/nirnay-ai.git
+cd nirnay-ai
 ```
-
-Replace the repository URL with the actual GitHub repository URL.
 
 ### 2. Backend Setup
 
