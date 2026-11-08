@@ -78,7 +78,13 @@ The engine needs about **1 GB of memory**, so use the **Standard** plan (2 GB). 
 
 ## 4. The shareable APK
 
-Once the health check shows real mode, build the app against that address:
+Once the health check shows real mode, build the app against that address. On this laptop, one command checks the health first and builds it into app\dist\nirnay-<server host>.apk:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File app\build-server-apk.ps1 -Url https://<your-service>.onrender.com
+```
+
+Or by hand:
 
 ```bash
 cd app
