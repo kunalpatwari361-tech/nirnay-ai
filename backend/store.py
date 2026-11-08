@@ -248,6 +248,16 @@ class Store:
         with self.lock:
             return {a.id: a.identity() for a in self.apps.values()}
 
+    def same_pan(self, app: "Application") -> list[dict]:
+        """Other applications (same mode) on this application's PAN, with the details they gave."""
+        with self.lock:
+            rows = [a for a in self.apps.values() if a.id != app.id and a.mode == app.mode and a.pan
+                    and a.pan == app.pan and a.profile]
+        return [{"application_id": a.id, "created_at": a.created_at.isoformat(), "name": a.profile.get("name"),
+                 "dob": a.profile.get("dob"), "employment": a.profile.get("employment"), "employer": a.profile.get("employer"),
+                 "monthly_income": a.profile.get("monthly_income"),
+                 "outcome": (a.final or a.in_principle or {}).get("offer", {}).get("outcome")} for a in rows]
+
     def photo_hashes(self) -> dict[str, set[str]]:
         with self.lock:
             return {a.id: set(a.photo_hashes) for a in self.apps.values()}

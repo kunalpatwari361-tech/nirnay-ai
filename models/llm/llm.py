@@ -237,6 +237,11 @@ _OFFLINE_FACTS = [
     ("survey_or_plot_number", re.compile(r"(?:Survey|Khata|Plot|Dag)\s*No\.?\s*([0-9]+(?:/[0-9A-Z]+)?)", re.I)),
     ("stamp_duty", re.compile(r"Stamp\s+Duty\s+Amount\s*\(Rs\.\)\s*([0-9][0-9,]+)", re.I)),
 ]
+# The buyer: "IN FAVOUR OF <name>, residing at ..." followed by "the PURCHASER" (or vendee, buyer).
+# \s* again because OCR runs words together ("INFAVOUROFKavyaRao,residingat").
+_OFFLINE_BUYER = re.compile(r"in\s*favou?r\s*of\s*(?:(?:shri|smt|mrs|mr|ms|kumari)\.?\s*)?([A-Za-z][A-Za-z.\s]{1,60}?)\s*"
+                            r"(?:,|\(|\bresiding|\bs/o|\bd/o|\bw/o|\baged)", re.I)
+_OFFLINE_PARTY = re.compile(r"purchaser|vendee|buyer", re.I)
 _OFFLINE_ISSUES = [
     # \s* rather than \s+ throughout: OCR often drops the spaces between words ("LateShriRamesh").
     ("deceased_owner", re.compile(r"(deceased|late\s*shri|late\s*smt|expired|passed\s*away|legal\s*heirs?|succession)", re.I)),
@@ -261,6 +266,9 @@ def _read_deed_offline(text: str) -> dict:
                 issues.append({"kind": kind, "explanation": f"The deed mentions '{rx.search(s).group(0)}'. A lawyer should check it.",
                                "quote": s[:240]})
                 break
+    m = _OFFLINE_BUYER.search(text)
+    if m and _OFFLINE_PARTY.search(text[m.end(): m.end() + 400]):     # "... hereinafter called the PURCHASER"
+        facts.append({"field": "buyer", "value": re.sub(r"\s+", " ", m.group(1)).strip(" ."), "quote": m.group(0)})
     is_deed = bool(re.search(r"(sale\s*deed|deed\s*of\s*(?:absolute\s*)?sale|conveyance|indenture)", text, re.I))
     return {"is_sale_deed": is_deed, "facts": facts, "issues": issues,
             "summary": "Read by offline keyword rules, not the LLM. The title chain was not checked."}

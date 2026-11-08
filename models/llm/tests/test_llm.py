@@ -82,6 +82,16 @@ def test_offline_deed_reader_finds_the_title_gap(fake):
     assert clean["issues"] == [] and clean["is_sale_deed"] and clean["flag"] == "pass"
 
 
+def test_offline_deed_reader_finds_the_buyer(fake):
+    fake(llm.LLMUnavailable("no_credentials"))
+    text = ("SALE DEED\nBY Suresh Patil, hereinafter called the VENDOR.\n"
+            "INFAVOUROFKavyaRao,residingatFlat12,HillView,Pune,hereinaftercalledthe\nPURCHASER.")
+    buyers = [f["value"] for f in llm.read_deed(text)["facts"] if f["field"] == "buyer"]
+    assert buyers == ["KavyaRao"]                                   # OCR ran the words together; the name match ignores spaces
+    charge = "SALE DEED\nA charge was created in favour of Union Bank, Pune.\nThe Vendor sells the flat."
+    assert not [f for f in llm.read_deed(charge)["facts"] if f["field"] == "buyer"]   # a bank's charge is not a buyer
+
+
 def test_letter_draft_with_a_stray_number_is_thrown_away(fake):
     fake({"opening": "Good news.", "explanation": "Your score is strong.", "next_steps": "Sign within 7 days."})
     r = llm.fill_letter({"letter": "in_principle", "reasons": ["Strong repayment history (score 765)"], "next_steps": []})

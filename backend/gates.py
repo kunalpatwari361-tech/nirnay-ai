@@ -6,7 +6,8 @@ Outcomes: pass < refer < reject. The most severe gate result wins.
 """
 from __future__ import annotations
 
-from datetime import date
+import re
+from datetime import date, timedelta
 
 from . import policy as pol
 from .reasons import REASONS
@@ -142,6 +143,15 @@ def fraud_documents(ev: dict, p: dict) -> Gate:
             g.notes.append(f"{slot}: " + "; ".join(d["tamper_signals"]))
         if d["reused_from"]:
             g.refer("R-FRD-06", document=slot)
+    if ev.get("same_pan") is not None and "duplicate_window_days" in p:
+        _same_pan(g, ev, p)
+    share = ev["bank"].get("cash_deposit_share_of_credits")
+    if "cash_deposit_share_refer_at" in p and share is not None:
+        g.facts["cash_deposit_share"] = share
+        if share >= p["cash_deposit_share_refer_at"]:
+            g.refer("R-FRD-08", share=round(share, 2))
+    if ev["bank"].get("entries_needing_review"):
+        g.notes.append(f"{ev['bank']['entries_needing_review']} bank entries the transaction tagger wasn't sure of")
     inc = ev["income"]
     if inc["employment"] == "salaried" and inc["slip_net_pay"] and inc["bank_salary"]:
         over = inc["slip_net_pay"] / inc["bank_salary"] - 1
@@ -158,6 +168,32 @@ def fraud_documents(ev: dict, p: dict) -> Gate:
     return g
 
 
+def _same_pan(g: Gate, ev: dict, p: dict) -> None:
+    """Other applications on the same PAN. The same person applying again is normal; the same PAN
+    with another name or date of birth, or (within the window) another income or employer, is not."""
+    from .fields import name_score
+    me, day = ev["profile"], date.fromisoformat(ev["today"])
+    since = day - timedelta(days=p["duplicate_window_days"])
+    differs: set[str] = set()
+    for o in ev["same_pan"]:
+        if o.get("name") and me.get("name") and name_score(o["name"], me["name"]) < 80:
+            differs.add("name")
+        if o.get("dob") and me.get("dob") and o["dob"] != me["dob"]:
+            differs.add("date of birth")
+        recent = date.fromisoformat(o["created_at"][:10]) >= since
+        if recent and o.get("monthly_income") and me.get("monthly_income"):
+            if abs(o["monthly_income"] - me["monthly_income"]) > p["duplicate_income_tolerance"] * me["monthly_income"]:
+                differs.add("income")
+        if recent and o.get("employer") and me.get("employer") and name_score(o["employer"], me["employer"]) < 80:
+            differs.add("employer")
+    g.facts["same_pan_applications"] = len(ev["same_pan"])
+    if differs:
+        g.refer("R-FRD-07", applications=len(ev["same_pan"]), differs=", ".join(sorted(differs)))
+        g.notes.append(f"same PAN on {len(ev['same_pan'])} other application(s) with a different {', '.join(sorted(differs))}")
+    elif ev["same_pan"]:
+        g.notes.append(f"same PAN on {len(ev['same_pan'])} earlier application(s) with the same details: a re-application")
+
+
 # --------------------------------------------------------------------------- 4 policy
 
 def policy_rules(ev: dict, p: dict) -> Gate:
@@ -167,6 +203,12 @@ def policy_rules(ev: dict, p: dict) -> Gate:
     g.facts.update(age=round(age, 1), age_at_end=round(age + req["years"], 1))
     if age < p["min_age"]:
         g.reject("R-POL-01", age=int(age))
+    allowed = (p.get("property_types") or {}).get(req.get("product"))
+    if allowed is not None:
+        ptype = req.get("property_type", "residential")
+        g.facts["property_type"] = ptype
+        if ptype not in allowed:
+            g.reject("R-POL-03", product=req["product"], property_type=ptype)
     if age + req["years"] > p["max_age_at_end"][prof["employment"]]:
         g.refer("R-POL-02", age_at_end=int(age + req["years"]))
     b = prof["bureau"]
@@ -222,9 +264,23 @@ def affordability(ev: dict, p: dict) -> tuple[Gate, pol.Eligibility]:
         g.refer("R-AFF-03", credits=bank["avg_monthly_credits"], declared=income)
     if bank["bounces"] >= p["bounces_refer_at"]:
         g.refer("R-AFF-02", bounces=bank["bounces"])
-    e = pol.eligibility(req["product"], income, inc["existing_emi"], req["property_value"], req["amount"], req["years"])
+    e = pol.eligibility(req["product"], income, inc["existing_emi"], req["property_value"], req["amount"], req["years"],
+                        req.get("property_type", "residential"), p)
     if e.max_emi <= 0:
         g.reject("R-AFF-01")
+    if req["product"] == "lap" and "lap_credit_cover_min" in p:
+        # A LAP is repaid from the applicant's cash flow, so the bank statement must show enough coming in.
+        total = e.emi + inc["existing_emi"]
+        if not bank.get("available"):
+            g.refer("R-AFF-05")
+            g.notes.append("LAP: no bank statement, so the cash flow could not be assessed")
+        elif total > 0:
+            cover = bank["avg_monthly_credits"] / total
+            g.facts["credit_cover"] = round(cover, 2)
+            if cover < p["lap_credit_cover_min"]:
+                g.refer("R-AFF-05", cover=round(cover, 2), minimum=p["lap_credit_cover_min"])
+                g.notes.append(f"LAP: monthly bank credits are {cover:.2f}x the EMIs; the policy asks for "
+                               f"{p['lap_credit_cover_min']}x")
     g.facts.update(income_used=income, income_source=inc["income_source"], existing_emi=inc["existing_emi"],
                    **{k: v for k, v in e.to_dict().items()})
     return g, e
@@ -270,9 +326,10 @@ def authority(e: pol.Eligibility, p: dict) -> Gate:
 
 # --------------------------------------------------------------------------- 8 property (final stage)
 
-def property_gate(ev: dict) -> tuple[Gate, float | None]:
+def property_gate(ev: dict, p: dict | None = None) -> tuple[Gate, float | None]:
     g = Gate("property")
     pr = ev["property"]
+    p = p or {}
     avm = pr["avm"]
     g.facts.update(estimate=avm["estimate"], low=avm["low"], high=avm["high"], confidence=avm["confidence"],
                    circle_value=avm["circle_value"], declared=avm["declared_price"])
@@ -306,6 +363,8 @@ def property_gate(ev: dict) -> tuple[Gate, float | None]:
         if pr["deed_buyer_score"] is not None and pr["deed_buyer_score"] < 80:
             g.refer("R-PRP-01")
             g.notes.append("deed: buyer's name differs from the applicant")
+    if "property_types" in p:
+        _product_property(g, ev, pr)
     photos = pr["photos"]
     if not photos:
         g.refer("R-PRP-02")
@@ -318,9 +377,40 @@ def property_gate(ev: dict) -> tuple[Gate, float | None]:
     return g, avm["value_for_ltv"]
 
 
+def _product_property(g: Gate, ev: dict, pr: dict) -> None:
+    """policy-v2: a LAP mortgages a property the applicant already owns, so ownership and existing
+    charges are checked; a commercial property is valued by an empanelled valuer."""
+    ptype = ev["request"].get("property_type", "residential")
+    g.facts["property_type"] = ptype
+    if ptype == "commercial":
+        g.refer("R-PRP-02")
+        g.notes.append("commercial property: the valuation model learnt from residential listings, so a valuer values it")
+    if ev["request"]["product"] != "lap":
+        return
+    owner = pr.get("deed_buyer_score")
+    g.facts["owner_name_score"] = owner
+    if owner is None:
+        g.refer("R-PRP-05")
+        g.notes.append("LAP: no sale deed in the applicant's name, so ownership isn't shown")
+    elif owner < 80:
+        g.refer("R-PRP-05")
+        g.notes.append("LAP: the deed names someone else as the owner")
+    land = pr["land_records"]
+    ec, cersai = land.get("encumbrance_certificate"), land.get("cersai")
+    g.facts.update(encumbrance=ec, cersai=cersai)
+    if ec is None or cersai is None:
+        g.refer("R-PRP-06")
+        g.notes.append("LAP: the encumbrance certificate and CERSAI search aren't connected, so existing charges weren't checked")
+    elif not (str(ec).lower().startswith("nil") and "no charge" in str(cersai).lower()):
+        g.refer("R-PRP-06")
+        g.notes.append(f"LAP: existing charge: {ec}; CERSAI: {cersai}")
+
+
 # --------------------------------------------------------------------------- compliance gate
 
-def compliance(ev: dict, gates: list[Gate], offer: dict, stage: str) -> Gate:
+AADHAAR_NUMBER = re.compile(r"(?<![\w.])[2-9]\d{3}[ -]?\d{4}[ -]?\d{4}(?![\w.])")
+
+def compliance(ev: dict, gates: list[Gate], offer: dict, stage: str, p: dict | None = None) -> Gate:
     """Regulation as code. Every rule names its source; one failure holds the decision."""
     g = Gate("compliance")
     rules = []
@@ -350,6 +440,16 @@ def compliance(ev: dict, gates: list[Gate], offer: dict, stage: str) -> Gate:
          not llm_rejects, "LLM findings can only refer")
     rule("CMP-08 cooling-off period stated", "RBI Digital Lending Directions 2025: cooling-off / look-up period",
          offer["outcome"] == "reject" or (offer.get("kfs") or {}).get("cooling_off_days", 0) >= 1)
+    if p is not None and p["version"] != "policy-v1":
+        import json
+        models = ev.get("models") or {}
+        rule("CMP-09 decision can be reproduced", "RBI FREE-AI framework (2025): audit trail for AI-assisted decisions",
+             ev.get("policy_version") in pol.POLICIES and bool(ev.get("model_inputs"))
+             and bool(models) and all(m.get("model_version") for m in models.values()),
+             "policy version, model inputs and model versions are in the record")
+        rule("CMP-10 no Aadhaar number in the record", "Aadhaar Act 2016 and UIDAI rules: only the masked number is kept; "
+             "DPDP Act 2023: collect only what is needed",
+             not AADHAAR_NUMBER.search(json.dumps(ev, ensure_ascii=False, default=str)), "Aadhaar shown as XXXX XXXX 1234 only")
     g.facts["rules"] = rules
     for r in rules:
         if not r["ok"]:

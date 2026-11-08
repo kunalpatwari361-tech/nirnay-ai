@@ -126,7 +126,9 @@ A second FastAPI service, built for the Flutter customer app, runs **all 12 mode
 | 11 | [LLM](models/llm/README.md) (Claude Sonnet 5.5) | Deed reader (every fact must quote the deed), officer file notes, letters, help assistant; offline rules without an API key |
 | 12 | [Translation](models/translation/README.md) | Letters and assistant answers in 22 Indian languages |
 
-Plus AML name screening against the UN list, fraud-ring and reused-file checks, PDF/photo tamper checks, eight gates and a compliance gate (8 coded rules, each with its regulation), the Key Facts Statement, and hash-chained decision records that can be replayed.
+Plus AML name screening against the UN list, fraud-ring and reused-file checks, PDF/photo tamper checks, eight gates and a compliance gate (10 coded rules, each with its regulation), the Key Facts Statement, and hash-chained decision records that can be replayed.
+
+**One decision engine.** `backend/` is the engine that makes decisions: the app calls it, and every gate, record and replay is there. `api/` (LoanGuard) is the earlier dashboard prototype with its own simpler rules; it doesn't decide the app's applications. Its document route now loads, using the same OCR and field rules as the engine (`models/document_ai`). How the PS2 review's eight problems are covered: [docs/PS2-VERIFICATION.md](docs/PS2-VERIFICATION.md).
 
 ```bash
 pip install -r backend/requirements.txt

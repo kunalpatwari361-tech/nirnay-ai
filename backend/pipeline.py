@@ -13,7 +13,7 @@ from models.credit_scorecard import scorecard
 from models.fraud_classifier import fraud
 from models.property_avm import avm
 
-from . import adapters, fields, gates, intake, policy as pol, sandbox
+from . import adapters, fields, gates, intake, policy as pol, provenance, risk, sandbox
 from .checks import aml, links
 from .config import settings
 from .intake import today
@@ -34,7 +34,7 @@ def _request(req: dict) -> dict:
     asked_years = int(req["years"])
     years = min(asked_years, pol.POLICY["max_tenure_years"][product])
     return {"product": product, "amount": float(req["amount"]), "asked_years": asked_years, "years": years,
-            "property_value": float(req["propertyValue"])}
+            "property_value": float(req["propertyValue"]), "property_type": req.get("propertyType") or "residential"}
 
 
 def gather(store: Store, app: Application, req: dict, prop: dict | None = None, photos: list[dict] | None = None,
@@ -121,6 +121,9 @@ def gather(store: Store, app: Application, req: dict, prop: dict | None = None, 
     ev["models"] = {"scorecard": scorecard.predict(inputs["credit"]), "challenger": challenger.predict(inputs["credit"]),
                     "fraud": fraud.predict(inputs["fraud"]), "anomaly": detector.predict(inputs["anomaly"])}
     ev["links"] = {"ring": links.ring_check(app.id, store.identities())}
+    # Other applications on the same PAN (real mode: the sandbox's demo people all use one sample PAN).
+    ev["same_pan"] = store.same_pan(app) if real else None
+    ev["data_sources"] = provenance.sources(ev, app.sources, docs, checked_at=now().isoformat())
     return ev
 
 
@@ -175,12 +178,12 @@ def _pct(x: float) -> str:
 
 
 def decide(ev: dict) -> dict:
-    p = pol.POLICY
+    p = pol.for_version(ev.get("policy_version"))      # a record replays under its own policy version
     req = ev["request"]
     gs = [gates.identity(ev), gates.aml(ev), gates.fraud_documents(ev, p), gates.policy_rules(ev, p)]
     value_for_ltv = req["property_value"]
     if ev["stage"] == "final":
-        pg, v = gates.property_gate(ev)
+        pg, v = gates.property_gate(ev, p)
         gs.append(pg)
         value_for_ltv = min(req["property_value"], v) if v else req["property_value"]
     aff_ev = {**ev, "request": {**req, "property_value": value_for_ltv}}
@@ -191,7 +194,7 @@ def decide(ev: dict) -> dict:
              "years": req["years"], "rate_pct": e.rate_pct, "emi": round(e.emi, 2), "value_for_ltv": value_for_ltv,
              "limited_by": e.limited_by}
     offer["kfs"] = kfs(e.eligible, e.rate_pct, req["years"]) if offer["outcome"] != "reject" else None
-    gs.append(gates.compliance(ev, gs, offer, ev["stage"]))
+    gs.append(gates.compliance(ev, gs, offer, ev["stage"], p))
     outcome = max((g.outcome for g in gs), key=gates.SEVERITY.get)
     offer["outcome"] = {"pass": "approve"}.get(outcome, outcome)
     return {"gates": [g.to_dict() for g in gs], "outcome": offer["outcome"], "offer": offer,
@@ -246,7 +249,8 @@ def run(store: Store, ledger: Ledger, app: Application, req: dict, prop: dict | 
     d = decide(ev)
     rec = ledger.append({"application_id": app.id, "stage": ev["stage"], "at": now().isoformat(),
                          "engine_version": ENGINE_VERSION, "policy_version": pol.POLICY["version"],
-                         "model_versions": model_versions(ev), "evidence": ev, **d})
+                         "model_versions": model_versions(ev), "evidence": ev, **d,
+                         "risk_summary": risk.summary(ev, d)})
     app.records.append(rec["seq"])
     result = {**d, "stage": ev["stage"], "record": {"seq": rec["seq"], "hash": rec["hash"]}, "evidence": ev}
     if ev["stage"] == "final":

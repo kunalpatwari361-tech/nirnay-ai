@@ -29,7 +29,7 @@ CHECKS = [
     ("photo_reuse", "Reused photos (imagehash pHash)", []),
     ("tamper", "PDF and photo tamper checks (pypdf, Pillow)", []),
     ("policy_rules", "Eligibility and policy rules (versioned table)", []),
-    ("compliance_gate", "Regulation as code (8 coded rules with sources)", []),
+    ("compliance_gate", "Regulation as code (10 coded rules with sources; 8 under policy-v1)", []),
 ]
 
 

@@ -450,6 +450,8 @@ class LoanRequest(BaseModel):
     amount: float = Field(gt=0, le=1e9)
     years: int = Field(ge=1, le=40)
     propertyValue: float = Field(gt=0, le=1e10)
+    # policy-v2: a home loan takes residential property; a LAP takes residential or commercial.
+    propertyType: Literal["residential", "commercial"] = "residential"
 
 
 def _signals(a: Application) -> dict:
@@ -555,7 +557,14 @@ def staff_applications(_: Staff):
     return [{"applicationId": x.id, "mode": x.mode, "phone": x.phone[:2] + "XXXXXX" + x.phone[-2:],
              "name": (x.profile or {}).get("name"), "createdAt": x.created_at.isoformat(), "status": letters.status_text(x),
              "documents": sorted(x.documents), "inPrinciple": (x.in_principle or {}).get("offer", {}).get("outcome"),
-             "final": (x.final or {}).get("offer", {}).get("outcome")} for x in rows]
+             "final": (x.final or {}).get("offer", {}).get("outcome"),
+             "loan": _loan(x.final or x.in_principle)} for x in rows]
+
+
+def _loan(result: dict | None) -> dict | None:
+    """Loan amount, income, existing EMI, FOIR and LTV from the latest decision."""
+    from .explain import loan_facts
+    return loan_facts(result) if result else None
 
 
 @app.get("/v1/staff/applications/{application_id}/file-note")
@@ -605,3 +614,20 @@ def replay(seq: int, _: Staff):
 @app.get("/v1/staff/ledger/verify")
 def verify(_: Staff):
     return ledger.verify()
+
+
+@app.get("/v1/staff/records/{seq}/explain")
+def explain_record(seq: int, _: Staff):
+    """One record for an auditor: sources, verification, models, risk, rules, reasons, versions,
+    and two checks made now: the chain's hash and a replay of the decision."""
+    from . import explain
+    r = ledger.get(seq)
+    if r is None:
+        raise HTTPException(404, "not_found")
+    return explain.explain(r, ledger.verify(), pipeline.replay(r))
+
+
+@app.get("/v1/staff/compliance/checklist")
+def compliance_checklist(_: Staff):
+    from . import compliance
+    return compliance.checklist()

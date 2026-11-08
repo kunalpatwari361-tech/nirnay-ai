@@ -100,13 +100,19 @@ Each stage **gathers** evidence (data sources and models, as plain JSON), then *
 |---|---|---|
 | 1 Identity | No live face, face mismatch, names differ across PAN, eKYC and documents | – |
 | 2 AML | Close name match with a matching or unknown date of birth. Namesakes with a different date of birth are cleared automatically. | – |
-| 3 Fraud & documents | Fraud or anomaly alert, ring, missing/unreadable/wrong document, a doubtful file (edited after it was made, or revisions appended), slip above bank salary credits | A document failed verification (`R-DOC-05`: it names an editing tool, is the same file as on another applicant's application, its PAN isn't the one entered, or its name is another person's); the slip doesn't match the employer's payroll record (`R-FRD-03`) |
-| 4 Policy | No credit history, score 650–699, loan past the maximum age | Under 21, score below 650 |
-| 5 Property (final) | Title gap (land records or the deed reader), valuation unsure or price out of range, below circle value, photos not geo-tagged, old or reused | – |
-| 6 Affordability | 2+ bounces, no salary credits seen, business credits below 80% of ITR income | EMIs already at the FOIR limit |
+| 3 Fraud & documents | Fraud or anomaly alert, ring, missing/unreadable/wrong document, a doubtful file (edited after it was made, or revisions appended), slip above bank salary credits, the same PAN applied with another name, date of birth, income or employer (`R-FRD-07`, real mode), half or more of the bank credits in cash (`R-FRD-08`) | A document failed verification (`R-DOC-05`: it names an editing tool, is the same file as on another applicant's application, its PAN isn't the one entered, or its name is another person's); the slip doesn't match the employer's payroll record (`R-FRD-03`) |
+| 4 Policy | No credit history, score 650–699, loan past the maximum age | Under 21, score below 650, a home loan on a commercial property (`R-POL-03`) |
+| 5 Property (final) | Title gap (land records or the deed reader), valuation unsure or price out of range, below circle value, photos not geo-tagged, old or reused, a commercial property (a valuer values it). LAP: ownership not shown by a deed in the applicant's name (`R-PRP-05`), an existing charge or no encumbrance/CERSAI check (`R-PRP-06`) | – |
+| 6 Affordability | 2+ bounces, no salary credits seen, business credits below 80% of ITR income. LAP: no bank statement, or monthly credits below 2x all EMIs (`R-AFF-05`) | EMIs already at the FOIR limit |
 | 7 Risk grade | Grade C | Grade D or E |
 | 8 Authority | Above ₹1 crore | – |
-| Compliance | Any of 8 coded rules fails: consent before data pull, KYC done, screening ran, RBI LTV tiers, KFS with APR, a reason for every adverse outcome, AI not the final judge, cooling-off stated | – |
+| Compliance | Any of 10 coded rules fails: consent before data pull, KYC done, screening ran, RBI LTV tiers, KFS with APR, a reason for every adverse outcome, AI not the final judge, cooling-off stated, the decision can be reproduced (CMP-09), no Aadhaar number in the record (CMP-10) | – |
+
+**Products.** A home loan takes residential property only; a LAP takes residential (60% LTV) or commercial (50%) property it mortgages, so the applicant must own it, it must be free of charges, and the bank statement must show the cash flow. The loan request carries `propertyType` (`residential` by default; the app doesn't ask yet). Every application shows the loan amount, income, existing EMI, FOIR and LTV (`loan` in `GET /v1/staff/applications`).
+
+**Policy versions.** `policy.py` keeps every version (`POLICIES`). policy-v2 (8 Nov 2026) added the product, LAP, duplicate and cash-deposit rules and CMP-09/10 without changing a v1 number. A record replays under the version it names, so a v1 record decides exactly as it did.
+
+**A model never rejects on its own.** Fraud and anomaly scores, the ring check, the duplicate check and the cash share only refer. Rejections come from policy rules and from verified document facts (a file that names an editing tool, someone else's PAN, a slip the payroll record contradicts).
 
 **Document verification.** Every upload gets a verdict and a 0–100 score (`intake.verify`), and no one is asked to confirm what was read:
 - **verified:** every check passed. The score is the weakest check: the classifier's confidence, the name match, and 60 at most for a doubtful file.
@@ -118,6 +124,8 @@ The rejection is made by rules, not by a model on its own (CMP-07). The app sees
 The most severe result wins. Customers see reason codes from the app's reviewed set, in their language. **Fraud and AML reasons show only as a general review** (`R-RSK-01`), because PMLA forbids tipping off. Officers see the exact internal code, what it means and what to check (`reasons.py`).
 
 **Records:** `ledger.py` appends each decision with its evidence, rule and model versions, gate results and outcome to a JSON-lines file. Each record's SHA-256 covers its body and the previous hash, so any edit breaks the chain. `GET /v1/staff/ledger/verify` finds where. `POST /v1/staff/records/{seq}/replay` re-runs the gates on the stored evidence and re-scores models 1–4 from their stored inputs; both must match.
+
+Each record also keeps **where every piece of evidence came from** (`evidence.data_sources`, `provenance.py`: provider, sandbox/live/uploaded/not connected, when, verification status, and what the engine does without it) and a **risk summary** (`risk_summary`, `risk.py`: score, category, eight factors, model confidence with the models' validation limits, and the decision's reasons; it explains, it never decides). `GET /v1/staff/records/{seq}/explain` (`explain.py`) puts one record together for an auditor: application ID, sources, verification, model outputs, risk, loan facts, policy rules, reasons, versions, timestamp, the record's own hash check, the chain check and a fresh replay.
 
 ## API
 
@@ -146,6 +154,8 @@ Customer routes need `Authorization: Bearer <token>` from OTP sign-in and the sa
 | `GET /v1/staff/applications/{id}/file-note` | LLM file note for officers |
 | `GET /v1/staff/applications/{id}/records`, `GET /v1/staff/records/{seq}` | Decision records |
 | `POST /v1/staff/records/{seq}/replay`, `GET /v1/staff/ledger/verify` | Replay and chain check |
+| `GET /v1/staff/records/{seq}/explain` | One record for an auditor: sources, verification, models, risk, rules, reasons, versions, hash, chain and replay |
+| `GET /v1/staff/compliance/checklist` | Each compliance area: the rule, its source, the code, its tests and the evidence kept (`compliance.py`); not a certificate |
 
 ## Demo cases (sandbox)
 
@@ -172,6 +182,11 @@ Choices in the app change the result. Share only the savings account through the
 - **`test_digilocker_bureau.py`:** DigiLocker's files (e-Aadhaar and PAN record) read with only the last 4 digits kept, unsafe or tampered files refused, the v2.4 link (purpose, service name, Aadhaar and PAN only, the mobile filled in), the sandbox sign-in, saying no, the token revoked after reading, DigiLocker's mobile compared and not kept, and real mode with DigiLocker and the credit report.
 - **`test_live_selfie.py`:** the head turn in either order or mirrored, measured from the straight frame; a still photo, both turns the same way, a second face, a missing face, a different face and a spoof all failing; challenges single-use, per application and expiring; and the route with the real face models.
 - **`test_gates.py`:** each gate rule on Ravi's real recorded evidence with one fact changed: spoofed selfie, face mismatch, AML hit (shown to the customer only as a review), fraud alert, low score, no history, age, bounces, EMI limit, ₹1 crore limit, missing and edited documents, a document that failed verification, records from before verdicts deciding as they did, withdrawn consent, and the challenger never changing the outcome.
+- **`test_decision_table.py`:** the outcome table (all pass approves; missing information, an unavailable provider and a fraud signal refer; a hard policy breach rejects; a model score alone never rejects), every gate running end to end, the explain view, a policy-v1 record replaying under v1.
+- **`test_product_policy.py`:** Home Loan vs LAP: residential only for a home loan, the commercial LAP LTV, the LAP cash-flow check, LAP ownership and encumbrance, commercial property to a valuer, loan facts for every application, the API's `propertyType`.
+- **`test_fraud_signals.py`:** the same PAN with other details (and a re-application that isn't one), cash deposits, KYC name and PAN mismatches, and the duplicate check end to end in real mode.
+- **`test_risk_summary.py`:** the risk summary on every record: score, category, the eight factors, model confidence and the models' validation limits; it never changes a decision.
+- **`test_compliance.py`:** the checklist covers the seven areas and every coded rule, every test it names exists, and each CMP rule holds a decision when its condition is broken.
 - **`test_verification.py`:** the score as the weakest check; edited, reused and someone else's documents failing; unreadable or wrong documents as retakes; a card with another PAN rejecting the application, the failure staying after a retake; and the applicant's own files on an earlier application not counting as reuse.
 
 The selfie test uses Minivision's sample photo when it is on the machine (`NIRNAY_FACE_SAMPLES`, default `K:/tools/downloads/silent-face`); the repo holds no face photos.
