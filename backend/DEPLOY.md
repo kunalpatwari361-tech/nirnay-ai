@@ -38,7 +38,7 @@ Set `NIRNAY_SMS_PROVIDER=twilio`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` and 
 
 ## Optional: the credit report and DigiLocker
 
-The app never asks applicants for their credit score. Without a bureau the report isn't pulled, and every decision waits for an officer to pull one (R-BUR-06).
+The app never asks applicants for their credit score. Without a bureau the report isn't pulled, and every decision waits for an officer to pull one (R-BUR-06). The applicant can upload their own credit report instead (CIBIL, Experian, Equifax or CRIF, less than 90 days old): its score counts for the in-principle offer, and an officer confirms it with the bureau before sanction (R-BUR-07).
 
 **Credit report: Decentro** ([docs](https://docs.decentro.tech/docs/credit-bureau-credit-report)):
 1. Create a Decentro account and get the staging `client_id` and `client_secret`.

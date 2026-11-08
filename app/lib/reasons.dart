@@ -63,5 +63,6 @@ String docName(AppLocalizations t, DocSlot s) => switch (s) {
       DocSlot.gst => t.docGst,
       DocSlot.bankStatement => t.docBankStatement,
       DocSlot.saleDeed => t.docSaleDeed,
+      DocSlot.creditReport => t.docCreditReport,
       _ => s.name,
     };

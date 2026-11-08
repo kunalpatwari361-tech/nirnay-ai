@@ -1345,4 +1345,69 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statusInProgress => 'In progress';
+
+  @override
+  String get appScoreTitle => 'Application score';
+
+  @override
+  String get appScoreNote => 'From our scorecard, out of 900';
+
+  @override
+  String get bandLow => 'Below our limit';
+
+  @override
+  String get bandCheck => 'Needs a check';
+
+  @override
+  String get bandGood => 'Good';
+
+  @override
+  String get bandExcellent => 'Excellent';
+
+  @override
+  String get whyManual => 'Why it needs a manual check';
+
+  @override
+  String get pendingManual => 'Pending manual verification';
+
+  @override
+  String get whatWentWell => 'What went well';
+
+  @override
+  String get cardAddDetails => 'Add your details and they show here.';
+
+  @override
+  String get scoreProvisional => 'Provisional';
+
+  @override
+  String get appScoreProvisional =>
+      'Worked out without your credit report. An officer confirms it once the report is pulled.';
+
+  @override
+  String get docCreditReport => 'Credit report';
+
+  @override
+  String get docOptional => 'Optional';
+
+  @override
+  String get creditReportBody =>
+      'No credit bureau is connected yet. Upload your free credit report from CIBIL, Experian, Equifax or CRIF (less than 3 months old) and we\'ll use its score. An officer confirms it with the bureau before sanction.';
+
+  @override
+  String get creditReportOld =>
+      'This credit report is more than 3 months old, or its date can\'t be read. Download a new one and upload it.';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'From your $bureau report. An officer confirms it with the bureau.';
+  }
+
+  @override
+  String get checkNotPulled => 'Not pulled yet';
+
+  @override
+  String get fieldBureau => 'Bureau';
+
+  @override
+  String get fieldReportDate => 'Report date';
 }

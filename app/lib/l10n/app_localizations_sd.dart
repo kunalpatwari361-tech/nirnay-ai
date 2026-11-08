@@ -1346,4 +1346,69 @@ class AppLocalizationsSd extends AppLocalizations {
 
   @override
   String get statusInProgress => 'جاري آهي';
+
+  @override
+  String get appScoreTitle => 'درخواست جو اسڪور';
+
+  @override
+  String get appScoreNote => 'اسان جي اسڪور ڪارڊ مان، 900 مان';
+
+  @override
+  String get bandLow => 'اسان جي حد کان گهٽ';
+
+  @override
+  String get bandCheck => 'جانچ ضروري';
+
+  @override
+  String get bandGood => 'سٺو';
+
+  @override
+  String get bandExcellent => 'تمام سٺو';
+
+  @override
+  String get whyManual => 'مينوئل جانچ ڇو ضروري آهي';
+
+  @override
+  String get pendingManual => 'مينوئل تصديق باقي آهي';
+
+  @override
+  String get whatWentWell => 'ڇا سٺو رهيو';
+
+  @override
+  String get cardAddDetails => 'پنهنجو تفصيل ڀريو، اهو هتي ڏيکاريو ويندو.';
+
+  @override
+  String get scoreProvisional => 'عارضي';
+
+  @override
+  String get appScoreProvisional =>
+      'توهان جي ڪريڊٽ رپورٽ کان سواءِ ڪڍيل. رپورٽ ڪڍڻ کان پوءِ هڪ آفيسر ان جي تصديق ڪندو.';
+
+  @override
+  String get docCreditReport => 'ڪريڊٽ رپورٽ';
+
+  @override
+  String get docOptional => 'اختياري';
+
+  @override
+  String get creditReportBody =>
+      'اڃا ڪو ڪريڊٽ بيورو ڳنڍيل ناهي. CIBIL، Experian، Equifax يا CRIF کان پنهنجي مفت ڪريڊٽ رپورٽ (3 مهينن کان گهٽ پراڻي) اپلوڊ ڪريو، اسان ان جو اسڪور استعمال ڪنداسين. منظوري کان اڳ هڪ آفيسر بيورو سان ان جي تصديق ڪندو.';
+
+  @override
+  String get creditReportOld =>
+      'هي ڪريڊٽ رپورٽ 3 مهينن کان پراڻي آهي، يا ان جي تاريخ پڙهي نه سگهي. نئين رپورٽ ڊائونلوڊ ڪري اپلوڊ ڪريو.';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'توهان جي $bureau رپورٽ مان. هڪ آفيسر بيورو سان ان جي تصديق ڪندو.';
+  }
+
+  @override
+  String get checkNotPulled => 'اڃا نه ڪڍي وئي';
+
+  @override
+  String get fieldBureau => 'بيورو';
+
+  @override
+  String get fieldReportDate => 'رپورٽ جي تاريخ';
 }

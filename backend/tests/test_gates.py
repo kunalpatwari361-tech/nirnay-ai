@@ -57,6 +57,25 @@ def test_no_credit_history_refers(ev):
     assert "R-BUR-04" in run(ev)[1]
 
 
+def test_no_credit_report_never_rejects_on_the_grade(ev):
+    # No bureau connected: the scorecard has no bureau score, so its grade is provisional and an
+    # officer grades the case once the report is pulled, instead of a risk reject.
+    ev["profile"]["bureau"].update(score=None, status="not_pulled", source="not-connected")
+    ev["models"]["scorecard"] = {**ev["models"]["scorecard"], "score": 646, "grade": "D"}
+    d, internal, shown = run(ev)
+    assert d["outcome"] == "refer"
+    assert "R-RSK-02" not in internal and {"R-RSK-01", "R-BUR-06"} <= internal
+    assert shown == ["R-RSK-01"]
+    gate = next(g for g in d["gates"] if g["gate"] == "risk_grade")
+    assert gate["facts"]["provisional"] is True
+
+
+def test_a_pulled_report_with_grade_d_still_rejects(ev):
+    ev["models"]["scorecard"] = {**ev["models"]["scorecard"], "score": 640, "grade": "D"}
+    d, internal, _ = run(ev)
+    assert d["outcome"] == "reject" and "R-RSK-02" in internal
+
+
 def test_under_21_rejects(ev):
     ev["profile"]["dob"] = "2007-01-01"
     assert "R-POL-01" in run(ev)[1]

@@ -288,9 +288,13 @@ def app_decision(result: dict) -> dict:
 
 
 def customer_credit(ev: dict) -> dict:
-    """The credit bureau's score, and how the report was got (scored, no_history, not_pulled, unavailable)."""
+    """The credit score, and how it was got: scored and no_history (pulled from the bureau), not_pulled,
+    unavailable, or applicant_report (read from the report the applicant uploaded)."""
     b = ev["profile"]["bureau"]
-    return {"score": b.get("score"), "status": b.get("status")}
+    out = {"score": b.get("score"), "status": b.get("status")}
+    if b.get("status") == "applicant_report":
+        out.update(bureau=b.get("report_bureau"), reportDate=b.get("report_date"))
+    return out
 
 
 def customer_verification(ev: dict) -> dict:
@@ -304,5 +308,6 @@ def customer_score(ev: dict) -> dict:
     """The live scorecard's working, for the customer: start, points per factor, score, grade.
     Only model 1 (credit) is shown. Fraud and screening results are never shown to customers."""
     sc = ev["models"]["scorecard"]
-    return {"score": sc["score"], "grade": sc["grade"], "base": sc["base_score"],
+    provisional = ev["profile"]["bureau"].get("status") in gates.NOT_PULLED   # worked out without a credit report
+    return {"score": sc["score"], "grade": sc["grade"], "base": sc["base_score"], "provisional": provisional,
             "factors": [{"input": f["input"], "bin": f["bin"], "points": f["points"]} for f in sc["points"]]}

@@ -1352,4 +1352,69 @@ class AppLocalizationsBrx extends AppLocalizations {
 
   @override
   String get statusInProgress => 'थाबायनो दं';
+
+  @override
+  String get appScoreTitle => 'आबेदननि स्कोर';
+
+  @override
+  String get appScoreNote => 'जोंनि स्कोरकार्डनिफ्राय, 900 नि गेजेराव';
+
+  @override
+  String get bandLow => 'जोंनि सिमानि गाहायाव';
+
+  @override
+  String get bandCheck => 'नायनाय नांगौ';
+
+  @override
+  String get bandGood => 'मोजां';
+
+  @override
+  String get bandExcellent => 'जोबोद मोजां';
+
+  @override
+  String get whyManual => 'मानो मेनुयेल नायनाय नांगौ';
+
+  @override
+  String get pendingManual => 'मेनुयेल नायनाय थानाय';
+
+  @override
+  String get whatWentWell => 'मा मोजां जादों';
+
+  @override
+  String get cardAddDetails => 'नोंथांनि बिबुंथि हो, बेयो बेयाव नुजाथानो।';
+
+  @override
+  String get scoreProvisional => 'जोबथा नङा';
+
+  @override
+  String get appScoreProvisional =>
+      'नोंथांनि क्रेडिट रिपर्ट गैयाब्लाबो सान्नाय जादों। रिपर्ट लानाय उनाव मोनसे हाकिमआ बेखौ थार खालामगोन।';
+
+  @override
+  String get docCreditReport => 'क्रेडिट रिपर्ट';
+
+  @override
+  String get docOptional => 'गोनां नङा';
+
+  @override
+  String get creditReportBody =>
+      'दानो जेबो क्रेडिट ब्युरो दाजाबनाय नङा। CIBIL, Experian, Equifax एबा CRIF निफ्राय नोंथांनि बेसेन गैयि क्रेडिट रिपर्ट (3 दाननिख्रुइ गोदानसिन) आपलोड खालाम, जोंनो बेनि स्कर बाहायगोन। मंजुरि होनायनि सिगां मोनसे हाकिमआ ब्युरोजों बेखौ थार खालामगोन।';
+
+  @override
+  String get creditReportOld =>
+      'बे क्रेडिट रिपर्टआ 3 दाननिख्रुइ गोजाम, एबा बेनि तारिखखौ फरायनो हायाखै। गोदान रिपर्ट डाउनलोड खालामनानै आपलोड खालाम।';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'नोंथांनि $bureau रिपर्ट निफ्राय। मोनसे हाकिमआ ब्युरोजों बेखौ थार खालामगोन।';
+  }
+
+  @override
+  String get checkNotPulled => 'दानो लानाय जायाखै';
+
+  @override
+  String get fieldBureau => 'ब्युरो';
+
+  @override
+  String get fieldReportDate => 'रिपर्टनि तारिख';
 }

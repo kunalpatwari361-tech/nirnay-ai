@@ -82,6 +82,10 @@ void main() {
     expect(find.byKey(const Key('score-panel')), findsOneWidget);
     expect(find.descendant(of: find.byKey(const Key('credit-score')), matching: find.text('765')), findsOneWidget);
     expect(find.byKey(const Key('verification-score')), findsOneWidget);
+    expect(find.byKey(const Key('app-score')), findsOneWidget);
+    expect(find.descendant(of: find.byKey(const Key('app-score')), matching: find.textContaining('Grade ')), findsOneWidget);
+    expect(find.descendant(of: find.byKey(const Key('reasons-approve')), matching: find.text('Loan is 75% of the property value; the limit is 80%')),
+        findsOneWidget);
     expect(find.text('How we scored you'), findsOneWidget);
     expect(find.textContaining('Decision record #SBX-'), findsOneWidget);
     await tapKey(tester, 'kfs');
@@ -120,8 +124,10 @@ void main() {
 
     await tester.pumpWidget(NirnayApp(api: MockNirnayApi(delay: Duration.zero)));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('card-asked')), findsOneWidget);
+    expect(find.byKey(const Key('card-asked')), findsNothing); // no made-up amount before the customer enters one
     expect(find.byKey(const Key('card-sanctioned')), findsNothing);
+    expect(onCard('Start an application and your details show here.'), findsOneWidget);
+    expect(onCard('₹45,00,000'), findsNothing);
     expect(find.byKey(const Key('track')), findsNothing);
     expect(find.byKey(const Key('lang-hi')), findsNothing); // no language grid under Start application
     expect(find.byKey(const Key('language')), findsOneWidget); // the language is picked from the header
@@ -179,6 +185,10 @@ void main() {
     expect(find.byKey(const Key('decision-refer')), findsOneWidget);
     expect(find.text('Our lawyer needs to review the property title.'), findsOneWidget);
     expect(find.text('Pending review'), findsOneWidget);
+    expect(find.text('Why it needs a manual check'), findsOneWidget);
+    expect(find.descendant(of: find.byKey(const Key('reasons-refer')), matching: find.text('Pending manual verification')), findsOneWidget);
+    expect(find.descendant(of: find.byKey(const Key('reasons-refer')), matching: find.text('Our lawyer needs to review the property title.')),
+        findsOneWidget);
   });
 
   testWidgets('Arjun is rejected with the reason, and can ask for a review', (tester) async {
@@ -187,6 +197,10 @@ void main() {
     await applyAs(tester, '9876500003');
     expect(find.byKey(const Key('decision-reject')), findsOneWidget);
     expect(find.text('One of your documents failed verification with the issuing authority.'), findsOneWidget);
+    expect(find.descendant(of: find.byKey(const Key('reasons-reject')), matching: find.text('One of your documents failed verification with the issuing authority.')),
+        findsOneWidget);
+    expect(find.text('Why we decided this'), findsOneWidget);
+    expect(find.byKey(const Key('credit-score')), findsOneWidget);
     expect(find.text('Ask for a review or raise a complaint'), findsOneWidget);
   });
 

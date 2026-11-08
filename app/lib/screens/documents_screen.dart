@@ -124,7 +124,11 @@ class _DocumentsScreenState extends State<DocumentsScreen> with WidgetsBindingOb
       }
       final result = await state.api.uploadDocument(state.session!, slot, bytes, '${slot.name}.${pdf ? 'pdf' : 'jpg'}');
       if (!result.accepted) {
-        _problems[slot] = result.reasonCode == 'R-DOC-02' ? t.docUnreadable : t.docWrong(docName(t, slot));
+        _problems[slot] = switch (result.reasonCode) {
+          'R-DOC-02' => t.docUnreadable,
+          'R-DOC-06' => t.creditReportOld,
+          _ => t.docWrong(docName(t, slot)),
+        };
       }
       state.update(() => state.documents[slot] = result);
       read = result;
@@ -203,6 +207,10 @@ class _DocumentsScreenState extends State<DocumentsScreen> with WidgetsBindingOb
           else if (_links.digilocker != null && state.requiredDocs.any((s) => s == DocSlot.pan || s == DocSlot.aadhaar))
             _digiLockerCard(t),
           for (final slot in state.requiredDocs) _docCard(context, slot),
+          // No credit bureau answered: the applicant's own credit report gives the score instead.
+          if (realMode && (state.profile?.creditReportWanted ?? false)) _docCard(context, DocSlot.creditReport, optional: true),
+          // Without an Account Aggregator (real mode) the statement is uploaded above instead.
+          if (!realMode)
           SectionCard(
             padding: const EdgeInsets.all(14),
             child: Row(
@@ -307,7 +315,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> with WidgetsBindingOb
     );
   }
 
-  Widget _docCard(BuildContext context, DocSlot slot) {
+  Widget _docCard(BuildContext context, DocSlot slot, {bool optional = false}) {
     final t = AppLocalizations.of(context);
     final result = context.watch<AppState>().documents[slot];
     final problem = _problems[slot];
@@ -328,6 +336,8 @@ class _DocumentsScreenState extends State<DocumentsScreen> with WidgetsBindingOb
         ? (t.docTryAgain, Tone.bad)
         : ok
         ? (t.verified, Tone.good)
+        : optional
+        ? (t.docOptional, Tone.info)
         : (t.docNeeded, Tone.warn);
     return Padding(
       key: Key('doc-${slot.name}'),
@@ -354,6 +364,20 @@ class _DocumentsScreenState extends State<DocumentsScreen> with WidgetsBindingOb
               Padding(
                 padding: const EdgeInsets.only(left: 52, top: 4),
                 child: Text(status, style: TextStyle(fontSize: 12.5, color: problem != null || failed ? C.badInk : C.muted)),
+              ),
+            if (slot == DocSlot.creditReport && ok && !failed && result!.fields['score'] != null)
+              Padding(
+                key: const Key('credit-report-score'),
+                padding: const EdgeInsets.only(left: 52, top: 2),
+                child: Text(
+                  [t.checkScore(result.fields['score']!), if (result.fields['bureau'] != null) result.fields['bureau']!].join(' · '),
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                ),
+              ),
+            if (slot == DocSlot.creditReport && !ok)
+              Padding(
+                padding: const EdgeInsets.only(left: 52, top: 4),
+                child: Text(t.creditReportBody, style: const TextStyle(fontSize: 12.5, color: C.muted, height: 1.4)),
               ),
             if (!ok) ...[
               const SizedBox(height: 10),

@@ -1363,4 +1363,69 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get statusInProgress => 'പുരോഗമിക്കുന്നു';
+
+  @override
+  String get appScoreTitle => 'അപേക്ഷാ സ്കോർ';
+
+  @override
+  String get appScoreNote => 'ഞങ്ങളുടെ സ്കോർകാർഡിൽ നിന്ന്, 900-ൽ';
+
+  @override
+  String get bandLow => 'ഞങ്ങളുടെ പരിധിയിൽ താഴെ';
+
+  @override
+  String get bandCheck => 'പരിശോധന വേണം';
+
+  @override
+  String get bandGood => 'നല്ലത്';
+
+  @override
+  String get bandExcellent => 'മികച്ചത്';
+
+  @override
+  String get whyManual => 'മാനുവൽ പരിശോധന എന്തിന്';
+
+  @override
+  String get pendingManual => 'മാനുവൽ പരിശോധന ബാക്കി';
+
+  @override
+  String get whatWentWell => 'എന്തെല്ലാം നന്നായി';
+
+  @override
+  String get cardAddDetails => 'നിങ്ങളുടെ വിവരങ്ങൾ നൽകുക, അവ ഇവിടെ കാണാം.';
+
+  @override
+  String get scoreProvisional => 'താൽക്കാലികം';
+
+  @override
+  String get appScoreProvisional =>
+      'നിങ്ങളുടെ ക്രെഡിറ്റ് റിപ്പോർട്ട് ഇല്ലാതെ കണക്കാക്കിയത്. റിപ്പോർട്ട് എടുത്തശേഷം ഒരു ഉദ്യോഗസ്ഥൻ ഇത് ഉറപ്പാക്കും.';
+
+  @override
+  String get docCreditReport => 'ക്രെഡിറ്റ് റിപ്പോർട്ട്';
+
+  @override
+  String get docOptional => 'ഐച്ഛികം';
+
+  @override
+  String get creditReportBody =>
+      'ഇതുവരെ ഒരു ക്രെഡിറ്റ് ബ്യൂറോയും ബന്ധിപ്പിച്ചിട്ടില്ല. CIBIL, Experian, Equifax അല്ലെങ്കിൽ CRIF-ൽ നിന്നുള്ള നിങ്ങളുടെ സൗജന്യ ക്രെഡിറ്റ് റിപ്പോർട്ട് (3 മാസത്തിൽ താഴെ പഴക്കമുള്ളത്) അപ്‌ലോഡ് ചെയ്യുക, ഞങ്ങൾ അതിലെ സ്കോർ ഉപയോഗിക്കും. അനുമതിക്ക് മുമ്പ് ഒരു ഉദ്യോഗസ്ഥൻ ബ്യൂറോയുമായി ഇത് ഉറപ്പാക്കും.';
+
+  @override
+  String get creditReportOld =>
+      'ഈ ക്രെഡിറ്റ് റിപ്പോർട്ടിന് 3 മാസത്തിലധികം പഴക്കമുണ്ട്, അല്ലെങ്കിൽ അതിലെ തീയതി വായിക്കാനായില്ല. പുതിയ റിപ്പോർട്ട് ഡൗൺലോഡ് ചെയ്ത് അപ്‌ലോഡ് ചെയ്യുക.';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'നിങ്ങളുടെ $bureau റിപ്പോർട്ടിൽ നിന്ന്. ഒരു ഉദ്യോഗസ്ഥൻ ബ്യൂറോയുമായി ഇത് ഉറപ്പാക്കും.';
+  }
+
+  @override
+  String get checkNotPulled => 'ഇതുവരെ എടുത്തിട്ടില്ല';
+
+  @override
+  String get fieldBureau => 'ബ്യൂറോ';
+
+  @override
+  String get fieldReportDate => 'റിപ്പോർട്ട് തീയതി';
 }

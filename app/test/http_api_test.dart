@@ -150,7 +150,7 @@ void main() {
       'valuation': {'estimate': 16501000.0, 'low': 12456000.0, 'high': 20413000.0, 'valueForLtv': 12000000.0},
       'kfs': {'loan_amount': 6000000.0, 'processing_fee': 30000, 'gst_on_fee': 5400, 'total_interest': 5938309.2,
         'total_payable': 11973709.2, 'apr_pct': 10.6, 'cooling_off_days': 3},
-      'score': {'score': 712, 'grade': 'B', 'base': 650, 'factors': [
+      'score': {'score': 712, 'grade': 'B', 'base': 650, 'provisional': true, 'factors': [
         {'input': 'bureau_score', 'bin': '738 or more', 'points': 38},
         {'input': 'loan_amount', 'bin': 'missing', 'points': 0},
       ]},
@@ -159,12 +159,18 @@ void main() {
       'verification': {'score': 61, 'documents': {'pan': 97, 'bankStatement': 61, 'notASlot': 50}},
     };
     final a = api({
-      'POST /v1/applications/HL-2611-12345/in-principle': (200, {...decision, 'stage': 'in_principle', 'outcome': 'approve', 'valuation': null}),
+      'POST /v1/applications/HL-2611-12345/in-principle': (200, {
+        ...decision, 'stage': 'in_principle', 'outcome': 'approve', 'valuation': null,
+        // no bureau connected: the score came from the credit report the applicant uploaded
+        'credit': {'score': 772, 'status': 'applicant_report', 'bureau': 'TransUnion CIBIL', 'reportDate': '2026-11-03'},
+      }),
       'POST /v1/applications/HL-2611-12345/final': (200, decision),
     });
     final req = LoanRequest(product: Product.lap, amount: 6000000, years: 15, propertyValue: 12000000);
     final ip = await a.inPrinciple(session, req);
     expect(ip.outcome, Outcome.approve);
+    expect((ip.credit!.score, ip.credit!.fromApplicantReport, ip.credit!.bureau, ip.credit!.reportDate),
+        (772, true, 'TransUnion CIBIL', '2026-11-03'));
     expect(jsonDecode(bodies.last)['product'], 'lap');
     final fin = await a.finalSanction(
         session,
@@ -182,6 +188,7 @@ void main() {
     expect(fin.keyFacts!.fee + fin.keyFacts!.gst, 35400);
     expect(fin.keyFacts!.aprPct, 10.6);
     expect(fin.score!.score, 712);
+    expect(fin.score!.provisional, isTrue); // no credit report pulled: the grade isn't final
     expect(fin.score!.factors.first.points, 38);
     expect(fin.reference, '#4 · abcdef0123');
     final body = bodies.last;

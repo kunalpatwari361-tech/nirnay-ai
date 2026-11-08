@@ -186,6 +186,16 @@ def policy_rules(ev: dict, p: dict) -> Gate:
     elif b.get("status") == "not_pulled":
         g.refer("R-BUR-06")
         g.notes.append("no credit bureau is connected, so the report was not pulled: an officer pulls it with PAN")
+    elif b.get("status") == "applicant_report":
+        # The score was read from a report the applicant uploaded (name and PAN checked). It counts
+        # for the in-principle offer; an officer confirms it with the bureau before sanction. A low
+        # one goes to an officer too: a misread score must never reject on its own.
+        g.notes.append(f"credit score {score} read from the applicant's own {b.get('report_bureau')} report dated "
+                       f"{b.get('report_date')}: not yet confirmed with the bureau")
+        if score < p["bureau_reject_below"] or ev["stage"] == "final":
+            g.refer("R-BUR-07", score=score)
+        if p["bureau_reject_below"] <= score < p["bureau_refer_below"]:
+            g.refer("R-BUR-05", score=score)
     elif not score:
         g.refer("R-BUR-04")
     elif score < p["bureau_reject_below"]:
@@ -222,12 +232,27 @@ def affordability(ev: dict, p: dict) -> tuple[Gate, pol.Eligibility]:
 
 # --------------------------------------------------------------------------- 6 risk grade
 
+NOT_PULLED = ("not_pulled", "unavailable")   # no credit report: no bureau connected, or the bureau failed
+UNCONFIRMED = NOT_PULLED + ("applicant_report",)   # ... or only the applicant's own report, not yet confirmed
+
+
 def risk_grade(ev: dict) -> Gate:
     g = Gate("risk_grade")
     sc, ch = ev["models"]["scorecard"], ev["models"]["challenger"]
-    g.facts.update(score=sc["score"], grade=sc["grade"], challenger_score=ch["score"], challenger_grade=ch["grade"])
-    if sc["grade"] == "C":
+    # Without a credit report the scorecard is missing its main input (the bureau score counts as
+    # missing), so its grade is provisional: a low one goes to an officer, who grades the case once
+    # the report is pulled. It never rejects on its own.
+    provisional = ev["profile"]["bureau"].get("status") in NOT_PULLED
+    g.facts.update(score=sc["score"], grade=sc["grade"], challenger_score=ch["score"], challenger_grade=ch["grade"],
+                   provisional=provisional)
+    if provisional:
+        g.notes.append(f"grade {sc['grade']} is provisional: worked out without a credit report")
+        if sc["grade"] in ("C", "D", "E"):
+            g.refer("R-RSK-01", grade=sc["grade"])
+    elif sc["grade"] == "C":
         g.refer("R-RSK-01", grade="C")
+    elif sc["grade"] in ("D", "E") and ev["profile"]["bureau"].get("status") in UNCONFIRMED:
+        g.refer("R-RSK-01", grade=sc["grade"])    # from the applicant's own report: an officer confirms it first
     elif sc["grade"] in ("D", "E"):
         g.reject("R-RSK-02", grade=sc["grade"])
     g.notes.append(f"challenger (shadow, not used): {ch['score']} grade {ch['grade']}")

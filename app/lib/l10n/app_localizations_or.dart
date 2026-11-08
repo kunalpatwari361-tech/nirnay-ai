@@ -1344,4 +1344,69 @@ class AppLocalizationsOr extends AppLocalizations {
 
   @override
   String get statusInProgress => 'ଚାଲିଛି';
+
+  @override
+  String get appScoreTitle => 'ଆବେଦନ ସ୍କୋର';
+
+  @override
+  String get appScoreNote => 'ଆମ ସ୍କୋରକାର୍ଡରୁ, 900 ମଧ୍ୟରୁ';
+
+  @override
+  String get bandLow => 'ଆମ ସୀମାଠାରୁ କମ୍';
+
+  @override
+  String get bandCheck => 'ଯାଞ୍ଚ ଆବଶ୍ୟକ';
+
+  @override
+  String get bandGood => 'ଭଲ';
+
+  @override
+  String get bandExcellent => 'ଉତ୍କୃଷ୍ଟ';
+
+  @override
+  String get whyManual => 'ମାନୁଆଲ ଯାଞ୍ଚ କାହିଁକି ଆବଶ୍ୟକ';
+
+  @override
+  String get pendingManual => 'ମାନୁଆଲ ଯାଞ୍ଚ ବାକି ଅଛି';
+
+  @override
+  String get whatWentWell => 'କଣ ଭଲ ହେଲା';
+
+  @override
+  String get cardAddDetails => 'ଆପଣଙ୍କ ବିବରଣୀ ଦିଅନ୍ତୁ, ତାହା ଏଠାରେ ଦେଖାଯିବ।';
+
+  @override
+  String get scoreProvisional => 'ଅସ୍ଥାୟୀ';
+
+  @override
+  String get appScoreProvisional =>
+      'ଆପଣଙ୍କ କ୍ରେଡିଟ୍ ରିପୋର୍ଟ ବିନା ହିସାବ କରାଯାଇଛି। ରିପୋର୍ଟ ଆଣିବା ପରେ ଜଣେ ଅଧିକାରୀ ଏହାକୁ ନିଶ୍ଚିତ କରିବେ।';
+
+  @override
+  String get docCreditReport => 'କ୍ରେଡିଟ୍ ରିପୋର୍ଟ';
+
+  @override
+  String get docOptional => 'ଇଚ୍ଛାଧୀନ';
+
+  @override
+  String get creditReportBody =>
+      'ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି କ୍ରେଡିଟ୍ ବ୍ୟୁରୋ ସଂଯୁକ୍ତ ହୋଇନାହିଁ। CIBIL, Experian, Equifax କିମ୍ବା CRIF ରୁ ଆପଣଙ୍କ ମାଗଣା କ୍ରେଡିଟ୍ ରିପୋର୍ଟ (3 ମାସରୁ କମ୍ ପୁରୁଣା) ଅପଲୋଡ୍ କରନ୍ତୁ, ଆମେ ତାହାର ସ୍କୋର ବ୍ୟବହାର କରିବୁ। ମଞ୍ଜୁରି ପୂର୍ବରୁ ଜଣେ ଅଧିକାରୀ ବ୍ୟୁରୋ ସହିତ ଏହାକୁ ନିଶ୍ଚିତ କରିବେ।';
+
+  @override
+  String get creditReportOld =>
+      'ଏହି କ୍ରେଡିଟ୍ ରିପୋର୍ଟ 3 ମାସରୁ ପୁରୁଣା, କିମ୍ବା ଏହାର ତାରିଖ ପଢ଼ାଯାଇପାରିଲା ନାହିଁ। ନୂଆ ରିପୋର୍ଟ ଡାଉନଲୋଡ୍ କରି ଅପଲୋଡ୍ କରନ୍ତୁ।';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'ଆପଣଙ୍କ $bureau ରିପୋର୍ଟରୁ। ଜଣେ ଅଧିକାରୀ ବ୍ୟୁରୋ ସହିତ ଏହାକୁ ନିଶ୍ଚିତ କରିବେ।';
+  }
+
+  @override
+  String get checkNotPulled => 'ଏପର୍ଯ୍ୟନ୍ତ ଅଣାଯାଇନାହିଁ';
+
+  @override
+  String get fieldBureau => 'ବ୍ୟୁରୋ';
+
+  @override
+  String get fieldReportDate => 'ରିପୋର୍ଟ ତାରିଖ';
 }

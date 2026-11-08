@@ -2491,6 +2491,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'In progress'**
   String get statusInProgress;
+
+  /// No description provided for @appScoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Application score'**
+  String get appScoreTitle;
+
+  /// No description provided for @appScoreNote.
+  ///
+  /// In en, this message translates to:
+  /// **'From our scorecard, out of 900'**
+  String get appScoreNote;
+
+  /// No description provided for @bandLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Below our limit'**
+  String get bandLow;
+
+  /// No description provided for @bandCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs a check'**
+  String get bandCheck;
+
+  /// No description provided for @bandGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get bandGood;
+
+  /// No description provided for @bandExcellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get bandExcellent;
+
+  /// No description provided for @whyManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it needs a manual check'**
+  String get whyManual;
+
+  /// No description provided for @pendingManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending manual verification'**
+  String get pendingManual;
+
+  /// No description provided for @whatWentWell.
+  ///
+  /// In en, this message translates to:
+  /// **'What went well'**
+  String get whatWentWell;
+
+  /// No description provided for @cardAddDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your details and they show here.'**
+  String get cardAddDetails;
+
+  /// No description provided for @scoreProvisional.
+  ///
+  /// In en, this message translates to:
+  /// **'Provisional'**
+  String get scoreProvisional;
+
+  /// No description provided for @appScoreProvisional.
+  ///
+  /// In en, this message translates to:
+  /// **'Worked out without your credit report. An officer confirms it once the report is pulled.'**
+  String get appScoreProvisional;
+
+  /// No description provided for @docCreditReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit report'**
+  String get docCreditReport;
+
+  /// No description provided for @docOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get docOptional;
+
+  /// No description provided for @creditReportBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No credit bureau is connected yet. Upload your free credit report from CIBIL, Experian, Equifax or CRIF (less than 3 months old) and we\'ll use its score. An officer confirms it with the bureau before sanction.'**
+  String get creditReportBody;
+
+  /// No description provided for @creditReportOld.
+  ///
+  /// In en, this message translates to:
+  /// **'This credit report is more than 3 months old, or its date can\'t be read. Download a new one and upload it.'**
+  String get creditReportOld;
+
+  /// No description provided for @creditFromReport.
+  ///
+  /// In en, this message translates to:
+  /// **'From your {bureau} report. An officer confirms it with the bureau.'**
+  String creditFromReport(String bureau);
+
+  /// No description provided for @checkNotPulled.
+  ///
+  /// In en, this message translates to:
+  /// **'Not pulled yet'**
+  String get checkNotPulled;
+
+  /// No description provided for @fieldBureau.
+  ///
+  /// In en, this message translates to:
+  /// **'Bureau'**
+  String get fieldBureau;
+
+  /// No description provided for @fieldReportDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Report date'**
+  String get fieldReportDate;
 }
 
 class _AppLocalizationsDelegate

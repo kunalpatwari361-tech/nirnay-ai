@@ -1367,4 +1367,70 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get statusInProgress => 'நடைபெறுகிறது';
+
+  @override
+  String get appScoreTitle => 'விண்ணப்ப மதிப்பெண்';
+
+  @override
+  String get appScoreNote => 'எங்கள் மதிப்பெண் அட்டையிலிருந்து, 900-க்கு';
+
+  @override
+  String get bandLow => 'எங்கள் வரம்புக்குக் கீழே';
+
+  @override
+  String get bandCheck => 'சரிபார்ப்பு தேவை';
+
+  @override
+  String get bandGood => 'நல்லது';
+
+  @override
+  String get bandExcellent => 'மிகச் சிறந்தது';
+
+  @override
+  String get whyManual => 'நேரடிச் சரிபார்ப்பு ஏன் தேவை';
+
+  @override
+  String get pendingManual => 'நேரடிச் சரிபார்ப்பு நிலுவையில்';
+
+  @override
+  String get whatWentWell => 'எவை நன்றாக இருந்தன';
+
+  @override
+  String get cardAddDetails =>
+      'உங்கள் விவரங்களை நிரப்புங்கள், அவை இங்கே தெரியும்.';
+
+  @override
+  String get scoreProvisional => 'தற்காலிகம்';
+
+  @override
+  String get appScoreProvisional =>
+      'உங்கள் கடன் அறிக்கை இல்லாமல் கணக்கிடப்பட்டது. அறிக்கை எடுத்த பிறகு ஒரு அதிகாரி இதை உறுதிசெய்வார்.';
+
+  @override
+  String get docCreditReport => 'கடன் அறிக்கை';
+
+  @override
+  String get docOptional => 'விருப்பத்தேர்வு';
+
+  @override
+  String get creditReportBody =>
+      'இன்னும் எந்தக் கடன் தகவல் நிறுவனமும் இணைக்கப்படவில்லை. CIBIL, Experian, Equifax அல்லது CRIF-இலிருந்து உங்கள் இலவச கடன் அறிக்கையை (3 மாதங்களுக்குள்) பதிவேற்றுங்கள், அதன் மதிப்பெண்ணை நாங்கள் பயன்படுத்துவோம். ஒப்புதலுக்கு முன் ஒரு அதிகாரி அதை நிறுவனத்துடன் உறுதிசெய்வார்.';
+
+  @override
+  String get creditReportOld =>
+      'இந்தக் கடன் அறிக்கை 3 மாதங்களுக்கு மேல் பழையது, அல்லது அதன் தேதியைப் படிக்க முடியவில்லை. புதிய அறிக்கையைப் பதிவிறக்கிப் பதிவேற்றுங்கள்.';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'உங்கள் $bureau அறிக்கையிலிருந்து. ஒரு அதிகாரி அதை நிறுவனத்துடன் உறுதிசெய்வார்.';
+  }
+
+  @override
+  String get checkNotPulled => 'இன்னும் எடுக்கப்படவில்லை';
+
+  @override
+  String get fieldBureau => 'கடன் தகவல் நிறுவனம்';
+
+  @override
+  String get fieldReportDate => 'அறிக்கை தேதி';
 }

@@ -1352,4 +1352,69 @@ class AppLocalizationsSat extends AppLocalizations {
 
   @override
   String get statusInProgress => 'ᱪᱟᱞᱟᱜ ᱠᱟᱱᱟ';
+
+  @override
+  String get appScoreTitle => 'ᱟᱨᱡᱤ ᱨᱮᱭᱟᱜ ᱥᱠᱚᱨ';
+
+  @override
+  String get appScoreNote => 'ᱟᱵᱚᱣᱟᱜ ᱥᱠᱚᱨᱠᱟᱨᱰ ᱠᱷᱚᱱ, 900 ᱨᱮᱭᱟᱜ';
+
+  @override
+  String get bandLow => 'ᱟᱵᱚᱣᱟᱜ ᱥᱤᱢᱟᱹ ᱠᱷᱚᱱ ᱠᱚᱢ';
+
+  @override
+  String get bandCheck => 'ᱧᱮᱞ ᱞᱟᱹᱠᱛᱤ';
+
+  @override
+  String get bandGood => 'ᱵᱮᱥ';
+
+  @override
+  String get bandExcellent => 'ᱟᱹᱰᱤ ᱵᱮᱥ';
+
+  @override
+  String get whyManual => 'ᱪᱮᱫᱟᱜ ᱛᱤ ᱛᱮ ᱧᱮᱞ ᱞᱟᱹᱠᱛᱤ';
+
+  @override
+  String get pendingManual => 'ᱛᱤ ᱛᱮ ᱧᱮᱞ ᱵᱟᱠᱤ ᱢᱮᱱᱟᱜᱼᱟ';
+
+  @override
+  String get whatWentWell => 'ᱪᱮᱫ ᱵᱮᱥ ᱦᱩᱭ ᱮᱱᱟ';
+
+  @override
+  String get cardAddDetails => 'ᱟᱢᱟᱜ ᱵᱤᱵᱨᱚᱬ ᱮᱢ ᱢᱮ, ᱱᱚᱸᱰᱮ ᱧᱮᱞᱚᱜᱼᱟ᱾';
+
+  @override
+  String get scoreProvisional => 'ᱠᱟᱹᱪᱟᱹ';
+
+  @override
+  String get appScoreProvisional =>
+      'ᱟᱢᱟᱜ ᱠᱨᱮᱰᱤᱴ ᱨᱤᱯᱚᱨᱴ ᱵᱤᱱᱟ ᱦᱤᱥᱟᱹᱵ ᱟᱠᱟᱱᱟ᱾ ᱨᱤᱯᱚᱨᱴ ᱟᱹᱜᱩ ᱛᱟᱭᱚᱢ ᱢᱤᱫ ᱚᱯᱷᱤᱥᱚᱨ ᱱᱚᱶᱟ ᱥᱟᱹᱨᱤ ᱮᱫᱟᱭ᱾';
+
+  @override
+  String get docCreditReport => 'ᱠᱨᱮᱰᱤᱴ ᱨᱤᱯᱚᱨᱴ';
+
+  @override
+  String get docOptional => 'ᱢᱚᱱᱮ ᱞᱮᱠᱟ';
+
+  @override
+  String get creditReportBody =>
+      'ᱱᱤᱛ ᱦᱟᱹᱵᱤᱡ ᱡᱟᱦᱟᱸᱱ ᱠᱨᱮᱰᱤᱴ ᱵᱭᱩᱨᱚ ᱵᱟᱝ ᱡᱚᱲᱟᱣ ᱟᱠᱟᱱᱟ᱾ CIBIL, Experian, Equifax ᱟᱨᱵᱟᱝ CRIF ᱠᱷᱚᱱ ᱟᱢᱟᱜ ᱯᱷᱨᱤ ᱠᱨᱮᱰᱤᱴ ᱨᱤᱯᱚᱨᱴ (3 ᱪᱟᱸᱫᱚ ᱠᱷᱚᱱ ᱠᱚᱢ ᱢᱟᱨᱮ) ᱟᱯᱞᱚᱰ ᱢᱮ, ᱟᱞᱮ ᱚᱱᱟᱜ ᱥᱠᱚᱨ ᱵᱮᱵᱷᱟᱨ ᱞᱮᱜᱼᱟ᱾ ᱢᱚᱱᱡᱩᱨ ᱞᱟᱦᱟᱨᱮ ᱢᱤᱫ ᱚᱯᱷᱤᱥᱚᱨ ᱵᱭᱩᱨᱚ ᱥᱟᱶ ᱱᱚᱶᱟ ᱥᱟᱹᱨᱤ ᱮᱫᱟᱭ᱾';
+
+  @override
+  String get creditReportOld =>
+      'ᱱᱚᱶᱟ ᱠᱨᱮᱰᱤᱴ ᱨᱤᱯᱚᱨᱴ 3 ᱪᱟᱸᱫᱚ ᱠᱷᱚᱱ ᱵᱟᱹᱲᱛᱤ ᱢᱟᱨᱮ, ᱟᱨᱵᱟᱝ ᱚᱱᱟᱜ ᱢᱟᱦᱟᱸ ᱵᱟᱝ ᱯᱟᱲᱦᱟᱣ ᱫᱟᱲᱮᱭᱟᱜ ᱠᱟᱱᱟ᱾ ᱱᱟᱶᱟ ᱨᱤᱯᱚᱨᱴ ᱰᱟᱣᱱᱞᱚᱰ ᱠᱟᱛᱮ ᱟᱯᱞᱚᱰ ᱢᱮ᱾';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'ᱟᱢᱟᱜ $bureau ᱨᱤᱯᱚᱨᱴ ᱠᱷᱚᱱ᱾ ᱢᱤᱫ ᱚᱯᱷᱤᱥᱚᱨ ᱵᱭᱩᱨᱚ ᱥᱟᱶ ᱱᱚᱶᱟ ᱥᱟᱹᱨᱤ ᱮᱫᱟᱭ᱾';
+  }
+
+  @override
+  String get checkNotPulled => 'ᱱᱤᱛ ᱦᱟᱹᱵᱤᱡ ᱵᱟᱝ ᱟᱹᱜᱩ ᱟᱠᱟᱱᱟ';
+
+  @override
+  String get fieldBureau => 'ᱵᱭᱩᱨᱚ';
+
+  @override
+  String get fieldReportDate => 'ᱨᱤᱯᱚᱨᱴ ᱢᱟᱦᱟᱸ';
 }

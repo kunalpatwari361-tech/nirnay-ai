@@ -363,6 +363,54 @@ void main() {
     expect(engine.liveFrames, isNull);
     expect(find.text('Start live selfie'), findsOneWidget); // they can try again
   });
+
+  testWidgets('documents: no bureau connected, so the applicant can upload their own credit report', (tester) async {
+    final (_, state) = await onDocuments(tester, shares: () => DigiLockerShare(status: 'none'));
+    expect(state.profile!.creditReportWanted, isTrue);
+    await tester.scrollUntilVisible(find.byKey(const Key('doc-creditReport')), 200, scrollable: find.byType(Scrollable).first);
+    expect(find.text('Credit report'), findsOneWidget);
+    expect(find.text('Optional'), findsOneWidget);
+    expect(find.textContaining('Upload your free credit report from CIBIL'), findsOneWidget);
+    expect(find.text('Fetched through your Account Aggregator'), findsNothing); // no Account Aggregator in real mode
+    expect(state.requiredDocs, isNot(contains(DocSlot.creditReport))); // optional: the offer doesn't wait for it
+    state.update(() => state.documents[DocSlot.creditReport] = DocResult(
+          slot: DocSlot.creditReport,
+          detectedType: 'creditReport',
+          confidence: 0.95,
+          accepted: true,
+          fields: {'score': '772', 'bureau': 'TransUnion CIBIL', 'reportDate': '2026-11-03'},
+          verification: DocVerification(verdict: 'verified', score: 95),
+        ));
+    await tester.pumpAndSettle();
+    expect(find.text('Score 772 · TransUnion CIBIL'), findsOneWidget);
+  }, skip: !realMode);
+
+  testWidgets('decision: the credit meter shows the score from the uploaded report, and says an officer confirms it',
+      (tester) async {
+    final engine = FakeRealEngine();
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+    final state = AppState(engine)
+      ..session = Session(token: 't', deviceId: 'd', applicationId: 'HL-2611-10006')
+      ..inPrinciple = Decision(
+        stage: 'in_principle',
+        outcome: Outcome.approve,
+        amount: 3000000,
+        years: 20,
+        ratePct: 8.6,
+        emi: 26225,
+        reasons: const [],
+        credit: CreditScore(score: 772, status: 'applicant_report', bureau: 'TransUnion CIBIL', reportDate: '2026-11-03'),
+      );
+    await tester.pumpWidget(NirnayApp(api: engine, state: state));
+    await tester.pumpAndSettle();
+    tester.state<NavigatorState>(find.byType(Navigator).first).pushNamed('/decision');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('credit-score')), findsOneWidget);
+    expect(find.text('772'), findsOneWidget);
+    expect(find.text('From your TransUnion CIBIL report. An officer confirms it with the bureau.'), findsOneWidget);
+  }, skip: !realMode);
 }
 
 /// A front camera that hands out small, different JPEG frames and keeps them.

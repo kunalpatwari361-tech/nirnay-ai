@@ -1349,4 +1349,69 @@ class AppLocalizationsKs extends AppLocalizations {
 
   @override
   String get statusInProgress => 'جٲری';
+
+  @override
+  String get appScoreTitle => 'درخواستُک اسکور';
+
+  @override
+  String get appScoreNote => 'سانٛہہ اسکور کارڈٕ پیٚٹھٕ، 900 منٛزٕ';
+
+  @override
+  String get bandLow => 'سانٛہہ حدٕ کھوتہٕ کم';
+
+  @override
+  String get bandCheck => 'جانچ چھےٚ ضروٗری';
+
+  @override
+  String get bandGood => 'رۄت';
+
+  @override
+  String get bandExcellent => 'واریاہ رۄت';
+
+  @override
+  String get whyManual => 'مینول جانچ کیازِ چھےٚ ضروٗری';
+
+  @override
+  String get pendingManual => 'مینول جانچ چھےٚ باقی';
+
+  @override
+  String get whatWentWell => 'کیاہ رُود رۄت';
+
+  @override
+  String get cardAddDetails => 'پنٕنۍ تفصیل بَرِو، سۄ یِیہِ یَتہِ نَظرِ۔';
+
+  @override
+  String get scoreProvisional => 'عارضی';
+
+  @override
+  String get appScoreProvisional =>
+      'تُہٕنزِ کریڈٹ رپورٹِ ورٲے کوڈمُت۔ رپورٹ اَنٕنہٕ پتہٕ کرِ اکھ افسر یہِ پکہٕ۔';
+
+  @override
+  String get docCreditReport => 'کریڈٹ رپورٹ';
+
+  @override
+  String get docOptional => 'اختیاری';
+
+  @override
+  String get creditReportBody =>
+      'وُنہِ چھُنہٕ کانٛہہ کریڈٹ بیورو جُڑِتھ۔ CIBIL، Experian، Equifax یا CRIF پیٚٹھٕ پنٕنۍ مُفت کریڈٹ رپورٹ (3 رٮ۪تھن کھۄتہٕ کم پرٲنۍ) اَپلوڈ کٔرِو، اَسۍ ورتاوو تَمیُک سکور۔ منظوری برونٛہہ کرِ اکھ افسر بیورو سٟتؠ یہِ پکہٕ۔';
+
+  @override
+  String get creditReportOld =>
+      'یہِ کریڈٹ رپورٹ چھےٚ 3 رٮ۪تھن کھۄتہٕ پرٲنۍ، یا ہیٚکہٕ نہٕ امیُک تٲریخ پٔرِتھ۔ نٔو رپورٹ ڈاؤنلوڈ کٔرِتھ اَپلوڈ کٔرِو۔';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'تُہٕنزِ $bureau رپورٹِ پیٚٹھٕ۔ اکھ افسر کرِ بیورو سٟتؠ یہِ پکہٕ۔';
+  }
+
+  @override
+  String get checkNotPulled => 'وُنہِ چھُنہٕ کڈنہٕ آمُت';
+
+  @override
+  String get fieldBureau => 'بیورو';
+
+  @override
+  String get fieldReportDate => 'رپورٹُک تٲریخ';
 }

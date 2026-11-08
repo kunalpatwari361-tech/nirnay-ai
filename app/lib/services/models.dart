@@ -42,6 +42,8 @@ class Profile {
   // connected: an officer pulls it), "unavailable" (the bureau failed), "self_declared" (older apps).
   final String? bureauStatus, bureauSource;
   bool get bureauPulled => bureauStatus == 'scored' || bureauStatus == 'no_history';
+  /// No bureau answered, so the applicant can upload their own credit report instead.
+  bool get creditReportWanted => bureauStatus != null && !bureauPulled;
 
   int ageOn(DateTime day) {
     var age = day.year - dateOfBirth.year;
@@ -159,7 +161,10 @@ class ConsentRecord {
   Map<String, Object> toJson() => {'given': given, 'options': options, 'optional': optional};
 }
 
-enum DocSlot { pan, aadhaar, salarySlip, form16, itr, gst, bankStatement, saleDeed, allotmentLetter, encumbrance, propertyTax }
+enum DocSlot {
+  pan, aadhaar, salarySlip, form16, itr, gst, bankStatement, saleDeed, allotmentLetter, encumbrance, propertyTax,
+  creditReport, // optional: the applicant's own report, when no bureau answered
+}
 
 class DocResult {
   DocResult({
@@ -176,7 +181,8 @@ class DocResult {
   final double confidence;
   final bool accepted;
   final String? reasonCode; // R-DOC-01 wrong document, R-DOC-02 unreadable
-  final Map<String, String> fields; // what OCR read: name, pan, employer, netPay, period, year, income, business
+  final Map<String, String> fields; // what OCR read: name, pan, employer, netPay, period, year, income, business;
+  // a credit report: score, bureau, reportDate
   final DocVerification? verification; // null from an engine older than verdicts
 
   bool get failed => verification?.verdict == 'failed';
@@ -261,12 +267,14 @@ class Decision {
   final VerificationScore? verification; // the document checks' score
 }
 
-/// The credit bureau's score. status: scored, no_history, not_pulled (no bureau connected: an
-/// officer pulls the report), unavailable (the bureau failed), self_declared (older applications).
+/// The credit score. status: scored, no_history, not_pulled (no bureau connected: an officer pulls
+/// the report), unavailable (the bureau failed), applicant_report (read from the credit report the
+/// applicant uploaded: bureau and reportDate say which), self_declared (older applications).
 class CreditScore {
-  CreditScore({this.score, this.status});
+  CreditScore({this.score, this.status, this.bureau, this.reportDate});
   final int? score;
-  final String? status;
+  final String? status, bureau, reportDate;
+  bool get fromApplicantReport => status == 'applicant_report';
 }
 
 /// The score after verification: the weakest uploaded document's, since one bad document decides.
@@ -327,10 +335,11 @@ class ScoreFactor {
 }
 
 class ScoreBreakdown {
-  ScoreBreakdown({required this.score, required this.grade, required this.base, required this.factors});
+  ScoreBreakdown({required this.score, required this.grade, required this.base, required this.factors, this.provisional = false});
   final int score, base;
   final String grade; // A to E
   final List<ScoreFactor> factors;
+  final bool provisional; // worked out without a credit report: an officer confirms it once the report is pulled
 }
 
 class DecisionLetter {

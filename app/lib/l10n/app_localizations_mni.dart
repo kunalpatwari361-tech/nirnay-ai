@@ -1351,4 +1351,69 @@ class AppLocalizationsMni extends AppLocalizations {
 
   @override
   String get statusInProgress => 'চত্থরি';
+
+  @override
+  String get appScoreTitle => 'এপ্লিকেসনগী স্কোর';
+
+  @override
+  String get appScoreNote => 'ঐখোয়গী স্কোরকার্দগী মতুংইন্না, 900 গী মনুংদা';
+
+  @override
+  String get bandLow => 'ঐখোয়গী লিমিত্তগী মখাদা';
+
+  @override
+  String get bandCheck => 'চেক তৌবা মথৌ তাই';
+
+  @override
+  String get bandGood => 'ফৈ';
+
+  @override
+  String get bandExcellent => 'য়াম্না ফৈ';
+
+  @override
+  String get whyManual => 'করিগী মেনুএল চেক তৌবা মথৌ তাইবগে';
+
+  @override
+  String get pendingManual => 'মেনুএল চেক লৈরি';
+
+  @override
+  String get whatWentWell => 'করি ফখিবগে';
+
+  @override
+  String get cardAddDetails => 'নহাক্কী ৱাফমশিং হাপচিনবীয়ু, মফম অসিদা উনগনি।';
+
+  @override
+  String get scoreProvisional => 'মতম খরগীদমক্কী';
+
+  @override
+  String get appScoreProvisional =>
+      'নহাক্কী ক্রেডিট রিপোর্ট য়াওদনা থীখিবনি। রিপোর্ট লৌরবা মতুংদা অফিসর অমনা মসি শোয়দনা হায়গনি।';
+
+  @override
+  String get docCreditReport => 'ক্রেডিট রিপোর্ট';
+
+  @override
+  String get docOptional => 'মথৌ তাদবা';
+
+  @override
+  String get creditReportBody =>
+      'হৌজিক ফাওবা ক্রেডিট ব্যুরো অমত্তা শম্নদ্রি। CIBIL, Experian, Equifax নত্রগা CRIF দগী নহাক্কী অমান লৌদবা ক্রেডিট রিপোর্ট (থা 3 নাইদবা) অপলোড তৌবীয়ু, ঐখোয়না মসিগী স্কোর শিজিন্নগনি। য়াথং পীদ্রিঙৈ মমাংদা অফিসর অমনা ব্যুরোগা লোয়ননা মসি শোয়দনা হায়গনি।';
+
+  @override
+  String get creditReportOld =>
+      'ক্রেডিট রিপোর্ট অসি থা 3 হেন্না অরিবনি, নত্রগা মসিগী তারিখ পাবা ঙম্লোই। অনৌবা রিপোর্ট ডাউনলোড তৌরগা অপলোড তৌবীয়ু।';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'নহাক্কী $bureau রিপোর্ট দগী। অফিসর অমনা ব্যুরোগা লোয়ননা মসি শোয়দনা হায়গনি।';
+  }
+
+  @override
+  String get checkNotPulled => 'হৌজিক ফাওবা লৌরমদ্রি';
+
+  @override
+  String get fieldBureau => 'ব্যুরো';
+
+  @override
+  String get fieldReportDate => 'রিপোর্টকী তারিখ';
 }

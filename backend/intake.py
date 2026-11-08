@@ -11,7 +11,7 @@ from datetime import date
 from models.document_classifier import classifier
 from models.transaction_tagger import tagger
 
-from . import fields, sandbox
+from . import credit_report, fields, sandbox
 from .checks import links, tamper
 from .config import settings
 from .store import Application, Store, now
@@ -20,10 +20,13 @@ REQUIRED_CONSENTS = ("bureau", "aa", "kyc", "privacy")
 SLOT_TYPES = {"pan": "pan_card", "aadhaar": "aadhaar_card", "salarySlip": "salary_slip", "form16": "form_16", "itr": "itr",
               "gst": "gst_certificate", "bankStatement": "bank_statement", "saleDeed": "sale_deed",
               "allotmentLetter": "allotment_letter", "encumbrance": "encumbrance_certificate",
-              "propertyTax": "property_tax_receipt"}
+              "propertyTax": "property_tax_receipt", "creditReport": "credit_report"}
 TYPE_SLOTS = {v: k for k, v in SLOT_TYPES.items()}
-NAMED_SLOTS = ("pan", "aadhaar", "salarySlip", "form16", "itr", "gst", "bankStatement")
+NAMED_SLOTS = ("pan", "aadhaar", "salarySlip", "form16", "itr", "gst", "bankStatement", "creditReport")
 ID_PHOTO_SLOTS = ("pan", "aadhaar")
+# No credit report from a bureau: the applicant can upload their own (backend/credit_report.py).
+# It also replaces a score an older app version had them type in.
+REPORT_WANTED = ("not_pulled", "unavailable", "self_declared", "applicant_report")
 
 
 class IntakeError(Exception):
@@ -344,6 +347,8 @@ def upload_document(store: Store, app: Application, slot: str, data: bytes, file
     from models.ocr import ocr
     if slot not in SLOT_TYPES:
         raise IntakeError("unknown_slot")
+    if slot == "creditReport" and (app.profile is None or app.profile["bureau"].get("status") not in REPORT_WANTED):
+        raise IntakeError("credit_report_not_needed", 409)     # the bureau answered: its report is used
     if len(data) > settings.max_upload_bytes:
         raise IntakeError("file_too_large", 413)
     kind = _kind(data)
@@ -351,8 +356,11 @@ def upload_document(store: Store, app: Application, slot: str, data: bytes, file
         raise IntakeError("unsupported_file", 415)
     read = ocr.read(data, filename)
     text = read["text"]
-    cls = classifier.predict({"ocr_text": text, "expected_type": SLOT_TYPES[slot]})
-    found = fields.extract(slot, text) if cls["flag"] == "pass" else {}
+    if slot == "creditReport":
+        cls, found = _read_credit_report(text)
+    else:
+        cls = classifier.predict({"ocr_text": text, "expected_type": SLOT_TYPES[slot]})
+        found = fields.extract(slot, text) if cls["flag"] == "pass" else {}
     rec = {"slot": slot, "file_kind": kind, "uploaded_at": now().isoformat(),
            "ocr": {k: read[k] for k in ("model_version", "pages", "sources", "passes", "mean_confidence", "has_hindi", "error")},
            "text_chars": len(text), "classifier": {k: cls[k] for k in ("model_version", "document_type", "confidence", "top3",
@@ -367,7 +375,7 @@ def upload_document(store: Store, app: Application, slot: str, data: bytes, file
     app.file_digests.add(digest)
     if app.profile and found.get("name") and slot in NAMED_SLOTS:
         rec["name_score"] = round(fields.name_score(found["name"], app.profile["name"]), 1)
-    if slot == "pan" and found.get("pan") and app.pan:
+    if slot in ("pan", "creditReport") and found.get("pan") and app.pan:
         rec["pan_matches"] = found["pan"] == app.pan
     if slot in ID_PHOTO_SLOTS and kind != "pdf" and rec["accepted"]:
         _id_photo(app, slot, data, rec)
@@ -389,11 +397,41 @@ def upload_document(store: Store, app: Application, slot: str, data: bytes, file
         rec["failed_before"] = earlier
     rec["verification"] = verify(rec)
     app.documents[slot] = rec
+    if slot == "creditReport":
+        _credit_from_report(app, rec)
     # Keep the file for officers, except Aadhaar: UIDAI rules forbid storing Aadhaar copies,
     # so only the masked number and the checks are kept.
     keep = settings.store_files and slot != "aadhaar"
     store.save_document(app, rec, digest, data if keep else None, kind)
     return rec
+
+
+def _read_credit_report(text: str) -> tuple[dict, dict]:
+    """The credit report's fields, and a record shaped like the classifier's (model 6 isn't
+    trained on credit reports, so rules decide what it is)."""
+    found = credit_report.read(text)
+    flag, reason = credit_report.check(found, today())
+    cls = {"model_version": "credit-report-rules-v1", "document_type": "credit_report" if found else "unknown",
+           "confidence": 0.95 if flag == "pass" else 0.5 if found else 0.0, "top3": [], "needs_review": flag != "pass",
+           "flag": flag, "reason_code": reason}
+    return cls, found
+
+
+def _credit_from_report(app: Application, rec: dict) -> None:
+    """A verified credit report the applicant uploaded fills the credit score while no bureau has
+    answered. Each upload starts again from the bureau's own answer, so a report that doesn't pass
+    takes the earlier one's score away. An officer confirms the score before sanction (R-BUR-07)."""
+    from . import bureau as bureau_mod
+    prof = app.profile
+    before = prof.pop("bureau_before_report", None) or prof["bureau"]
+    prof["bureau"] = before
+    if rec["verification"]["verdict"] != "verified":
+        return
+    f = rec["fields"]
+    prof["bureau_before_report"] = before
+    prof["bureau"] = bureau_mod.empty(f"applicant-report ({f['bureau']})", "applicant_report", score=int(f["score"]),
+                                      report_bureau=f["bureau"], report_date=f["reportDate"],
+                                      existing_emi=before.get("existing_emi") or 0.0, replaces=before.get("status"))
 
 
 def _id_photo(app: Application, slot: str, data: bytes, rec: dict) -> None:
@@ -468,7 +506,7 @@ def doc_result(rec: dict) -> dict:
     applicant sees, so the checks aren't taught; a failure shows only as the verdict."""
     detected = TYPE_SLOTS.get(rec["classifier"]["document_type"], rec["classifier"]["document_type"])
     shown = {k: v for k, v in rec["fields"].items() if k in ("name", "pan", "aadhaar", "employer", "netPay", "period", "year",
-                                                              "income", "business")}
+                                                              "income", "business", "score", "bureau", "reportDate")}
     v = verification(rec)
     return {"slot": rec["slot"], "detectedType": detected, "confidence": rec["classifier"]["confidence"],
             "accepted": rec["accepted"], "reasonCode": rec["reason_code"], "fields": shown,

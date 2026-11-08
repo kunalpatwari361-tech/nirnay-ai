@@ -196,9 +196,10 @@ class _DemoNote extends StatelessWidget {
       );
 }
 
-/// The loan card, in one flat navy. Before approval it shows what the customer asked for and the
-/// details they gave; only once the loan is approved does it show the approved (or, after the final
-/// decision, the sanctioned) amount with its rate and EMI. "Track" shows where the application is.
+/// The loan card, in one flat navy. It shows only what the customer has told us: nothing made up
+/// before they fill in their details, then what they asked for and the details they gave. Only once
+/// the loan is approved does it show the approved (or, after the final decision, the sanctioned)
+/// amount with its rate and EMI. "Track" shows where the application is.
 class _LoanCard extends StatelessWidget {
   const _LoanCard();
 
@@ -214,9 +215,11 @@ class _LoanCard extends StatelessWidget {
     final product = s.product == Product.homeLoan ? t.productHomeLoan : t.productLap;
     final status = _status(t, s);
 
-    final (heading, amount, note) = offer == null
-        ? (id == null ? t.loanAmountLabel : t.cardAsked, s.loanAmount, id == null ? t.cardNotStarted : t.cardSanctionLater)
-        : (s.finalDecision != null ? t.cardSanctionedAmount : t.approvedInPrinciple, offer.amount, null);
+    final (String? heading, double? amount, String? note) = offer != null
+        ? (s.finalDecision != null ? t.cardSanctionedAmount : t.approvedInPrinciple, offer.amount, null)
+        : p != null
+            ? (t.cardAsked, s.loanAmount, t.cardSanctionLater)
+            : (null, null, id == null ? t.cardNotStarted : t.cardAddDetails); // no default amounts shown as theirs
     final facts = <(String, String)>[
       if (p != null) (t.nameLabel, p.name),
       if (offer != null) ...[
@@ -224,12 +227,10 @@ class _LoanCard extends StatelessWidget {
         (t.kfsEmi, rupees(offer.emi)),
         (t.tenureLabel, t.yearsLabel('${offer.years}')),
         (t.cardAsked, rupees(s.loanAmount)),
-      ] else ...[
+      ] else if (p != null)
         (t.tenureLabel, t.yearsLabel('${s.years}')),
-        if (id == null) (t.kfsRate, t.ratePa(Policy.ratePct(s.product).toStringAsFixed(2))),
-      ],
-      (t.propertyValueLabel, rupees(s.propertyValue)),
       if (p != null) ...[
+        (t.propertyValueLabel, rupees(s.propertyValue)),
         (t.incomeLabel, rupees(p.monthlyIncome)),
         if (p.employer.trim().isNotEmpty) (t.fieldEmployer, p.employer),
         if (p.panMasked.isNotEmpty) (t.fieldPan, p.panMasked),
@@ -255,15 +256,20 @@ class _LoanCard extends StatelessWidget {
           if (status != null) _StatusPill(key: const Key('card-status'), text: status.$1, color: status.$2),
         ]),
         const SizedBox(height: 16),
-        Text(heading, style: soft.copyWith(fontSize: 12.5)),
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: AlignmentDirectional.centerStart,
-          child: Text(rupees(amount),
-              key: Key(approved ? 'card-sanctioned' : 'card-asked'),
-              style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800)),
-        ),
-        if (note != null) Text(note, key: const Key('card-note'), style: soft.copyWith(height: 1.35)),
+        if (heading != null) Text(heading, style: soft.copyWith(fontSize: 12.5)),
+        if (amount != null)
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: AlignmentDirectional.centerStart,
+            child: Text(rupees(amount),
+                key: Key(approved ? 'card-sanctioned' : 'card-asked'),
+                style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800)),
+          ),
+        if (note != null)
+          Text(note,
+              key: const Key('card-note'),
+              style: amount == null ? const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600, height: 1.35) : soft.copyWith(height: 1.35)),
+        if (facts.isNotEmpty) ...[
         const SizedBox(height: 14),
         Container(height: 1, color: Colors.white.withValues(alpha: 0.18)),
         const SizedBox(height: 12),
@@ -283,6 +289,7 @@ class _LoanCard extends StatelessWidget {
               ),
           ]);
         }),
+        ],
         if (id != null) ...[
           const SizedBox(height: 14),
           FilledButton.icon(
@@ -442,6 +449,19 @@ class _Progress extends StatelessWidget {
 class _LiveChecks extends StatelessWidget {
   const _LiveChecks();
 
+  /// The credit score tile: the bureau's score, or the score on the report the applicant uploaded
+  /// when no bureau answered. "Not pulled yet" is never shown as "no credit history".
+  static (String, String, Color?) _bureau(AppLocalizations t, AppState s) {
+    final p = s.profile;
+    if (p == null) return (t.checkBureau, t.checkPending, null);
+    if (p.bureauPulled || p.bureauStatus == null) {
+      return (t.checkBureau, p.bureauScore == null ? t.checkNoHistory : t.checkScore('${p.bureauScore}'), C.good);
+    }
+    final report = s.documents[DocSlot.creditReport];
+    final score = (report?.verified ?? false) ? report!.fields['score'] : null;
+    return score != null ? (t.checkBureau, t.checkScore(score), C.good) : (t.checkBureau, t.checkNotPulled, null);
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
@@ -450,8 +470,13 @@ class _LiveChecks extends StatelessWidget {
     final done = s.requiredDocs.where((d) => s.documents[d]?.accepted ?? false).length;
     final total = s.requiredDocs.length;
     final tiles = [
-      (t.checkBureau, p == null ? t.checkPending : (p.bureauScore == null ? t.checkNoHistory : t.checkScore('${p.bureauScore}')), p == null ? null : C.good),
-      (t.checkBank, p == null ? t.checkPending : t.checkBankRead, p == null ? null : C.good),
+      _bureau(t, s),
+      // Real mode has no Account Aggregator: the bank statement is read once it's uploaded.
+      realMode
+          ? ((s.documents[DocSlot.bankStatement]?.verified ?? false)
+              ? (t.checkBank, t.verified, C.good)
+              : (t.checkBank, t.checkPending, null))
+          : (t.checkBank, p == null ? t.checkPending : t.checkBankRead, p == null ? null : C.good),
       (t.checkKyc, (s.selfieResult?.passed ?? false) ? t.verified : t.checkPending, (s.selfieResult?.passed ?? false) ? C.good : null),
       (t.checkDocs, t.countOf('$done', '$total'), done == total ? C.good : (done > 0 ? C.warnInk : null)),
     ];

@@ -1338,4 +1338,69 @@ class AppLocalizationsGu extends AppLocalizations {
 
   @override
   String get statusInProgress => 'ચાલુ છે';
+
+  @override
+  String get appScoreTitle => 'અરજીનો સ્કોર';
+
+  @override
+  String get appScoreNote => 'અમારા સ્કોરકાર્ડ પરથી, 900 માંથી';
+
+  @override
+  String get bandLow => 'અમારી મર્યાદાથી ઓછો';
+
+  @override
+  String get bandCheck => 'તપાસ જરૂરી';
+
+  @override
+  String get bandGood => 'સારો';
+
+  @override
+  String get bandExcellent => 'ઉત્તમ';
+
+  @override
+  String get whyManual => 'મેન્યુઅલ તપાસ કેમ જરૂરી છે';
+
+  @override
+  String get pendingManual => 'મેન્યુઅલ ચકાસણી બાકી';
+
+  @override
+  String get whatWentWell => 'શું સારું રહ્યું';
+
+  @override
+  String get cardAddDetails => 'તમારી વિગતો ભરો, તે અહીં દેખાશે.';
+
+  @override
+  String get scoreProvisional => 'કામચલાઉ';
+
+  @override
+  String get appScoreProvisional =>
+      'તમારા ક્રેડિટ રિપોર્ટ વિના ગણેલો. રિપોર્ટ મળ્યા પછી એક અધિકારી તેની પુષ્ટિ કરશે.';
+
+  @override
+  String get docCreditReport => 'ક્રેડિટ રિપોર્ટ';
+
+  @override
+  String get docOptional => 'વૈકલ્પિક';
+
+  @override
+  String get creditReportBody =>
+      'હજી કોઈ ક્રેડિટ બ્યુરો જોડાયેલ નથી. CIBIL, Experian, Equifax અથવા CRIF પરથી તમારો મફત ક્રેડિટ રિપોર્ટ (3 મહિનાથી ઓછો જૂનો) અપલોડ કરો, અમે તેનો સ્કોર વાપરીશું. મંજૂરી પહેલાં એક અધિકારી બ્યુરો સાથે તેની પુષ્ટિ કરશે.';
+
+  @override
+  String get creditReportOld =>
+      'આ ક્રેડિટ રિપોર્ટ 3 મહિનાથી જૂનો છે, અથવા તેની તારીખ વાંચી શકાઈ નથી. નવો રિપોર્ટ ડાઉનલોડ કરીને અપલોડ કરો.';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'તમારા $bureau રિપોર્ટ પરથી. એક અધિકારી બ્યુરો સાથે તેની પુષ્ટિ કરશે.';
+  }
+
+  @override
+  String get checkNotPulled => 'હજી મેળવ્યો નથી';
+
+  @override
+  String get fieldBureau => 'બ્યુરો';
+
+  @override
+  String get fieldReportDate => 'રિપોર્ટની તારીખ';
 }

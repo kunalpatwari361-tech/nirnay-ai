@@ -759,5 +759,32 @@
   "cardSanctionedAmount": "Sanctioned amount",
   "cardSanctionLater": "Your sanctioned amount, rate and EMI show here once your loan is approved.",
   "cardNotStarted": "Start an application and your details show here.",
-  "statusInProgress": "In progress"
+  "statusInProgress": "In progress",
+  "appScoreTitle": "Application score",
+  "appScoreNote": "From our scorecard, out of 900",
+  "bandLow": "Below our limit",
+  "bandCheck": "Needs a check",
+  "bandGood": "Good",
+  "bandExcellent": "Excellent",
+  "whyManual": "Why it needs a manual check",
+  "pendingManual": "Pending manual verification",
+  "whatWentWell": "What went well",
+  "cardAddDetails": "Add your details and they show here.",
+  "scoreProvisional": "Provisional",
+  "appScoreProvisional": "Worked out without your credit report. An officer confirms it once the report is pulled.",
+  "docCreditReport": "Credit report",
+  "docOptional": "Optional",
+  "creditReportBody": "No credit bureau is connected yet. Upload your free credit report from CIBIL, Experian, Equifax or CRIF (less than 3 months old) and we'll use its score. An officer confirms it with the bureau before sanction.",
+  "creditReportOld": "This credit report is more than 3 months old, or its date can't be read. Download a new one and upload it.",
+  "creditFromReport": "From your {bureau} report. An officer confirms it with the bureau.",
+  "@creditFromReport": {
+    "placeholders": {
+      "bureau": {
+        "type": "String"
+      }
+    }
+  },
+  "checkNotPulled": "Not pulled yet",
+  "fieldBureau": "Bureau",
+  "fieldReportDate": "Report date"
 }

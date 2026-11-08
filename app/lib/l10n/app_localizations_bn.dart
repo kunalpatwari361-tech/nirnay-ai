@@ -1347,4 +1347,69 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get statusInProgress => 'চলছে';
+
+  @override
+  String get appScoreTitle => 'আবেদনের স্কোর';
+
+  @override
+  String get appScoreNote => 'আমাদের স্কোরকার্ড থেকে, 900-এর মধ্যে';
+
+  @override
+  String get bandLow => 'আমাদের সীমার নিচে';
+
+  @override
+  String get bandCheck => 'যাচাই দরকার';
+
+  @override
+  String get bandGood => 'ভালো';
+
+  @override
+  String get bandExcellent => 'চমৎকার';
+
+  @override
+  String get whyManual => 'কেন ম্যানুয়াল যাচাই দরকার';
+
+  @override
+  String get pendingManual => 'ম্যানুয়াল যাচাই বাকি';
+
+  @override
+  String get whatWentWell => 'কী ভালো হয়েছে';
+
+  @override
+  String get cardAddDetails => 'আপনার বিবরণ দিন, তা এখানে দেখা যাবে।';
+
+  @override
+  String get scoreProvisional => 'অস্থায়ী';
+
+  @override
+  String get appScoreProvisional =>
+      'আপনার ক্রেডিট রিপোর্ট ছাড়া হিসাব করা। রিপোর্ট আনা হলে একজন আধিকারিক এটি নিশ্চিত করবেন।';
+
+  @override
+  String get docCreditReport => 'ক্রেডিট রিপোর্ট';
+
+  @override
+  String get docOptional => 'ঐচ্ছিক';
+
+  @override
+  String get creditReportBody =>
+      'এখনও কোনো ক্রেডিট ব্যুরো যুক্ত নেই। CIBIL, Experian, Equifax বা CRIF থেকে আপনার বিনামূল্যের ক্রেডিট রিপোর্ট (3 মাসের কম পুরোনো) আপলোড করুন, আমরা তার স্কোর ব্যবহার করব। অনুমোদনের আগে একজন আধিকারিক ব্যুরোর সঙ্গে এটি নিশ্চিত করবেন।';
+
+  @override
+  String get creditReportOld =>
+      'এই ক্রেডিট রিপোর্ট 3 মাসের বেশি পুরোনো, বা এর তারিখ পড়া যায়নি। নতুন রিপোর্ট ডাউনলোড করে আপলোড করুন।';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'আপনার $bureau রিপোর্ট থেকে। একজন আধিকারিক ব্যুরোর সঙ্গে এটি নিশ্চিত করবেন।';
+  }
+
+  @override
+  String get checkNotPulled => 'এখনও আনা হয়নি';
+
+  @override
+  String get fieldBureau => 'ব্যুরো';
+
+  @override
+  String get fieldReportDate => 'রিপোর্টের তারিখ';
 }

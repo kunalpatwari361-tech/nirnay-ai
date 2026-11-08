@@ -1346,4 +1346,69 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get statusInProgress => 'جاری ہے';
+
+  @override
+  String get appScoreTitle => 'درخواست کا اسکور';
+
+  @override
+  String get appScoreNote => 'ہمارے اسکور کارڈ سے، 900 میں سے';
+
+  @override
+  String get bandLow => 'ہماری حد سے کم';
+
+  @override
+  String get bandCheck => 'جانچ ضروری';
+
+  @override
+  String get bandGood => 'اچھا';
+
+  @override
+  String get bandExcellent => 'بہت اچھا';
+
+  @override
+  String get whyManual => 'دستی جانچ کیوں ضروری ہے';
+
+  @override
+  String get pendingManual => 'دستی تصدیق باقی ہے';
+
+  @override
+  String get whatWentWell => 'کیا اچھا رہا';
+
+  @override
+  String get cardAddDetails => 'اپنی تفصیلات بھریں، وہ یہاں نظر آئیں گی۔';
+
+  @override
+  String get scoreProvisional => 'عارضی';
+
+  @override
+  String get appScoreProvisional =>
+      'آپ کی کریڈٹ رپورٹ کے بغیر نکالا گیا۔ رپورٹ نکالنے کے بعد ایک افسر اس کی تصدیق کرے گا۔';
+
+  @override
+  String get docCreditReport => 'کریڈٹ رپورٹ';
+
+  @override
+  String get docOptional => 'اختیاری';
+
+  @override
+  String get creditReportBody =>
+      'ابھی کوئی کریڈٹ بیورو منسلک نہیں ہے۔ CIBIL، Experian، Equifax یا CRIF سے اپنی مفت کریڈٹ رپورٹ (3 ماہ سے کم پرانی) اپلوڈ کریں، ہم اس کا اسکور استعمال کریں گے۔ منظوری سے پہلے ایک افسر بیورو سے اس کی تصدیق کرے گا۔';
+
+  @override
+  String get creditReportOld =>
+      'یہ کریڈٹ رپورٹ 3 ماہ سے پرانی ہے، یا اس کی تاریخ پڑھی نہیں جا سکی۔ نئی رپورٹ ڈاؤن لوڈ کر کے اپلوڈ کریں۔';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'آپ کی $bureau رپورٹ سے۔ ایک افسر بیورو سے اس کی تصدیق کرے گا۔';
+  }
+
+  @override
+  String get checkNotPulled => 'ابھی نہیں نکالی گئی';
+
+  @override
+  String get fieldBureau => 'بیورو';
+
+  @override
+  String get fieldReportDate => 'رپورٹ کی تاریخ';
 }

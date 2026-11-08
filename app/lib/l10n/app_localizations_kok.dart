@@ -1344,4 +1344,69 @@ class AppLocalizationsKok extends AppLocalizations {
 
   @override
   String get statusInProgress => 'चालू आसा';
+
+  @override
+  String get appScoreTitle => 'अर्जाचो स्कोअर';
+
+  @override
+  String get appScoreNote => 'आमच्या स्कोअरकार्डांतल्यान, 900 तल्यान';
+
+  @override
+  String get bandLow => 'आमच्या मर्यादेपरस उणो';
+
+  @override
+  String get bandCheck => 'तपासणी गरजेची';
+
+  @override
+  String get bandGood => 'बरो';
+
+  @override
+  String get bandExcellent => 'उत्कृश्ट';
+
+  @override
+  String get whyManual => 'मॅन्युअल तपासणी कित्याक गरजेची';
+
+  @override
+  String get pendingManual => 'मॅन्युअल तपासणी उरल्या';
+
+  @override
+  String get whatWentWell => 'कितें बरें जालें';
+
+  @override
+  String get cardAddDetails => 'तुमचो तपशील भरात, तो हांगा दिसतलो।';
+
+  @override
+  String get scoreProvisional => 'तात्पुरतो';
+
+  @override
+  String get appScoreProvisional =>
+      'तुमच्या क्रेडिट रिपोर्टाबगर काडला. रिपोर्ट काडल्या उपरांत एक अधिकारी ताची खात्री करतलो।';
+
+  @override
+  String get docCreditReport => 'क्रेडिट रिपोर्ट';
+
+  @override
+  String get docOptional => 'पर्यायी';
+
+  @override
+  String get creditReportBody =>
+      'अजून खंयचोच क्रेडिट ब्युरो जोडूंक ना. CIBIL, Experian, Equifax वा CRIF कडल्यान तुमचो मोफत क्रेडिट रिपोर्ट (3 म्हयन्यां परस उणो पोरनो) अपलोड करात, आमी ताचो स्कोर वापरतले. मंजुरे आदीं एक अधिकारी ब्युरोकडेन ताची खात्री करतलो.';
+
+  @override
+  String get creditReportOld =>
+      'हो क्रेडिट रिपोर्ट 3 म्हयन्यां परस पोरनो, वा ताची तारीख वाचूंक मेळूंक ना. नवो रिपोर्ट डाउनलोड करून अपलोड करात.';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'तुमच्या $bureau रिपोर्टांतल्यान. एक अधिकारी ब्युरोकडेन ताची खात्री करतलो.';
+  }
+
+  @override
+  String get checkNotPulled => 'अजून काडूंक ना';
+
+  @override
+  String get fieldBureau => 'ब्युरो';
+
+  @override
+  String get fieldReportDate => 'रिपोर्टाची तारीख';
 }

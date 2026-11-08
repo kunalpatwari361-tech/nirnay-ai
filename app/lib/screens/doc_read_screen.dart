@@ -50,7 +50,9 @@ class _DocReadScreenState extends State<DocReadScreen> with SingleTickerProvider
             ? t.docVerified(seen == null ? asked : docName(t, seen))
             : r.reasonCode == 'R-DOC-02'
                 ? t.docUnreadable
-                : t.docWrong(asked);
+                : r.reasonCode == 'R-DOC-06'
+                    ? t.creditReportOld
+                    : t.docWrong(asked);
 
     return Scaffold(
       appBar: AppBar(
@@ -235,6 +237,9 @@ class _DocReadScreenState extends State<DocReadScreen> with SingleTickerProvider
         'year' => t.fieldYear,
         'income' => t.fieldIncome,
         'business' => t.fieldBusiness,
+        'score' => t.factorBureau,
+        'bureau' => t.fieldBureau,
+        'reportDate' => t.fieldReportDate,
         _ => null,
       };
 }

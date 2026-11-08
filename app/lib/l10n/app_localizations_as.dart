@@ -1344,4 +1344,69 @@ class AppLocalizationsAs extends AppLocalizations {
 
   @override
   String get statusInProgress => 'চলি আছে';
+
+  @override
+  String get appScoreTitle => 'আবেদনৰ স্ক\'ৰ';
+
+  @override
+  String get appScoreNote => 'আমাৰ স্ক\'ৰকাৰ্ডৰ পৰা, 900 ৰ ভিতৰত';
+
+  @override
+  String get bandLow => 'আমাৰ সীমাৰ তলত';
+
+  @override
+  String get bandCheck => 'পৰীক্ষা লাগিব';
+
+  @override
+  String get bandGood => 'ভাল';
+
+  @override
+  String get bandExcellent => 'উৎকৃষ্ট';
+
+  @override
+  String get whyManual => 'কিয় মেনুৱেল পৰীক্ষা লাগিব';
+
+  @override
+  String get pendingManual => 'মেনুৱেল পৰীক্ষা বাকী';
+
+  @override
+  String get whatWentWell => 'কি ভাল হ\'ল';
+
+  @override
+  String get cardAddDetails => 'আপোনাৰ বিৱৰণ দিয়ক, সেয়া ইয়াত দেখা যাব।';
+
+  @override
+  String get scoreProvisional => 'অস্থায়ী';
+
+  @override
+  String get appScoreProvisional =>
+      'আপোনাৰ ক্ৰেডিট ৰিপ\'ৰ্ট অবিহনে হিচাপ কৰা। ৰিপ\'ৰ্ট অনাৰ পিছত এজন বিষয়াই ইয়াক নিশ্চিত কৰিব।';
+
+  @override
+  String get docCreditReport => 'ক্ৰেডিট ৰিপ\'ৰ্ট';
+
+  @override
+  String get docOptional => 'ঐচ্ছিক';
+
+  @override
+  String get creditReportBody =>
+      'এতিয়াও কোনো ক্ৰেডিট ব্যুৰো সংযোগ হোৱা নাই। CIBIL, Experian, Equifax বা CRIFৰ পৰা আপোনাৰ বিনামূলীয়া ক্ৰেডিট ৰিপ\'ৰ্ট (3 মাহতকৈ কম পুৰণি) আপলোড কৰক, আমি তাৰ স্ক\'ৰ ব্যৱহাৰ কৰিম। অনুমোদনৰ আগতে এজন বিষয়াই ব্যুৰোৰ সৈতে ইয়াক নিশ্চিত কৰিব।';
+
+  @override
+  String get creditReportOld =>
+      'এই ক্ৰেডিট ৰিপ\'ৰ্ট 3 মাহতকৈ পুৰণি, বা ইয়াৰ তাৰিখ পঢ়িব পৰা নগ\'ল। নতুন ৰিপ\'ৰ্ট ডাউনল\'ড কৰি আপলোড কৰক।';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'আপোনাৰ $bureau ৰিপ\'ৰ্টৰ পৰা। এজন বিষয়াই ব্যুৰোৰ সৈতে ইয়াক নিশ্চিত কৰিব।';
+  }
+
+  @override
+  String get checkNotPulled => 'এতিয়াও অনা হোৱা নাই';
+
+  @override
+  String get fieldBureau => 'ব্যুৰো';
+
+  @override
+  String get fieldReportDate => 'ৰিপ\'ৰ্টৰ তাৰিখ';
 }

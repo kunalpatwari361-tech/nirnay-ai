@@ -11,6 +11,7 @@ import '../state.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 import '../widgets/consent_sheet.dart';
+import '../widgets/score_meter.dart';
 
 const grievanceOfficer = ('Anita Rao', 'grievance@nirnay.example'); // fictional, for the demo
 
@@ -91,48 +92,62 @@ class DecisionScreen extends StatelessWidget {
               ],
             ),
           ),
-          if (positives.isNotEmpty) ...[
+          // The two meters: the bureau's score and our application score (model 1's scorecard).
+          if (d.credit != null || d.score != null) ...[
             const SizedBox(height: 20),
-            SectionTitle(t.whyOffer),
-            SectionCard(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-              child: Column(children: [for (final r in positives) CheckRow(ok: true, label: reasonText(t, r, lang))]),
-            ),
+            SectionTitle(t.yourScores),
+            _Meters(credit: d.credit, score: d.score),
           ],
-          if (negatives.isNotEmpty) ...[
-            const SizedBox(height: 20),
-            SectionTitle(d.outcome == Outcome.reject ? t.whyRejected : t.whyReferred),
+          // Why: the reasons, grouped by the outcome they led to.
+          const SizedBox(height: 20),
+          SectionTitle(switch (d.outcome) {
+            Outcome.approve => t.whyOffer,
+            Outcome.refer => t.whyManual,
+            Outcome.reject => t.whyRejected,
+          }),
+          if (d.outcome == Outcome.approve)
             SectionCard(
+              key: const Key('reasons-approve'),
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+              child: Column(
+                children: [
+                  for (final r in positives) CheckRow(ok: true, label: reasonText(t, r, lang)),
+                  for (final r in negatives) _ReasonRow(text: reasonText(t, r, lang), tone: Tone.info),
+                ],
+              ),
+            )
+          else ...[
+            SectionCard(
+              key: Key('reasons-${d.outcome.name}'),
               tone: tone,
               padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (final r in negatives)
-                    // The reason code itself (for example R-FRD-03) is for staff only: it is not shown to the
-                    // customer, so a fraud check is never revealed.
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(Icons.info_outline, color: tone.ink, size: 20),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(reasonText(t, r, lang), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, height: 1.35)),
-                          ),
-                        ],
-                      ),
-                    ),
+                  if (d.outcome == Outcome.refer) ...[
+                    Pill(t.pendingManual, tone: tone),
+                    const SizedBox(height: 10),
+                  ],
+                  // The reason code itself (for example R-FRD-03) is for staff only: it is not shown to the
+                  // customer, so a fraud check is never revealed.
+                  for (final r in negatives) _ReasonRow(text: reasonText(t, r, lang), tone: tone),
                   Text(d.outcome == Outcome.reject ? t.rejectBody : t.referBody, style: const TextStyle(fontSize: 12.5, color: C.muted, height: 1.4)),
                 ],
               ),
             ),
+            if (positives.isNotEmpty) ...[
+              const SizedBox(height: 20),
+              SectionTitle(t.whatWentWell),
+              SectionCard(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                child: Column(children: [for (final r in positives) CheckRow(ok: true, label: reasonText(t, r, lang))]),
+              ),
+            ],
           ],
-          if (d.credit != null || d.verification != null) ...[
+          if (d.verification != null) ...[
             const SizedBox(height: 20),
-            SectionTitle(t.yourScores),
-            _Scores(credit: d.credit, verification: d.verification),
+            SectionTitle(t.verificationTitle),
+            _Verification(verification: d.verification!),
           ],
           if (d.score != null) ...[
             const SizedBox(height: 20),
@@ -325,92 +340,121 @@ class DecisionScreen extends StatelessWidget {
   }
 }
 
-/// The credit bureau's score, and the score after the documents were verified (the lowest
-/// document's), with each document's score below.
-class _Scores extends StatelessWidget {
-  const _Scores({this.credit, this.verification});
+/// The credit meter (the bureau's score) and the application meter (model 1's scorecard score
+/// with its grade), side by side, with the bands' key below.
+class _Meters extends StatelessWidget {
+  const _Meters({this.credit, this.score});
   final CreditScore? credit;
-  final VerificationScore? verification;
+  final ScoreBreakdown? score;
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final c = credit?.score;
-    final v = verification?.score;
-    final docs = verification?.documents ?? const <DocSlot, int>{};
-    Tone docTone(int x) => x >= 80 ? Tone.good : x > 10 ? Tone.warn : Tone.bad;
+    final s = score;
+    final meters = <Widget>[
+      ScoreMeter(
+        key: const Key('credit-score'),
+        title: t.factorBureau,
+        score: c,
+        caption: c != null && credit!.fromApplicantReport
+            ? t.creditFromReport(credit!.bureau ?? t.docCreditReport)
+            : c != null
+                ? t.scoreOutOf
+                : credit?.status == 'no_history'
+                    ? t.creditNoHistory
+                    : t.creditNotPulled,
+      ),
+      if (s != null)
+        ScoreMeter(
+          key: const Key('app-score'),
+          title: t.appScoreTitle,
+          score: s.score,
+          caption: s.provisional ? t.appScoreProvisional : t.appScoreNote,
+          badge: s.provisional ? t.scoreProvisional : t.gradeLabel(s.grade),
+          provisional: s.provisional,
+        ),
+    ];
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                child: _ScoreTile(
-                  key: const Key('credit-score'),
-                  title: t.factorBureau,
-                  value: c == null ? '—' : '$c',
-                  note: c != null ? t.scoreOutOf : credit?.status == 'no_history' ? t.creditNoHistory : t.creditNotPulled,
-                  tone: c == null ? Tone.warn : c >= 700 ? Tone.good : Tone.warn,
-                ),
-              ),
+              Expanded(child: meters.first),
               const SizedBox(width: 10),
-              Expanded(
-                child: _ScoreTile(
-                  key: const Key('verification-score'),
-                  title: t.verificationTitle,
-                  value: v == null ? '—' : '$v',
-                  note: t.verificationFrom,
-                  tone: v == null ? Tone.info : docTone(v),
-                ),
-              ),
+              Expanded(child: meters.length > 1 ? meters.last : const SizedBox()),
             ],
           ),
         ),
-        if (docs.isNotEmpty) ...[
-          const SizedBox(height: 10),
-          SectionCard(
-            padding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
-            child: Column(
-              children: [
-                for (final e in docs.entries)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      children: [
-                        Expanded(child: Text(docName(t, e.key), style: const TextStyle(fontSize: 13.5))),
-                        Text('${e.value}/100', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: docTone(e.value).ink)),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
+        const SizedBox(height: 10),
+        const ScoreBandKey(),
       ],
     );
   }
 }
 
-class _ScoreTile extends StatelessWidget {
-  const _ScoreTile({super.key, required this.title, required this.value, required this.note, required this.tone});
-  final String title, value, note;
+/// One reason, with an icon in the outcome's colour.
+class _ReasonRow extends StatelessWidget {
+  const _ReasonRow({required this.text, required this.tone});
+  final String text;
   final Tone tone;
 
   @override
-  Widget build(BuildContext context) => SectionCard(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-        child: Column(
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: C.muted)),
-            const SizedBox(height: 4),
-            Text(value, style: serif(30).copyWith(color: tone.ink)),
-            const SizedBox(height: 2),
-            Text(note, style: const TextStyle(fontSize: 12, color: C.muted, height: 1.3)),
+            Icon(Icons.info_outline, color: tone.ink, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(text, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, height: 1.35)),
+            ),
           ],
         ),
       );
+}
+
+/// The score after the documents were verified (the lowest document's), with each document's score.
+class _Verification extends StatelessWidget {
+  const _Verification({required this.verification});
+  final VerificationScore verification;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final v = verification.score;
+    Tone docTone(int x) => x >= 80 ? Tone.good : x > 10 ? Tone.warn : Tone.bad;
+    return SectionCard(
+      key: const Key('verification-score'),
+      padding: EdgeInsets.fromLTRB(14, 12, 14, verification.documents.isEmpty ? 12 : 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(v == null ? '—' : '$v', style: serif(30).copyWith(color: v == null ? C.muted : docTone(v).ink)),
+              const SizedBox(width: 10),
+              Expanded(child: Text(t.verificationFrom, style: const TextStyle(fontSize: 12.5, color: C.muted, height: 1.3))),
+            ],
+          ),
+          if (verification.documents.isNotEmpty) const Divider(height: 16),
+          for (final e in verification.documents.entries)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(child: Text(docName(t, e.key), style: const TextStyle(fontSize: 13.5))),
+                  Text('${e.value}/100', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: docTone(e.value).ink)),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }
 
 /// How model 1 (the credit scorecard) reached the score: start, points per factor, score and grade.
@@ -440,7 +484,7 @@ class _ScorePanel extends StatelessWidget {
               Text('${score.score}', style: serif(30)),
               const SizedBox(width: 8),
               Expanded(child: Text(t.scoreOutOf, style: const TextStyle(fontSize: 13, color: C.muted))),
-              Pill(t.gradeLabel(score.grade), tone: good ? Tone.good : Tone.warn),
+              Pill(score.provisional ? t.scoreProvisional : t.gradeLabel(score.grade), tone: score.provisional ? Tone.info : (good ? Tone.good : Tone.warn)),
             ],
           ),
           const SizedBox(height: 6),

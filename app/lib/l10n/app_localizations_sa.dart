@@ -1350,4 +1350,69 @@ class AppLocalizationsSa extends AppLocalizations {
 
   @override
   String get statusInProgress => 'प्रचलति';
+
+  @override
+  String get appScoreTitle => 'आवेदनाङ्कः';
+
+  @override
+  String get appScoreNote => 'अस्माकम् अङ्कपत्रात्, 900 मध्ये';
+
+  @override
+  String get bandLow => 'अस्माकं सीमायाः न्यूनम्';
+
+  @override
+  String get bandCheck => 'परीक्षणम् आवश्यकम्';
+
+  @override
+  String get bandGood => 'उत्तमम्';
+
+  @override
+  String get bandExcellent => 'अत्युत्तमम्';
+
+  @override
+  String get whyManual => 'हस्तपरीक्षणं किमर्थम् आवश्यकम्';
+
+  @override
+  String get pendingManual => 'हस्तपरीक्षणम् अवशिष्टम्';
+
+  @override
+  String get whatWentWell => 'किं सम्यक् अभवत्';
+
+  @override
+  String get cardAddDetails => 'स्वस्य विवरणं पूरयतु, तत् अत्र दृश्यते।';
+
+  @override
+  String get scoreProvisional => 'अस्थायि';
+
+  @override
+  String get appScoreProvisional =>
+      'भवतः क्रेडिट-प्रतिवेदनं विना गणितम्। प्रतिवेदने आनीते एकः अधिकारी एतत् निश्चिनोति।';
+
+  @override
+  String get docCreditReport => 'क्रेडिट-प्रतिवेदनम्';
+
+  @override
+  String get docOptional => 'वैकल्पिकम्';
+
+  @override
+  String get creditReportBody =>
+      'अद्यापि किमपि क्रेडिट-ब्यूरो न संयोजितम्। CIBIL, Experian, Equifax अथवा CRIF तः स्वस्य निःशुल्कं क्रेडिट-प्रतिवेदनं (मासत्रयात् न्यूनं पुरातनम्) उपारोपयतु, वयं तस्य अङ्कं प्रयोक्ष्यामः। स्वीकृतेः पूर्वं एकः अधिकारी ब्यूरो-द्वारा एतत् निश्चिनोति।';
+
+  @override
+  String get creditReportOld =>
+      'एतत् क्रेडिट-प्रतिवेदनं मासत्रयात् अधिकं पुरातनम्, अथवा अस्य दिनाङ्कः पठितुं न शक्तः। नूतनं प्रतिवेदनम् अवतार्य उपारोपयतु।';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'भवतः $bureau प्रतिवेदनात्। एकः अधिकारी ब्यूरो-द्वारा एतत् निश्चिनोति।';
+  }
+
+  @override
+  String get checkNotPulled => 'अद्यापि न आनीतम्';
+
+  @override
+  String get fieldBureau => 'ब्यूरो';
+
+  @override
+  String get fieldReportDate => 'प्रतिवेदन-दिनाङ्कः';
 }

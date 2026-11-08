@@ -311,8 +311,14 @@ Decision decisionFromJson(Map<String, dynamic> j) {
   );
 }
 
-CreditScore? _credit(Map<String, dynamic>? c) =>
-    c == null ? null : CreditScore(score: (c['score'] as num?)?.toInt(), status: c['status'] as String?);
+CreditScore? _credit(Map<String, dynamic>? c) => c == null
+    ? null
+    : CreditScore(
+        score: (c['score'] as num?)?.toInt(),
+        status: c['status'] as String?,
+        bureau: c['bureau'] as String?,
+        reportDate: c['reportDate'] as String?,
+      );
 
 VerificationScore? _verified(Map<String, dynamic>? v) => v == null
     ? null
@@ -344,6 +350,7 @@ ScoreBreakdown? _score(Map<String, dynamic>? s) => s == null
         score: (s['score'] as num).toInt(),
         grade: s['grade'] as String,
         base: (s['base'] as num).toInt(),
+        provisional: s['provisional'] == true,
         factors: [
           for (final f in s['factors'] as List)
             ScoreFactor(input: f['input'] as String, bin: '${f['bin']}', points: (f['points'] as num).toInt()),

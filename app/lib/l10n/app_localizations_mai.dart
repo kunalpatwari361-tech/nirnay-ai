@@ -1341,4 +1341,69 @@ class AppLocalizationsMai extends AppLocalizations {
 
   @override
   String get statusInProgress => 'चलि रहल अछि';
+
+  @override
+  String get appScoreTitle => 'आवेदन स्कोर';
+
+  @override
+  String get appScoreNote => 'हमर स्कोरकार्ड सँ, 900 मे सँ';
+
+  @override
+  String get bandLow => 'हमर सीमा सँ कम';
+
+  @override
+  String get bandCheck => 'जाँच आवश्यक';
+
+  @override
+  String get bandGood => 'नीक';
+
+  @override
+  String get bandExcellent => 'बहुत नीक';
+
+  @override
+  String get whyManual => 'मैनुअल जाँच किएक आवश्यक अछि';
+
+  @override
+  String get pendingManual => 'मैनुअल जाँच बाँकी';
+
+  @override
+  String get whatWentWell => 'की नीक रहल';
+
+  @override
+  String get cardAddDetails => 'अपन विवरण भरू, ओ एतए देखाएत।';
+
+  @override
+  String get scoreProvisional => 'अस्थायी';
+
+  @override
+  String get appScoreProvisional =>
+      'अहाँक क्रेडिट रिपोर्टक बिना निकालल गेल। रिपोर्ट निकललाक बाद एकटा अधिकारी एकर पुष्टि करताह।';
+
+  @override
+  String get docCreditReport => 'क्रेडिट रिपोर्ट';
+
+  @override
+  String get docOptional => 'वैकल्पिक';
+
+  @override
+  String get creditReportBody =>
+      'एखन धरि कोनो क्रेडिट ब्यूरो जुड़ल नहि अछि। CIBIL, Experian, Equifax वा CRIF सँ अपन मुफ्त क्रेडिट रिपोर्ट (3 मास सँ कम पुरान) अपलोड करू, हम ओकर स्कोर उपयोग करब। मंजूरी सँ पहिने एकटा अधिकारी ब्यूरो सँ एकर पुष्टि करताह।';
+
+  @override
+  String get creditReportOld =>
+      'ई क्रेडिट रिपोर्ट 3 मास सँ पुरान अछि, वा एकर तारीख नहि पढ़ल जा सकल। नव रिपोर्ट डाउनलोड कऽ अपलोड करू।';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'अहाँक $bureau रिपोर्ट सँ। एकटा अधिकारी ब्यूरो सँ एकर पुष्टि करताह।';
+  }
+
+  @override
+  String get checkNotPulled => 'एखन धरि नहि निकालल गेल';
+
+  @override
+  String get fieldBureau => 'ब्यूरो';
+
+  @override
+  String get fieldReportDate => 'रिपोर्टक तारीख';
 }

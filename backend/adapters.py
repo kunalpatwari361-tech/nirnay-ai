@@ -38,7 +38,8 @@ def credit_inputs(profile: dict, loan: float, property_value: float, today: date
     b = profile["bureau"]
     return {
         "bureau_score": b.get("score") or 0,
-        "bureau_status": b.get("status", "scored"),
+        # The score on the applicant's own report is the bureau's score, so it counts as scored.
+        "bureau_status": "scored" if b.get("status") == "applicant_report" else b.get("status", "scored"),
         "credit_history_years": b.get("history_years"),
         "loan_amount": None,           # vehicle-loan scale only; see the module notes
         "ltv": round(100 * loan / property_value, 2) if property_value else None,
@@ -57,8 +58,9 @@ def anomaly_inputs(profile: dict, loan: float, property_value: float, today: dat
     b = profile["bureau"]
     # A self-declared score comes without the bureau's account list, so to the detector it
     # would look like "a score with no loans", which its integrity rules call impossible.
-    # The detector checks bureau records for consistency, so it only gets a pulled score.
-    score = 0 if b.get("status") == "self_declared" else (b.get("score") or 0)
+    # The detector checks bureau records for consistency, so it only gets a pulled score. A score
+    # read from the applicant's own report also comes without the account list.
+    score = 0 if b.get("status") in ("self_declared", "applicant_report") else (b.get("score") or 0)
     return {
         "loan_amount": round(loan * AMOUNT_SCALE),
         "asset_cost": round(property_value * AMOUNT_SCALE),

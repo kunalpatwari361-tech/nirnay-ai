@@ -1350,4 +1350,69 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get statusInProgress => 'ಪ್ರಗತಿಯಲ್ಲಿದೆ';
+
+  @override
+  String get appScoreTitle => 'ಅರ್ಜಿ ಸ್ಕೋರ್';
+
+  @override
+  String get appScoreNote => 'ನಮ್ಮ ಸ್ಕೋರ್‌ಕಾರ್ಡ್‌ನಿಂದ, 900 ರಲ್ಲಿ';
+
+  @override
+  String get bandLow => 'ನಮ್ಮ ಮಿತಿಗಿಂತ ಕಡಿಮೆ';
+
+  @override
+  String get bandCheck => 'ಪರಿಶೀಲನೆ ಬೇಕು';
+
+  @override
+  String get bandGood => 'ಉತ್ತಮ';
+
+  @override
+  String get bandExcellent => 'ಅತ್ಯುತ್ತಮ';
+
+  @override
+  String get whyManual => 'ಮ್ಯಾನುವಲ್ ಪರಿಶೀಲನೆ ಏಕೆ ಬೇಕು';
+
+  @override
+  String get pendingManual => 'ಮ್ಯಾನುವಲ್ ಪರಿಶೀಲನೆ ಬಾಕಿ ಇದೆ';
+
+  @override
+  String get whatWentWell => 'ಯಾವುದು ಚೆನ್ನಾಗಿತ್ತು';
+
+  @override
+  String get cardAddDetails => 'ನಿಮ್ಮ ವಿವರಗಳನ್ನು ತುಂಬಿ, ಅವು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.';
+
+  @override
+  String get scoreProvisional => 'ತಾತ್ಕಾಲಿಕ';
+
+  @override
+  String get appScoreProvisional =>
+      'ನಿಮ್ಮ ಕ್ರೆಡಿಟ್ ವರದಿ ಇಲ್ಲದೆ ಲೆಕ್ಕ ಹಾಕಲಾಗಿದೆ. ವರದಿ ತೆಗೆದ ನಂತರ ಒಬ್ಬ ಅಧಿಕಾರಿ ಇದನ್ನು ಖಚಿತಪಡಿಸುತ್ತಾರೆ.';
+
+  @override
+  String get docCreditReport => 'ಕ್ರೆಡಿಟ್ ವರದಿ';
+
+  @override
+  String get docOptional => 'ಐಚ್ಛಿಕ';
+
+  @override
+  String get creditReportBody =>
+      'ಇನ್ನೂ ಯಾವುದೇ ಕ್ರೆಡಿಟ್ ಬ್ಯೂರೋ ಸಂಪರ್ಕವಾಗಿಲ್ಲ. CIBIL, Experian, Equifax ಅಥವಾ CRIF ನಿಂದ ನಿಮ್ಮ ಉಚಿತ ಕ್ರೆಡಿಟ್ ವರದಿಯನ್ನು (3 ತಿಂಗಳಿಗಿಂತ ಕಡಿಮೆ ಹಳೆಯದು) ಅಪ್‌ಲೋಡ್ ಮಾಡಿ, ನಾವು ಅದರ ಸ್ಕೋರ್ ಬಳಸುತ್ತೇವೆ. ಮಂಜೂರಾತಿಗೆ ಮೊದಲು ಒಬ್ಬ ಅಧಿಕಾರಿ ಬ್ಯೂರೋ ಜೊತೆ ಇದನ್ನು ಖಚಿತಪಡಿಸುತ್ತಾರೆ.';
+
+  @override
+  String get creditReportOld =>
+      'ಈ ಕ್ರೆಡಿಟ್ ವರದಿ 3 ತಿಂಗಳಿಗಿಂತ ಹಳೆಯದು, ಅಥವಾ ಅದರ ದಿನಾಂಕ ಓದಲಾಗಲಿಲ್ಲ. ಹೊಸ ವರದಿಯನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'ನಿಮ್ಮ $bureau ವರದಿಯಿಂದ. ಒಬ್ಬ ಅಧಿಕಾರಿ ಬ್ಯೂರೋ ಜೊತೆ ಇದನ್ನು ಖಚಿತಪಡಿಸುತ್ತಾರೆ.';
+  }
+
+  @override
+  String get checkNotPulled => 'ಇನ್ನೂ ತೆಗೆದಿಲ್ಲ';
+
+  @override
+  String get fieldBureau => 'ಬ್ಯೂರೋ';
+
+  @override
+  String get fieldReportDate => 'ವರದಿಯ ದಿನಾಂಕ';
 }

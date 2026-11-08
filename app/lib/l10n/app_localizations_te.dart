@@ -1353,4 +1353,69 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get statusInProgress => 'కొనసాగుతోంది';
+
+  @override
+  String get appScoreTitle => 'దరఖాస్తు స్కోర్';
+
+  @override
+  String get appScoreNote => 'మా స్కోర్‌కార్డ్ నుండి, 900 లో';
+
+  @override
+  String get bandLow => 'మా పరిమితి కంటే తక్కువ';
+
+  @override
+  String get bandCheck => 'తనిఖీ అవసరం';
+
+  @override
+  String get bandGood => 'మంచిది';
+
+  @override
+  String get bandExcellent => 'అద్భుతం';
+
+  @override
+  String get whyManual => 'మాన్యువల్ తనిఖీ ఎందుకు అవసరం';
+
+  @override
+  String get pendingManual => 'మాన్యువల్ ధృవీకరణ పెండింగ్‌లో ఉంది';
+
+  @override
+  String get whatWentWell => 'ఏవి బాగున్నాయి';
+
+  @override
+  String get cardAddDetails => 'మీ వివరాలు నింపండి, అవి ఇక్కడ కనిపిస్తాయి.';
+
+  @override
+  String get scoreProvisional => 'తాత్కాలికం';
+
+  @override
+  String get appScoreProvisional =>
+      'మీ క్రెడిట్ రిపోర్ట్ లేకుండా లెక్కించినది. రిపోర్ట్ తీసిన తర్వాత ఒక అధికారి దీన్ని నిర్ధారిస్తారు.';
+
+  @override
+  String get docCreditReport => 'క్రెడిట్ రిపోర్ట్';
+
+  @override
+  String get docOptional => 'ఐచ్ఛికం';
+
+  @override
+  String get creditReportBody =>
+      'ఇంకా ఏ క్రెడిట్ బ్యూరో అనుసంధానం కాలేదు. CIBIL, Experian, Equifax లేదా CRIF నుండి మీ ఉచిత క్రెడిట్ రిపోర్ట్‌ను (3 నెలల కంటే తక్కువ పాతది) అప్‌లోడ్ చేయండి, మేము దాని స్కోర్ ఉపయోగిస్తాము. మంజూరుకు ముందు ఒక అధికారి బ్యూరోతో దీన్ని నిర్ధారిస్తారు.';
+
+  @override
+  String get creditReportOld =>
+      'ఈ క్రెడిట్ రిపోర్ట్ 3 నెలల కంటే పాతది, లేదా దాని తేదీ చదవలేకపోయాము. కొత్త రిపోర్ట్ డౌన్‌లోడ్ చేసి అప్‌లోడ్ చేయండి.';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'మీ $bureau రిపోర్ట్ నుండి. ఒక అధికారి బ్యూరోతో దీన్ని నిర్ధారిస్తారు.';
+  }
+
+  @override
+  String get checkNotPulled => 'ఇంకా తీయలేదు';
+
+  @override
+  String get fieldBureau => 'బ్యూరో';
+
+  @override
+  String get fieldReportDate => 'రిపోర్ట్ తేదీ';
 }

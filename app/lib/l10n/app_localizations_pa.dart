@@ -1347,4 +1347,69 @@ class AppLocalizationsPa extends AppLocalizations {
 
   @override
   String get statusInProgress => 'ਜਾਰੀ ਹੈ';
+
+  @override
+  String get appScoreTitle => 'ਅਰਜ਼ੀ ਦਾ ਸਕੋਰ';
+
+  @override
+  String get appScoreNote => 'ਸਾਡੇ ਸਕੋਰਕਾਰਡ ਤੋਂ, 900 ਵਿੱਚੋਂ';
+
+  @override
+  String get bandLow => 'ਸਾਡੀ ਹੱਦ ਤੋਂ ਘੱਟ';
+
+  @override
+  String get bandCheck => 'ਜਾਂਚ ਲੋੜੀਂਦੀ';
+
+  @override
+  String get bandGood => 'ਚੰਗਾ';
+
+  @override
+  String get bandExcellent => 'ਬਹੁਤ ਵਧੀਆ';
+
+  @override
+  String get whyManual => 'ਮੈਨੂਅਲ ਜਾਂਚ ਕਿਉਂ ਲੋੜੀਂਦੀ ਹੈ';
+
+  @override
+  String get pendingManual => 'ਮੈਨੂਅਲ ਤਸਦੀਕ ਬਾਕੀ';
+
+  @override
+  String get whatWentWell => 'ਕੀ ਵਧੀਆ ਰਿਹਾ';
+
+  @override
+  String get cardAddDetails => 'ਆਪਣੇ ਵੇਰਵੇ ਭਰੋ, ਉਹ ਇੱਥੇ ਦਿਖਾਈ ਦੇਣਗੇ।';
+
+  @override
+  String get scoreProvisional => 'ਆਰਜ਼ੀ';
+
+  @override
+  String get appScoreProvisional =>
+      'ਤੁਹਾਡੀ ਕ੍ਰੈਡਿਟ ਰਿਪੋਰਟ ਤੋਂ ਬਿਨਾਂ ਕੱਢਿਆ ਗਿਆ। ਰਿਪੋਰਟ ਕੱਢਣ ਤੋਂ ਬਾਅਦ ਇੱਕ ਅਧਿਕਾਰੀ ਇਸ ਦੀ ਪੁਸ਼ਟੀ ਕਰੇਗਾ।';
+
+  @override
+  String get docCreditReport => 'ਕ੍ਰੈਡਿਟ ਰਿਪੋਰਟ';
+
+  @override
+  String get docOptional => 'ਵਿਕਲਪਿਕ';
+
+  @override
+  String get creditReportBody =>
+      'ਹਾਲੇ ਕੋਈ ਕ੍ਰੈਡਿਟ ਬਿਊਰੋ ਜੁੜਿਆ ਨਹੀਂ ਹੈ। CIBIL, Experian, Equifax ਜਾਂ CRIF ਤੋਂ ਆਪਣੀ ਮੁਫ਼ਤ ਕ੍ਰੈਡਿਟ ਰਿਪੋਰਟ (3 ਮਹੀਨਿਆਂ ਤੋਂ ਘੱਟ ਪੁਰਾਣੀ) ਅੱਪਲੋਡ ਕਰੋ, ਅਸੀਂ ਉਸ ਦਾ ਸਕੋਰ ਵਰਤਾਂਗੇ। ਮਨਜ਼ੂਰੀ ਤੋਂ ਪਹਿਲਾਂ ਇੱਕ ਅਧਿਕਾਰੀ ਬਿਊਰੋ ਨਾਲ ਇਸ ਦੀ ਪੁਸ਼ਟੀ ਕਰੇਗਾ।';
+
+  @override
+  String get creditReportOld =>
+      'ਇਹ ਕ੍ਰੈਡਿਟ ਰਿਪੋਰਟ 3 ਮਹੀਨਿਆਂ ਤੋਂ ਪੁਰਾਣੀ ਹੈ, ਜਾਂ ਇਸ ਦੀ ਤਾਰੀਖ਼ ਪੜ੍ਹੀ ਨਹੀਂ ਜਾ ਸਕੀ। ਨਵੀਂ ਰਿਪੋਰਟ ਡਾਊਨਲੋਡ ਕਰਕੇ ਅੱਪਲੋਡ ਕਰੋ।';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'ਤੁਹਾਡੀ $bureau ਰਿਪੋਰਟ ਤੋਂ। ਇੱਕ ਅਧਿਕਾਰੀ ਬਿਊਰੋ ਨਾਲ ਇਸ ਦੀ ਪੁਸ਼ਟੀ ਕਰੇਗਾ।';
+  }
+
+  @override
+  String get checkNotPulled => 'ਹਾਲੇ ਨਹੀਂ ਕੱਢੀ ਗਈ';
+
+  @override
+  String get fieldBureau => 'ਬਿਊਰੋ';
+
+  @override
+  String get fieldReportDate => 'ਰਿਪੋਰਟ ਦੀ ਤਾਰੀਖ਼';
 }

@@ -1350,4 +1350,69 @@ class AppLocalizationsNe extends AppLocalizations {
 
   @override
   String get statusInProgress => 'जारी छ';
+
+  @override
+  String get appScoreTitle => 'आवेदन स्कोर';
+
+  @override
+  String get appScoreNote => 'हाम्रो स्कोरकार्डबाट, 900 मध्ये';
+
+  @override
+  String get bandLow => 'हाम्रो सीमाभन्दा कम';
+
+  @override
+  String get bandCheck => 'जाँच आवश्यक';
+
+  @override
+  String get bandGood => 'राम्रो';
+
+  @override
+  String get bandExcellent => 'उत्कृष्ट';
+
+  @override
+  String get whyManual => 'म्यानुअल जाँच किन चाहिन्छ';
+
+  @override
+  String get pendingManual => 'म्यानुअल प्रमाणीकरण बाँकी';
+
+  @override
+  String get whatWentWell => 'के राम्रो भयो';
+
+  @override
+  String get cardAddDetails => 'आफ्नो विवरण भर्नुहोस्, त्यो यहाँ देखिन्छ।';
+
+  @override
+  String get scoreProvisional => 'अस्थायी';
+
+  @override
+  String get appScoreProvisional =>
+      'तपाईंको क्रेडिट रिपोर्टबिना निकालिएको। रिपोर्ट निकालेपछि एक अधिकारीले यसको पुष्टि गर्नुहुन्छ।';
+
+  @override
+  String get docCreditReport => 'क्रेडिट रिपोर्ट';
+
+  @override
+  String get docOptional => 'ऐच्छिक';
+
+  @override
+  String get creditReportBody =>
+      'अहिलेसम्म कुनै क्रेडिट ब्युरो जोडिएको छैन। CIBIL, Experian, Equifax वा CRIF बाट आफ्नो निःशुल्क क्रेडिट रिपोर्ट (3 महिनाभन्दा कम पुरानो) अपलोड गर्नुहोस्, हामी त्यसको स्कोर प्रयोग गर्नेछौं। स्वीकृतिअघि एक अधिकारीले ब्युरोसँग यसको पुष्टि गर्नुहुन्छ।';
+
+  @override
+  String get creditReportOld =>
+      'यो क्रेडिट रिपोर्ट 3 महिनाभन्दा पुरानो छ, वा यसको मिति पढ्न सकिएन। नयाँ रिपोर्ट डाउनलोड गरेर अपलोड गर्नुहोस्।';
+
+  @override
+  String creditFromReport(String bureau) {
+    return 'तपाईंको $bureau रिपोर्टबाट। एक अधिकारीले ब्युरोसँग यसको पुष्टि गर्नुहुन्छ।';
+  }
+
+  @override
+  String get checkNotPulled => 'अहिलेसम्म निकालिएको छैन';
+
+  @override
+  String get fieldBureau => 'ब्युरो';
+
+  @override
+  String get fieldReportDate => 'रिपोर्टको मिति';
 }

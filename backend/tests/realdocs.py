@@ -68,3 +68,17 @@ def statement(seed: str = "kavya") -> bytes:
              ("small", "This is a system generated statement.")]
     img = render.render({"kind": "page", "lines": lines}, random.Random(seed))
     return _jpeg(img)
+
+
+def credit_report(seed: str = "kavya", score: int = 772, issued: date | None = None, name: str = "KAVYA RAO",
+                  pan: str = PAN) -> bytes:
+    """The free credit report an applicant downloads from a bureau, as a photo of the first page."""
+    from models.document_classifier import render
+    issued = issued or date.today()
+    lines = [("head", "TransUnion CIBIL"), ("title", "CREDIT INFORMATION REPORT"),
+             ("kv", f"Report Date\t{issued:%d-%m-%Y}"), ("kv", f"Consumer Name\t{name}"),
+             ("kv", "Date of Birth\t19-08-1992"), ("kv", f"Income Tax ID (PAN)\t{pan}"),
+             ("sub", f"CIBIL Score {score}"),
+             ("small", "Scores range from 300 to 900. A higher score means a better credit history.")]
+    img = render.render({"kind": "page", "lines": lines}, random.Random(seed))
+    return _jpeg(img)
