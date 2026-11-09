@@ -11,7 +11,8 @@ if ($Url -notmatch '^https://[A-Za-z0-9.-]+(:\d+)?$') {
     throw "Use the server's https:// address with nothing after it, for example https://nirnay-engine.onrender.com"
 }
 Write-Host "Checking $Url/v1/health ... (a sleeping server can take a minute to wake)"
-$health = Invoke-RestMethod "$Url/v1/health" -TimeoutSec 120
+# The header skips the warning page a Microsoft dev tunnel shows to browsers (the app isn't one).
+$health = Invoke-RestMethod "$Url/v1/health" -TimeoutSec 120 -Headers @{ "X-Tunnel-Skip-AntiPhishing-Page" = "true" }
 if ($health.mode -ne "real") { throw "The engine at $Url is in '$($health.mode)' mode, not real mode." }
 Write-Host "Engine:   $($health.engine), database $($health.database), SMS $($health.sms)"
 if ($health.database -ne "postgresql") { Write-Warning "The database isn't PostgreSQL: applications are lost when the server restarts." }

@@ -74,7 +74,27 @@ The engine needs about **1 GB of memory**, so use the **Standard** plan (2 GB). 
 
 **Other hosts:** the same image runs anywhere that runs Docker with 2 GB of memory, such as Railway, Fly.io or a VPS. Set the same variables. Run a single instance, because the engine also keeps applications in memory.
 
-**Free option:** a Hugging Face Space with the Docker SDK has 16 GB of memory. Set `app_port: 8000` in the Space's README, add the variables as Space secrets, and push `backend/`, `models/` and `app/lib/l10n/` with the Dockerfile at the Space's root. It sleeps after 48 hours without visits and takes about a minute to wake.
+**Hugging Face:** Docker Spaces on the free CPU hardware now need a PRO subscription (Nov 2026), so they aren't a free option any more. Free hosts with 512 MB of memory (Render Free, Koyeb) are too small: the engine peaks at about 1.1 GB.
+
+## 3a. Free: this laptop and a Microsoft dev tunnel
+
+The engine runs on this laptop and a [Microsoft dev tunnel](https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/) gives it a fixed https address. It costs nothing, but the app works only while the laptop is on and both windows below are running. Applications are kept in `backend\var\real\nirnay.db` (or Supabase, if `DATABASE_URL` is set), so they survive restarts. ngrok isn't used because Windows Defender blocks it.
+
+1. Get `devtunnel.exe` from Microsoft (https://aka.ms/TunnelsCliDownload/win-x64) into `K:\tools\devtunnel\`, and sign in once with GitHub: `devtunnel user login -g -d` (enter the code it shows at github.com/login/device).
+2. Once only, make a saved tunnel, open to the app, for port 8002. A saved tunnel keeps its address; it's deleted after 30 days without use.
+   ```powershell
+   devtunnel create nirnay-engine -a --expiration 30d
+   devtunnel port create nirnay-engine -p 8002 --protocol http
+   ```
+3. Each time, start the engine and the tunnel, each in its own window:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File backend\run-local-real.ps1 -Twilio -Port 8002
+   ```
+   ```powershell
+   devtunnel host nirnay-engine
+   ```
+   The second prints the address, for example `https://<id>-8002.inc1.devtunnels.ms`.
+4. Build the APK against that address (section 4). Browsers see a dev tunnels warning page first; the app doesn't, because it isn't a browser.
 
 ## 4. The shareable APK
 
